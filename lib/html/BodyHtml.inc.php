@@ -53,7 +53,7 @@ class BodyHtml
      * @param $sect -> single section of our article
      * @param $divPanelBody
      */
-    function sectionWriting(DOMDocument $html, Section $sect, DOMElement $divPanelBody)
+    function sectionWriting(DOMDocument $html, ArticleSection $sect, DOMElement $divPanelBody)
     {
         foreach ($sect->getContent() as $secCont) {
             if (get_class($secCont) == "ParContent" && $secCont->getType() == "paragraph") {

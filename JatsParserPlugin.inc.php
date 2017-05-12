@@ -130,8 +130,7 @@ class JatsParserPlugin extends GenericPlugin {
 	function embedHtml($hookName, $params) {
 		$smarty =& $params[1];
 		$output =& $params[2];
-		
-		$article = $smarty->get_template_vars('article');
+		$article = $smarty->get_template_vars('publishedArticle');
 
 		foreach ($article->getGalleys() as $galley) {
 			if ($galley && in_array($galley->getFileType(), array('application/xml', 'text/xml'))) {
@@ -171,7 +170,7 @@ class JatsParserPlugin extends GenericPlugin {
         $mainJatsParser = new MainJatsParser();
 
         $html = $mainJatsParser->parsingJatsContent($document);
-		//$html = $document->saveHTML($document->documentElement);
+		$html = $html->saveHTML($html->documentElement);
 				
 		return $html;
 	}
