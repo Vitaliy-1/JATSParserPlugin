@@ -1,0 +1,610 @@
+body {
+	position: relative;
+}
+.panel-body {
+	padding-left: 0px;
+}
+
+main>div.grid-cell {
+	padding: 1px;
+}
+
+.container-fluid {
+	margin-bottom: 50px;
+}
+
+
+/* Styling article metadata */
+
+ul.author-list {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+.author-institution {
+	clear: both;
+}
+
+a.auth-name {
+	cursor: pointer;
+}
+
+
+div.article-meta span.institution {
+	display: none;
+	padding: 5px 10px 5px 15px;
+}
+
+.dates {
+	list-style-type: none;
+	padding-left: 0px;
+	margin-top: 20px;
+	font-family: albert;
+	margin-top: 30px;
+}
+
+div.article-meta span.name {
+	cursor: pointer;
+	color: #767676;
+}
+
+div.article-meta span.name:hover {
+	border-bottom: 1px solid #563d7c;
+	font-size: 15px;
+	font-style: italic;
+}
+
+div.article-meta span.affiliation {
+	display: none;
+	z-index: 5;
+	background-image: linear-gradient(to bottom,#f5f5f5 0,#e8e8e8 100%);
+	padding: 10px;
+	border-radius: 10px;
+	border: 1px solid #e7e7e7;
+	background-color: #f8f8f8;
+	font-style: italic;
+
+}
+
+div.authors-affil {
+	margin-top: 30px;
+}
+
+ul.author-list > li {
+    display: inline;
+    padding-right: 7px;
+}
+
+
+/* Sticky inarticle navigation */
+
+.fornav {
+	float: right;
+}
+
+ul.nav.nav-tabs.bs-docs-sidenav > li {
+	float: none;
+}
+
+ul.nav.nav-tabs.bs-docs-sidenav {
+    width: 300px;
+}
+
+.affix-top {
+	margin-top: 600px;
+	margin-left: 20px;
+}
+
+nav.bs-docs-sidebar.affix {
+	margin-top: 0;
+	position: fixed!important;
+	margin-left: 20px;
+}
+
+@media (max-width:991px) {
+	.fornav {
+		display: none;
+	}
+
+.container-fluid {
+	margin-bottom: 100px;
+}
+}
+
+nav > ul > li > a.H2 {
+	color: #767676;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	font-family: 'Helvetica Neue';
+	font-size: 14px;
+	margin: 0;
+}
+.nav-tabs>li.active>a.H2, .nav-tabs>li.active>a.H2:focus, .nav-tabs>li.active>a.H2:hover {
+	border: 0;
+	border-left: 1px solid #563d7c;
+	color: #563d7c;
+	font-size: 120%;
+	cursor: pointer;
+	background-color: white;
+	border-radius: 0;
+}
+
+ul#navblock.nav.nav-tabs.bs-docs-sidenav > li > a:hover {
+	background-color: white;
+	border: 0;
+	border-left: 1px solid #563d7c;
+	border-radius: 0;
+}
+
+ul.dates {
+	margin-bottom: 30px;
+}
+
+h3#abstr0 {
+	margin-top: 0;
+}
+
+/* Headings */
+
+h1 {
+	font-family: albert;
+	font-size: 23px;
+}
+
+h2 {
+	font-size: 21px;
+	font-family: 'Avenir LT W01 85 Heavy';
+	color: #6d6e70;
+	font-weight: 400;
+}
+
+h3{
+	font-size: 17px;
+}
+
+h3.subtitle {
+	color: #6d6e70;
+}
+
+
+
+/* Bootstrap tabs */
+
+.navwraper {
+	padding-left: 0;
+}
+nav.navigational-tabs>ul.nav.nav-tabs>li>a:hover {
+	background-color:  white;
+	border: 0;
+	border-top: 1px solid #563d7c;
+}
+
+.nav-tabs>li>a {
+    border-radius: 0;
+    margin-right: 0;
+}
+
+nav.navigational-tabs>ul.nav.nav-tabs>li.active>a:hover {
+    border-top: 1px solid #ececec;
+    border-left: 1px solid #ececec;
+    border-right: 1px solid #ececec;
+    border-bottom: 1px solid white;
+}
+#article {
+   border-left: 1px solid white!important;
+}
+
+nav.navigational-tabs>ul.nav.nav-tabs>li.active>a {
+    border-bottom: 1px solid white;
+    border-radius: 0;
+}
+
+@media (min-width:992px) {
+	li.mobile-navigation {
+		display: none;
+	}
+}
+
+
+/* Open Access Label */
+
+div.access-review {
+	margin-top: 20px;
+}
+
+p.license-access, p.reviewed {
+	display: inline-block;
+	font-family: albert;
+	font-size: 10px;
+	text-transform: uppercase;
+}
+
+p.license-access {
+	padding-right: 10px;
+}
+
+
+/* Pop-ups */
+
+a.ref-tip {
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+a.btn.btn-info {
+	padding: 0 6px 0 6px;
+	border: 0;
+	background: rgba(86, 61, 124, 0.1);
+	color: black;
+}
+
+div.article-text {
+	line-height: 1.6;
+}
+
+
+
+/* page width */
+
+
+.grid-cell {
+	background-color: white;
+	-webkit-box-shadow: 0px 0px 78px -8px rgba(0,0,0,0.82);
+    -moz-box-shadow: 0px 0px 78px -8px rgba(0,0,0,0.82);
+    box-shadow: 0px 0px 78px -8px #AAAAAA;
+    padding: 10px;
+    margin: 2% 13% 6% 13%;
+}
+
+#myAffix {
+	background-color: white;
+    top: 30px;
+    width: 240.703px;
+}
+
+.row.tab-content {
+
+}
+
+.forcontent {
+	background-color: white;
+	border-right: 1px solid #ececec;
+}
+
+.navwraper {
+	padding-right: 0px;
+}
+
+.article-content {
+	padding-left: 5%;
+
+}
+
+/* upper tabs navigation */
+
+.navwraper {
+	border-right: 0;
+}
+
+
+/* Tables and Figures */
+
+.tab-pane.fade.active.in > .figure-wrap {
+	margin-top: 50px;
+}
+
+table.table.table-striped.table-bordered th {
+	text-align: center;
+    color: #333;
+    vertical-align: middle;
+}
+
+table.table.table-striped.table-bordered {
+    overflow-x: auto;
+	border: none;
+	display: block;
+}
+
+@media (max-width: 767px) {
+
+table.table.table-striped.table-bordered {
+    border: none;
+    overflow-x: auto;
+    display: block;
+}
+}
+
+td {
+    color: #333;
+}
+
+table {
+    color: #333;
+}
+
+div.article-text .figure-wrap {
+	padding: 5px;
+	border-top: 1px solid #ececec;
+	border-bottom: 1px solid #ececec;
+}
+
+#figuresdata .figure-wrap {
+
+}
+
+/* Images */
+
+div.imagewrap {
+    padding-top: 10px;
+}
+
+p.comments {
+    color: #777;
+}
+
+div.fig-box {
+    color: #777;
+}
+
+div.imagewrap > img {
+    max-width: 100%
+}
+
+/* Info Panel */
+
+div#infodata > ul.author-list > li.name {
+	display: block;
+	float: none;
+}
+
+div#infodata div.institution {
+	display: block;
+	padding-left: 0;
+}
+
+div#infodata li.name {
+    padding-bottom: 20px;
+}
+
+div#infodata ul.author-list {
+	margin-top: 40px;
+}
+
+.info-auth-heading {
+    font-weight: bold;
+    font-family: 'Avenir LT W01 85 Heavy';
+	color: #6d6e70;
+	font-size: 19px;
+}
+
+#infodata div.institution {
+	color: #6d6e70;
+	font-family: Helvetica;
+}
+
+
+/* Styling citations */
+
+li.ref {
+	margin-bottom: 10px;
+}
+
+span.bib {
+	display: block;
+	margin-left: 35px;
+}
+
+span.ref-title {
+	display: block;
+	color: rgb(77, 89, 102);
+	font-size: 120%;
+
+}
+
+span.ref-auth {
+	display: block;
+	font-size: 100%;
+	color: rgba(77, 89, 102, 0.8);
+}
+
+span.ref-source {
+	display: block;
+	font-size: 90%;
+	color: rgba(77, 89, 102, 0.8);
+	font-style: italic;
+}
+
+span.ref-full {
+	display: block;
+	font-style: italic;
+}
+
+a.fulltext {
+	color: rgb(86, 61, 124);
+}
+
+body {
+   counter-reset: item;
+ }
+ ol.references {
+   list-style: none;
+   padding-left: 0;
+ }
+ li.ref {
+   counter-increment: item;
+   margin-bottom: 5px;
+ }
+ li.ref:before {
+   margin-right: 10px;
+   content: counter(item);
+   background: rgba(86, 61, 124, 0.4);
+   border-radius: 100%;
+   color: white;
+   width: 1.5em;
+   text-align: center;
+   display: inline-block;
+   float: left;
+ }
+/* For Tablets abd Mobile */
+/**************************************************************************/
+/* Collapsible accordion panels*/
+@media (min-width: 1100px) and (max-width: 1300px) {
+div.grid-cell {
+    padding: 10px;
+    margin: 2% 6% 6% 6%;
+}
+
+}
+
+@media (min-width: 992px) and (max-width: 1099px) {
+div.grid-cell {
+    padding: 10px;
+    margin: 2% 2% 6% 2%;
+}
+}
+
+@media (max-width: 991px) {
+
+h2.title {
+	font-family: arial;
+}
+
+div.panel {
+	margin-top: 20px;
+	cursor: pointer;
+}
+
+.forcontent {
+	border-right: none;
+}
+
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+.article-content {
+	padding-left: 0;
+}
+
+div.grid-cell {
+    padding: 10px;
+    margin: 2% 6% 2% 6%;
+}
+
+div.panel-body {
+	padding-left: 10px;
+}
+
+
+div.article-sections > div.panel.panel-default {
+	margin-top: 12px;
+}
+}
+
+
+@media (max-width: 767px) {
+.article-content {
+	padding-left: 0;
+}
+
+.forcontent {
+	padding: 0 5px 0 5px;
+}
+.grid-cell {
+    padding: 0;
+    margin: 0;
+}
+
+div.panel-body {
+	padding: 5px;
+	padding-left: 10px;
+}
+
+div.article-sections > div.panel.panel-default {
+	margin-top: 12px;
+}
+
+}
+
+/* Floating Main Menu */
+
+@media (max-width: 767px) {
+
+.navwraper.col-lg-7.col-md-7.col-sm-12.col-xs-12 {
+	position: relative;
+	min-height: 40px;
+}
+
+nav.navigational-tabs {
+    z-index: 2;
+    width: 100%;
+    background-color: white;
+}
+.panel {
+	border-right: 0;
+	border-left: 0;
+}
+div.section {
+	border-left: 1px solid transparent;
+	border-right: 1px solid transparent;
+}
+}
+
+/* Journal title on extra small screens */
+@media (max-width: 500px) {
+	a.navbar-brand {
+		height: 60px;
+		text-align: center;
+	}
+	.navbar-toggle {
+		margin-bottom: 0px;
+	}
+}
+
+/* Authors in infodata */
+
+div#infodata span.name {
+	display: block;
+	font-size: 20px;
+	margin-bottom: 15px;
+}
+
+div#infodata span.affiliation {
+	display: block;
+	font-size: 15px;
+	font-style: italic;
+}
+
+div#infodata ul.author-list li {
+	margin-bottom: 40px;
+}
+
+div#infodata ul.author-list {
+	margin-bottom: 70px;
+	border-bottom: 1px solid #ddd;
+}
+
+/* header site name */
+
+div.pkp_site_name_wrapper {
+	background-color: #5f5f5f;
+}
+
+.pkp_site_name {
+	text-align: center;
+	font-size: 2em;
+
+}
+
+.pkp_site_name a {
+	color: #fff;
+	font-family: arial;
+	display: inline-block;
+	font-size: 24px;
+	text-decoration: none;
+	font-weight: 700;
+	padding-top: 10px;
+	padding-bottom: 10px;
+
+}
+
