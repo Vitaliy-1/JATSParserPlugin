@@ -13,7 +13,6 @@
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.jatsParser.lib.main.MainJatsParser');
 
-
 class JatsParserPlugin extends GenericPlugin {
 	/**
 	 * Called as a plugin is registered to the registry
@@ -113,8 +112,8 @@ class JatsParserPlugin extends GenericPlugin {
 		if ($template != 'frontend/pages/article.tpl') return false;
 		
 		$templateMgr = $params[0];
-		$templateMgr->addStylesheet('embedGalley', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'psychosomatics.css');
-		$templateMgr->addJavaScript('embedGalley', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR .'psychosomatics.js');
+		//$templateMgr->addStylesheet('embedGalley', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'psychosomatics.css');
+		//$templateMgr->addJavaScript('embedGalley', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR .'psychosomatics.js');
 		
 		$templateMgr->addJavaScript('mathJax', '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=MML_HTMLorMML-full');
 		
@@ -144,17 +143,24 @@ class JatsParserPlugin extends GenericPlugin {
 		// Return false if no XML galleys available
 		if (!$xmlGalley) return false;
 
-		// getting PHP objects
-		$body = new Body();
-		
+		// Parsing JATS XML
+        $document = new DOMDocument;
+        $document->load($xmlGalley->getFile()->getFilePath());
+        $xpath = new DOMXPath($document);
 
+		$body = new Body();
+        $sections = $body->bodyParsing($xpath);
+
+        /* assigning references */
+        $back = new Back();
+        $references = $back->parsingBack($xpath);
 
 		// Parse XML to HTML		
-		$html = $this->_parseXml($xmlGalley->getFile());
+		//$html = $this->_parseXml($xmlGalley->getFile());
 
 		// Assign HTML to article template
-		$smarty->assign('html', $html);
-		
+
+        $smarty->assign('references', $references);
 		$output .= $smarty->fetch($this->getTemplatePath() . 'articleMainText.tpl');
 		
 		return false;
