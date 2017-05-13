@@ -27,7 +27,7 @@ class JatsParserPlugin extends GenericPlugin {
 		if ($success && $this->getEnabled()) {
 			
 			// TODO: how do you define a sequence for all plugins using this hook?
-			HookRegistry::register('Templates::Article::Footer::PageFooter', array($this, 'embedHtml'));
+			HookRegistry::register('Templates::Article::Main', array($this, 'embedHtml'));
 			
 			// Add stylesheet and javascript
 			HookRegistry::register('TemplateManager::display',array($this, 'displayCallback'));
@@ -128,34 +128,38 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param $params array
 	 */
 	function embedHtml($hookName, $params) {
+
 		$smarty =& $params[1];
 		$output =& $params[2];
-		$article = $smarty->get_template_vars('publishedArticle');
 
-		foreach ($article->getGalleys() as $galley) {
+        $articleArrays = $smarty->get_template_vars('article');
+
+
+		foreach ($articleArrays->getGalleys() as $galley) {
 			if ($galley && in_array($galley->getFileType(), array('application/xml', 'text/xml'))) {
 				$xmlGalley = $galley;
 			}
 		}
-		
+
 		// Return false if no XML galleys available
 		if (!$xmlGalley) return false;
+
+		// getting PHP objects
+		$body = new Body();
 		
-		$request = Application::getRequest();	
-		
+
+
 		// Parse XML to HTML		
 		$html = $this->_parseXml($xmlGalley->getFile());
-		
-		// Parse HTML image url's etc.
-		$html = $this->_parseHtmlContents($request, $html, $xmlGalley);
-		
+
 		// Assign HTML to article template
 		$smarty->assign('html', $html);
 		
-		$output .= $smarty->fetch($this->getTemplatePath() . 'articleFooter.tpl');
+		$output .= $smarty->fetch($this->getTemplatePath() . 'articleMainText.tpl');
 		
 		return false;
-		
+
+
 	}
 	/**
 	 * Return string containing the parsed HTML file.
@@ -174,43 +178,7 @@ class JatsParserPlugin extends GenericPlugin {
 				
 		return $html;
 	}
-	/**
-	 * Return string containing the parsed contents of the HTML file.
-	 * This function performs any necessary filtering, like image URL replacement.
-	 * @param $request PKPRequest
-	 * @param $galley ArticleGalley
-	 * @return string
-	 */	
-	function _parseHtmlContents($request, $contents, $galley) {
-		$journal = $request->getJournal();
-		$submissionFile = $galley->getFile();
-		// Replace media file references
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-		import('lib.pkp.classes.submission.SubmissionFile'); // Constants
-		$embeddableFiles = array_merge(
-			$submissionFileDao->getLatestRevisions($submissionFile->getSubmissionId(), SUBMISSION_FILE_PROOF),
-			$submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getFileId(), $submissionFile->getSubmissionId(), SUBMISSION_FILE_DEPENDENT)
-		);
-		$referredArticle = null;
-		$articleDao = DAORegistry::getDAO('ArticleDAO');
-		foreach ($embeddableFiles as $embeddableFile) {
-			$params = array();
-			// Ensure that the $referredArticle object refers to the article we want
-			if (!$referredArticle || $referredArticle->getId() != $galley->getSubmissionId()) {
-				$referredArticle = $articleDao->getById($galley->getSubmissionId());
-			}
-			$fileUrl = $request->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $galley->getBestGalleyId(), $embeddableFile->getFileId()), $params);
-			$pattern = preg_quote($embeddableFile->getOriginalFileName());
-			$contents = preg_replace(
-				'/([Ss][Rr][Cc]|[Hh][Rr][Ee][Ff]|[Dd][Aa][Tt][Aa])\s*=\s*"([^"]*' . $pattern . ')"/',
-				'\1="' . $fileUrl . '"',
-				$contents
-			);
-		}
-		return $contents;
-	}	
-	
-	
+
 	/**
 	 * Return string containing date
 	 * @param $text String to be formatted

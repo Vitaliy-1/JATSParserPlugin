@@ -116,7 +116,7 @@ class Back
                         $bibitemBook->setYear(trim($bookYear->nodeValue));
                     }
 
-                    self::parsingUrlDoiPmid($xpath, $elementCitation, $bibitemJournal);
+                    self::parsingUrlDoiPmid($xpath, $elementCitation, $bibitemBook);
 
                 } elseif ($elementCitation->getAttribute("publication-type") == "chapter" || ($counterForArticle == 0 && $counterForBook > 0 && $counterForChapter > 0)) {
                     $bibitemChapter = new BibitemChapter();

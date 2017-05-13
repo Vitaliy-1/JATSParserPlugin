@@ -26,46 +26,6 @@ class GeneralHtml
         $htmlNode = $html->createElement("html");
         $html->appendChild($htmlNode);
 
-        $htmlHead = $html->createElement("head");
-        $htmlNode->appendChild($htmlHead);
-
-        /* add links to css
-        * in the head */
-        $linkrel1 = $html->createElement("link");
-        $linkrel1->setAttribute("rel", "stylesheet");
-        $linkrel1->setAttribute("type", "text/css");
-        $linkrel1->setAttribute("href", "custom/css/bootstrap.min.css");
-        $htmlHead->appendChild($linkrel1);
-
-        $linkrel2 = $html->createElement("link");
-        $linkrel2->setAttribute("rel", "stylesheet");
-        $linkrel2->setAttribute("type", "text/css");
-        $linkrel2->setAttribute("href", "custom/css/bootstrap-theme.min.css");
-        $htmlHead->appendChild($linkrel2);
-
-        $linkrel3 = $html->createElement("link");
-        $linkrel3->setAttribute("rel", "stylesheet");
-        $linkrel3->setAttribute("type", "text/css");
-        $linkrel3->setAttribute("href", "custom/css/psychosomatics.css");
-        $htmlHead->appendChild($linkrel3);
-
-        /* add links to javascript
-        * in the head */
-        $script1 = $html->createElement("script", " ");
-        $script1->setAttribute("type", "text/javascript");
-        $script1->setAttribute("src", "custom/js/jquery.min.js");
-        $htmlHead->appendChild($script1);
-
-        $script2 = $html->createElement("script", " ");
-        $script2->setAttribute("type", "text/javascript");
-        $script2->setAttribute("src", "custom/js/bootstrap.min.js");
-        $htmlHead->appendChild($script2);
-
-        $script3 = $html->createElement("script", " ");
-        $script3->setAttribute("type", "text/javascript");
-        $script3->setAttribute("src", "custom/js/psychosomatics.js");
-        $script3->setAttribute("defer", "defer");
-        $htmlHead->appendChild($script3);
 
         /* make body structure */
         $bodyNode = $html->createElement("body");
