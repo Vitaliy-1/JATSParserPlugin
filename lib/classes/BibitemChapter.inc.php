@@ -18,7 +18,7 @@ class BibitemChapter {
     private $name;
     private $editor;
     private $chapterTitle;
-    private $collabAuthor;
+    private $collab;
     private $collabEditor;
     private $source;
     private $publisherLoc;
@@ -124,17 +124,17 @@ class BibitemChapter {
     /**
      * @return mixed
      */
-    public function getCollabAuthor()
+    public function getCollab()
     {
-        return $this->collabAuthor;
+        return $this->collab;
     }
 
     /**
-     * @param mixed $collabAuthor
+     * @param mixed $collab
      */
-    public function setCollabAuthor($collabAuthor)
+    public function setCollab($collab)
     {
-        $this->collabAuthor = $collabAuthor;
+        $this->collab = $collab;
     }
 
     /**

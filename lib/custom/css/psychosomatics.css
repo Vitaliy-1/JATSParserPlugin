@@ -426,7 +426,7 @@ a.fulltext {
 body {
    counter-reset: item;
  }
- ol.references {
+ ol.references > li.ref {
    list-style: none;
    padding-left: 0;
  }

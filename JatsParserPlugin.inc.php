@@ -112,7 +112,7 @@ class JatsParserPlugin extends GenericPlugin {
 		if ($template != 'frontend/pages/article.tpl') return false;
 		
 		$templateMgr = $params[0];
-		//$templateMgr->addStylesheet('embedGalley', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'psychosomatics.css');
+		$templateMgr->addStylesheet('embedGalley', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'psychosomatics.css');
 		//$templateMgr->addJavaScript('embedGalley', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR .'psychosomatics.js');
 		
 		$templateMgr->addJavaScript('mathJax', '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=MML_HTMLorMML-full');
@@ -127,12 +127,10 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param $params array
 	 */
 	function embedHtml($hookName, $params) {
-
 		$smarty =& $params[1];
 		$output =& $params[2];
 
         $articleArrays = $smarty->get_template_vars('article');
-
 
 		foreach ($articleArrays->getGalleys() as $galley) {
 			if ($galley && in_array($galley->getFileType(), array('application/xml', 'text/xml'))) {
@@ -151,40 +149,20 @@ class JatsParserPlugin extends GenericPlugin {
 		$body = new Body();
         $sections = $body->bodyParsing($xpath);
 
-        /* assigning references */
+        /* Assigning references */
         $back = new Back();
         $references = $back->parsingBack($xpath);
 
-		// Parse XML to HTML		
-		//$html = $this->_parseXml($xmlGalley->getFile());
-
-		// Assign HTML to article template
-
+		// Assigning variables to article template
+        $smarty->assign('references', $sections);
         $smarty->assign('references', $references);
+        $smarty->assign('path_template',$this->getTemplatePath());
 		$output .= $smarty->fetch($this->getTemplatePath() . 'articleMainText.tpl');
 		
 		return false;
 
 
 	}
-	/**
-	 * Return string containing the parsed HTML file.
-	 * @param $xmlGalley JATS XML Galley file
-	 * @return string
-	 */
-	function _parseXml($xmlGalley) {
-		
-		$document = new DOMDocument;
-		$document->load($xmlGalley->getFilePath());
-
-        $mainJatsParser = new MainJatsParser();
-
-        $html = $mainJatsParser->parsingJatsContent($document);
-		$html = $html->saveHTML($html->documentElement);
-				
-		return $html;
-	}
-
 	/**
 	 * Return string containing date
 	 * @param $text String to be formatted
@@ -196,9 +174,5 @@ class JatsParserPlugin extends GenericPlugin {
         $date = new \DateTime($text);
         return $date->format($format);
     }
-
-	
-	
-	
 }
 ?>

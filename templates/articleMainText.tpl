@@ -7,31 +7,36 @@
  * A template to be included via Templates::Article::Main hook.
  *}
 <div id="ful">
-    <ol class="refrences">
+    <ol class="references">
         {foreach from=$references->getReferences() item=reference}
-            <li class="ref">
-                <span class="bib" id="{$reference->getId()}">
-                {if get_class($reference) == "BibitemJournal"}
-                    <span class="ref-title">{$reference->getTitle()}</span>
-                    <span class="ref-ref-auth">
-                        {foreach from=$reference->getName() key=i item=name}
-                            <span class="authorSurname">{$name->getSurname()|trim}</span>
-                            <span class="authorInit">
-                                {foreach from=$name->getInitials() key=j item=initial}
-                                    <span initcount="{$name->getInitials()|@count}" j="{$j}" name="{$reference->getName()|count}">
-                                    {if $j+1 < $name->getInitials()|count}
-                                        {$initial}
-                                    {else}
-                                        {$initial},
-                                    {/if}
-                                    </span>
-                                {/foreach}
-                            </span>
-                        {/foreach}
+            {if get_class($reference) == "BibitemJournal"}
+                <li class="ref">
+                    <span class="bib" id="{$reference->getId()}">
+                        {include file="`$path_template`/vancouver/journal_article.tpl"}
                     </span>
-                {/if}
-                </span>
-            </li>
+                </li>
+            {/if}
+            {if get_class($reference) == "BibitemBook"}
+                <li class="ref">
+                    <span class="bib" id="{$reference->getId()}">
+                        {include file="`$path_template`/vancouver/book.tpl"}
+                    </span>
+                </li>
+            {/if}
+            {if get_class($reference) == "BibitemChapter"}
+                <li class="ref">
+                    <span class="bib" id="{$reference->getId()}">
+                        {include file="`$path_template`/vancouver/chapter.tpl"}
+                    </span>
+                </li>
+            {/if}
+            {if get_class($reference) == "BibitemConf"}
+                <li class="ref">
+                    <span class="bib" id="{$reference->getId()}">
+                        {include file="`$path_template`/vancouver/conference.tpl"}
+                    </span>
+                </li>
+            {/if}
         {/foreach}
     </ol>
 </div>
