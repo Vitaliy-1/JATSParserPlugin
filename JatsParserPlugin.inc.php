@@ -154,7 +154,7 @@ class JatsParserPlugin extends GenericPlugin {
         $references = $back->parsingBack($xpath);
 
 		// Assigning variables to article template
-        $smarty->assign('references', $sections);
+        $smarty->assign('sections', $sections);
         $smarty->assign('references', $references);
         $smarty->assign('path_template',$this->getTemplatePath());
 		$output .= $smarty->fetch($this->getTemplatePath() . 'articleMainText.tpl');
