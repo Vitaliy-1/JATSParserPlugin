@@ -11,7 +11,8 @@
  */
 
 import('lib.pkp.classes.plugins.GenericPlugin');
-import('plugins.generic.jatsParser.lib.main.MainJatsParser');
+import("plugins.generic.jatsParser.lib.main.Body");
+import("plugins.generic.jatsParser.lib.main.Back");
 
 class JatsParserPlugin extends GenericPlugin {
 	/**
