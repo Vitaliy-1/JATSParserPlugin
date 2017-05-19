@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/jatsParser/locale/en_US/locale.xml
+  *
+  * Copyright (c) 2017 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
+  * Distributed under the GNU GPL v3.
+  *
+  * jatsParser plugin localization strings
+  -->
+
+<locale name="uk_UA" full_name="Ukrainian">
+    <message key="plugins.generic.jatsParser.displayName">JATSParser плагін</message>
+    <message key="plugins.generic.jatsParser.description">Перетворює JATS XML в HTML через шаблони Smarty та показує на сторінці анотації</message>
+</locale>

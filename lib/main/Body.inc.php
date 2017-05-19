@@ -24,6 +24,7 @@ import("plugins.generic.jatsParser.lib.classes.Table");
 import("plugins.generic.jatsParser.lib.classes.Row");
 import("plugins.generic.jatsParser.lib.classes.Cell");
 import("plugins.generic.jatsParser.lib.classes.Figure");
+import("plugins.generic.jatsParser.lib.classes.JatsList");
 
 class Body
 {
@@ -72,17 +73,10 @@ class Body
             if ($secContent->tagName == "title") {
                 $section->setTitle(trim($secContent->nodeValue));
             } elseif ($secContent->tagName == "list") { // start of parsing lists, ordered and unordered are supported
-                $listContent = new ParContent();
-
-                if ($secContent->getAttribute("list-type") == "ordered") {
-                    $listContent->setType("list-ordered");
-                } elseif ($secContent->getAttribute("list-type") == "unordered") {
-                    $listContent->setType("list-unordered");
-                }
-                foreach ($xpath->evaluate("list-item/p", $secContent) as $listItem) {
-                    self::paragraphParsing($listItem, $listContent);
-                }
+                $listContent = new JatsList();
                 $section->getContent()->offsetSet(null, $listContent);
+                $this->listParsing($xpath, $secContent, $listContent);
+
             } elseif ($secContent->tagName == "p") { // start of parsing paragraphs
                 $paragraphContent = new ParContent();
                 $paragraphContent->setType("paragraph");
@@ -239,6 +233,31 @@ class Body
                 $bold = new Bold();
                 $bold->setContent($parContent->nodeValue);
                 $paragraphContent->getContent()->offsetSet(null, $bold);
+            }
+        }
+    }
+
+    /**
+     * @param DOMXPath $xpath
+     * @param DOMElement $secContent
+     * @param $listContent
+     */
+    public function listParsing(DOMXPath $xpath, DOMElement $secContent, JatsList $listContent)
+    {
+        if ($secContent->getAttribute("list-type") == "ordered" || $secContent->getAttribute("list-type") == "order") {
+            $listContent->setType("list-ordered");
+        } elseif ($secContent->getAttribute("list-type") == null || $secContent->getAttribute("list-type") == "unordered" || $secContent->getAttribute("list-type") == "bullet") {
+            $listContent->setType("list-unordered");
+        }
+        foreach ($xpath->evaluate("list-item/p", $secContent) as $listItem) {
+            $listParagraphContent = new ParContent();
+            $listContent->getContent()->offsetSet(null, $listParagraphContent);
+            self::paragraphParsing($listItem, $listParagraphContent);
+
+            foreach ($xpath->evaluate("../list", $listItem) as $sublistItem) {
+                $subListContent = new JatsList();
+                $listParagraphContent->getContent()->offsetSet(null, $subListContent);
+                $this->listParsing($xpath, $sublistItem, $subListContent);
             }
         }
     }

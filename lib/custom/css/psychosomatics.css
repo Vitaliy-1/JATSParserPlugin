@@ -10,7 +10,7 @@ main>div.grid-cell {
 }
 
 .container-fluid {
-	margin-bottom: 50px;
+	margin-bottom: 0px;
 }
 
 
@@ -608,3 +608,53 @@ div.pkp_site_name_wrapper {
 
 }
 
+/* Fixing original template
+ * Trying to override OJS style for article detail page
+ */
+
+/* full width for right and left bar*/
+article.obj_article_details > div.row > div.main_entry {
+	width: 100%;
+	float: none;
+}
+article.obj_article_details > div.row > div.entry_details {
+	width: 100%;
+	float: none;
+}
+
+@media (min-width: 992px) {
+	article.obj_article_details > div.row > div.main_entry {
+		width: 100%;
+		float: none;
+	}
+	article.obj_article_details > div.row > div.entry_details {
+		width: 100%;
+		float: none;
+	}
+}
+
+@media (min-width: 1200px) {
+	article.obj_article_details > div.row > div.main_entry {
+		width: 100%;
+		float: none;
+	}
+	article.obj_article_details > div.row > div.entry_details {
+		width: 100%;
+		float: none;
+	}
+}
+@media (min-width: 768px) {
+	article.obj_article_details > div.row > div.main_entry {
+		width: 100%;
+		float: none;
+	}
+	article.obj_article_details > div.row > div.entry_details {
+		width: 100%;
+		float: none;
+	}
+}
+
+/* correct headdings margins */
+h2.title.panel-title.collapsed {
+	margin: 0;
+}
