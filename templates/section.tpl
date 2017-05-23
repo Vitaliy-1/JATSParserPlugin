@@ -9,13 +9,13 @@
  *}
 
 
-{if get_class($secCont) == "ParContent" && $secCont->getType() == "paragraph"}
+{if get_class($secCont) == "ParContent" && $secCont->getType() == "paragraph"}{strip}
     <p class="for-sections">
         {foreach from=$secCont item=parCont}
             {include file="`$path_template`/paragraph.tpl"}
         {/foreach}
     </p>
-{elseif get_class($secCont) == "JatsList" && ($secCont->getType() =="list-ordered" || $secCont->getType() == "list-unordered")}
+{/strip}{elseif get_class($secCont) == "JatsList" && ($secCont->getType() =="list-ordered" || $secCont->getType() == "list-unordered")}{strip}
     {if $secCont->getType() == "list-ordered"}
         <ol class="ordered-1">
             {foreach from=$secCont->getContent() item=jatsList}
@@ -43,7 +43,7 @@
             {/foreach}
         </ol>
     {/if}
-{elseif get_class($secCont) == "Table"}
+{/strip}{elseif get_class($secCont) == "Table"}
     <div class="figure-wrap table">
         <div class="fig-box" id="{$secCont->getId()}">
             <table>

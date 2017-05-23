@@ -7,7 +7,7 @@
  * A template to be included via Templates::Article::Main hook.
  * for displaying lists; uses recursion for handling nested lists
  *}
-
+{strip}
 {if get_class($parCont) == "JatsList"}
     {if $parCont->getType() == "list-ordered"}
         <ol class="ordered-1">
@@ -37,3 +37,4 @@
         </ol>
     {/if}
 {/if}
+{/strip}

@@ -54,7 +54,7 @@
     {** writing references *}
 <div class="panwrap">
     <div class = "section">
-        <h2 class="title">{$references->getTitle()}</h2>
+        <h2 class="title references">{$references->getTitle()}</h2>
     </div>
     <div class="forpan">
         <div class="panel-body">

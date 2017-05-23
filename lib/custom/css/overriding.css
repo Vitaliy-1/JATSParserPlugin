@@ -1,0 +1,217 @@
+/* Fixing original template
+ * Trying to override OJS style for article detail page
+ */
+
+/* full width for right and left bar*/
+article.obj_article_details > div.row > div.main_entry {
+    width: 100%;
+    float: none;
+}
+article.obj_article_details > div.row > div.entry_details {
+    width: 100%;
+    float: none;
+}
+
+@media (min-width: 992px) {
+    article.obj_article_details > div.row > div.main_entry {
+        width: 100%;
+        float: none;
+    }
+    article.obj_article_details > div.row > div.entry_details {
+        width: 100%;
+        float: none;
+    }
+}
+
+@media (min-width: 1200px) {
+    article.obj_article_details > div.row > div.main_entry {
+        width: 100%;
+        float: none;
+    }
+    article.obj_article_details > div.row > div.entry_details {
+        width: 100%;
+        float: none;
+    }
+}
+@media (min-width: 768px) {
+    article.obj_article_details > div.row > div.main_entry {
+        width: 100%;
+        float: none;
+    }
+    article.obj_article_details > div.row > div.entry_details {
+        width: 100%;
+        float: none;
+    }
+}
+
+/* correct headdings margins */
+h2.title.panel-title.collapsed {
+    margin: 0;
+}
+@media (max-width: 991px) {
+    .container-fluid {
+        margin-bottom: 0;
+    }
+}
+
+
+/* remove right block */
+
+div.pkp_structure_sidebar.left {
+    display: none;
+}
+
+/* remove borders */
+div.pkp_structure_main:before, div.pkp_structure_main:after {
+    width: 0;
+}
+.obj_article_details .main_entry {
+    border-right: 0;
+}
+
+/* popovers */
+h3.popover-title {
+    margin: 0;
+    font-size: inherit;
+}
+
+/* Authors */
+article.obj_article_details > ul.item.authors {
+    padding-left: 0;
+}
+@media (min-width: 992px) {
+    div.obj_article_details > ul.item {
+        padding: 0;
+    }
+}
+
+/* body color */
+body {
+    background-color: #e6e6e6;
+}
+div.page.page_article {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 40px 5px rgba(0,0,0,0.5);
+}
+
+/* fixing shadow */
+div.page.page_article:after {
+    background-color: #fff;
+    height: 43px;
+    content: "";
+    position: absolute;
+    bottom: 52px;
+    left: 0;
+    right: 15px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+@media (max-width: 992px) {
+    div.page.page_article {
+        background-color: white;
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0 40px 5px rgba(0,0,0,0.5);
+    }
+
+    div.page.page_article:after {
+        background-color: #fff;
+        height: 83px;
+        content: "";
+        position: absolute;
+        bottom: -15px;
+        left: 0;
+        right: 0;
+        border-bottom-right-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+    div#pkp_content_footer {
+        margin-top: 50px;
+    }
+    div.pkp_structure_content.has_sidebar {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+div.fornav.col-lg-5.col-md-5 {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+@media (min-width: 992px) {
+    .obj_article_details .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+@media (min-width: 768px) {
+    .obj_article_details .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+/* overriding article blocks */
+@media (min-width: 1200px) {
+    div.pkp_structure_content.has_sidebar > div#pkp_content_main {
+        width: 58.33333333%;
+    }
+}
+
+@media (min-width: 992px) {
+    div.pkp_structure_content.has_sidebar > div#pkp_content_main {
+        width: 58.33333333%;
+    }
+}
+
+/* overriding OJS breadcrumbs on article page */
+nav.cmp_breadcrumbs {
+    display: block;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    margin-bottom: 20px;
+}
+
+nav.cmp_breadcrumbs > ol {
+    margin-bottom: 0;
+}
+
+@media (max-width: 991px) {
+    nav.cmp_breadcrumbs {
+        margin-top: 30px;
+        margin-bottom: 0;
+    }
+    nav.cmp_breadcrumbs > ol {
+
+    }
+}
+
+/* remove padding from pkp content main */
+div#pkp_content_main {
+    padding-left: 0;
+}
+
+@media (max-width: 991px) {
+    div#pkp_content_main {
+        padding-right: 0;
+    }
+}
+
+/* overriding title block */
+article.obj_article_details > div.row {
+    border-top: 0;
+    margin-top: 0;
+}
+div.page.page_article {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+}

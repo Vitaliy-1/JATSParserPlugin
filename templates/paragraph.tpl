@@ -7,7 +7,7 @@
  * A template to be included via Templates::Article::Main hook.
  * for writing article paragraphs
  *}
-
+{strip}
 {if get_class($parCont) == "ParText"}
     {$parCont->getContent()}
 {elseif get_class($parCont) == "Xref"}
@@ -27,3 +27,4 @@
 {elseif get_class($parCont) == "Bold"}
     <b>{$parCont->getContent()}</b>
 {/if}
+{/strip}

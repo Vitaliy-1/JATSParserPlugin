@@ -1,82 +1,37 @@
-body {
-	position: relative;
+
+/* fonts */
+body p {
+    font-family: 'PT Serif', serif;
+    font-size: 14px;
 }
-.panel-body {
-	padding-left: 0px;
+.pkp_structure_main p {
+    font-size: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
-
-main>div.grid-cell {
-	padding: 1px;
+.pkp_structure_main h2 {
+    font-weight: normal;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-family: 'Play', sans-serif;
+   /* font-family: 'Open Sans', sans-serif; */
+    color: grey;
 }
-
-.container-fluid {
-	margin-bottom: 0px;
-}
-
-
-/* Styling article metadata */
-
-ul.author-list {
-    list-style-type: none;
-    padding-left: 0px;
-}
-
-.author-institution {
-	clear: both;
-}
-
-a.auth-name {
-	cursor: pointer;
+.pkp_structure_main h1 {
+    font-family: 'Open Sans', sans-serif;
+    padding-left: 10px;
+    font-weight: 600;
+    color: grey;
 }
 
+/* article text*/
 
-div.article-meta span.institution {
-	display: none;
-	padding: 5px 10px 5px 15px;
+div.panel-body {
+    padding: 0;
 }
-
-.dates {
-	list-style-type: none;
-	padding-left: 0px;
-	margin-top: 20px;
-	font-family: albert;
-	margin-top: 30px;
-}
-
-div.article-meta span.name {
-	cursor: pointer;
-	color: #767676;
-}
-
-div.article-meta span.name:hover {
-	border-bottom: 1px solid #563d7c;
-	font-size: 15px;
-	font-style: italic;
-}
-
-div.article-meta span.affiliation {
-	display: none;
-	z-index: 5;
-	background-image: linear-gradient(to bottom,#f5f5f5 0,#e8e8e8 100%);
-	padding: 10px;
-	border-radius: 10px;
-	border: 1px solid #e7e7e7;
-	background-color: #f8f8f8;
-	font-style: italic;
-
-}
-
-div.authors-affil {
-	margin-top: 30px;
-}
-
-ul.author-list > li {
-    display: inline;
-    padding-right: 7px;
-}
-
-
-/* Sticky inarticle navigation */
+/* Sticky
+* inarticle
+* navigation */
 
 .fornav {
 	float: right;
@@ -87,20 +42,47 @@ ul.nav.nav-tabs.bs-docs-sidenav > li {
 }
 
 ul.nav.nav-tabs.bs-docs-sidenav {
-    width: 300px;
+
 }
 
 .affix-top {
-	margin-top: 600px;
-	margin-left: 20px;
+	margin-top: 0;
+	margin-left: 0;
 }
 
 nav.bs-docs-sidebar.affix {
-	margin-top: 0;
-	position: fixed!important;
-	margin-left: 20px;
+	top: 0;
+	padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    background-color: white;
+    width: 38%;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    right: 55px;
+    z-index: 2;
 }
 
+.affix-bottom {
+	position: relative;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    background-color: white;
+    width: 115.2%;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+
+}
+
+nav#myAffix > ul a {
+    /* font-family: 'Arimo', sans-serif; */
+    font-family: 'Play', sans-serif;
+}
+
+.nav-tabs{
+    border-bottom: 0;
+}
 @media (max-width:991px) {
 	.fornav {
 		display: none;
@@ -144,86 +126,6 @@ h3#abstr0 {
 	margin-top: 0;
 }
 
-/* Headings */
-
-h1 {
-	font-family: albert;
-	font-size: 23px;
-}
-
-h2 {
-	font-size: 21px;
-	font-family: 'Avenir LT W01 85 Heavy';
-	color: #6d6e70;
-	font-weight: 400;
-}
-
-h3{
-	font-size: 17px;
-}
-
-h3.subtitle {
-	color: #6d6e70;
-}
-
-
-
-/* Bootstrap tabs */
-
-.navwraper {
-	padding-left: 0;
-}
-nav.navigational-tabs>ul.nav.nav-tabs>li>a:hover {
-	background-color:  white;
-	border: 0;
-	border-top: 1px solid #563d7c;
-}
-
-.nav-tabs>li>a {
-    border-radius: 0;
-    margin-right: 0;
-}
-
-nav.navigational-tabs>ul.nav.nav-tabs>li.active>a:hover {
-    border-top: 1px solid #ececec;
-    border-left: 1px solid #ececec;
-    border-right: 1px solid #ececec;
-    border-bottom: 1px solid white;
-}
-#article {
-   border-left: 1px solid white!important;
-}
-
-nav.navigational-tabs>ul.nav.nav-tabs>li.active>a {
-    border-bottom: 1px solid white;
-    border-radius: 0;
-}
-
-@media (min-width:992px) {
-	li.mobile-navigation {
-		display: none;
-	}
-}
-
-
-/* Open Access Label */
-
-div.access-review {
-	margin-top: 20px;
-}
-
-p.license-access, p.reviewed {
-	display: inline-block;
-	font-family: albert;
-	font-size: 10px;
-	text-transform: uppercase;
-}
-
-p.license-access {
-	padding-right: 10px;
-}
-
-
 /* Pop-ups */
 
 a.ref-tip {
@@ -243,51 +145,17 @@ div.article-text {
 }
 
 
-
-/* page width */
-
-
-.grid-cell {
-	background-color: white;
-	-webkit-box-shadow: 0px 0px 78px -8px rgba(0,0,0,0.82);
-    -moz-box-shadow: 0px 0px 78px -8px rgba(0,0,0,0.82);
-    box-shadow: 0px 0px 78px -8px #AAAAAA;
-    padding: 10px;
-    margin: 2% 13% 6% 13%;
-}
-
-#myAffix {
-	background-color: white;
-    top: 30px;
-    width: 240.703px;
-}
-
-.row.tab-content {
-
-}
-
-.forcontent {
-	background-color: white;
-	border-right: 1px solid #ececec;
-}
-
-.navwraper {
-	padding-right: 0px;
-}
-
-.article-content {
-	padding-left: 5%;
-
-}
-
-/* upper tabs navigation */
-
-.navwraper {
-	border-right: 0;
-}
-
-
 /* Tables and Figures */
+
+div.figure-wrap {
+    font-family: 'Play', sans-serif;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+div.figure-wrap p {
+    font-family: 'Play', sans-serif;
+}
 
 .tab-pane.fade.active.in > .figure-wrap {
 	margin-top: 50px;
@@ -331,57 +199,6 @@ div.article-text .figure-wrap {
 #figuresdata .figure-wrap {
 
 }
-
-/* Images */
-
-div.imagewrap {
-    padding-top: 10px;
-}
-
-p.comments {
-    color: #777;
-}
-
-div.fig-box {
-    color: #777;
-}
-
-div.imagewrap > img {
-    max-width: 100%
-}
-
-/* Info Panel */
-
-div#infodata > ul.author-list > li.name {
-	display: block;
-	float: none;
-}
-
-div#infodata div.institution {
-	display: block;
-	padding-left: 0;
-}
-
-div#infodata li.name {
-    padding-bottom: 20px;
-}
-
-div#infodata ul.author-list {
-	margin-top: 40px;
-}
-
-.info-auth-heading {
-    font-weight: bold;
-    font-family: 'Avenir LT W01 85 Heavy';
-	color: #6d6e70;
-	font-size: 19px;
-}
-
-#infodata div.institution {
-	color: #6d6e70;
-	font-family: Helvetica;
-}
-
 
 /* Styling citations */
 
@@ -550,111 +367,40 @@ div.section {
 }
 }
 
-/* Journal title on extra small screens */
-@media (max-width: 500px) {
-	a.navbar-brand {
-		height: 60px;
-		text-align: center;
-	}
-	.navbar-toggle {
-		margin-bottom: 0px;
-	}
+/* Styling tabs */
+ul.ui-tabs-nav.ui-corner-all.ui-helper-reset.ui-helper-clearfix.ui-widget-header {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+   /* margin-right: -4px; */ <!-- for removing shadow -->
 }
 
-/* Authors in infodata */
-
-div#infodata span.name {
-	display: block;
-	font-size: 20px;
-	margin-bottom: 15px;
+ul.ui-tabs-nav.ui-corner-all.ui-helper-reset.ui-helper-clearfix.ui-widget-header > li {
+    border-left: 0;
 }
 
-div#infodata span.affiliation {
-	display: block;
-	font-size: 15px;
-	font-style: italic;
+.ui-widget-header {
+    background: #e6e6e6;
 }
 
-div#infodata ul.author-list li {
-	margin-bottom: 40px;
+div#article_page_tabs {
+    padding: 0;
+    border: 0;
 }
-
-div#infodata ul.author-list {
-	margin-bottom: 70px;
-	border-bottom: 1px solid #ddd;
-}
-
-/* header site name */
-
-div.pkp_site_name_wrapper {
-	background-color: #5f5f5f;
-}
-
-.pkp_site_name {
-	text-align: center;
-	font-size: 2em;
+li#for_floating_right {
 
 }
-
-.pkp_site_name a {
-	color: #fff;
-	font-family: arial;
-	display: inline-block;
-	font-size: 24px;
-	text-decoration: none;
-	font-weight: 700;
-	padding-top: 10px;
-	padding-bottom: 10px;
-
+div.before_title {
+    background: linear-gradient(to bottom, #f6f6f6, #fff);
 }
 
-/* Fixing original template
- * Trying to override OJS style for article detail page
- */
-
-/* full width for right and left bar*/
-article.obj_article_details > div.row > div.main_entry {
-	width: 100%;
-	float: none;
-}
-article.obj_article_details > div.row > div.entry_details {
-	width: 100%;
-	float: none;
+div.before_title > p {
+    padding: 10px 0 0 15px;
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-size: 10px;
 }
 
-@media (min-width: 992px) {
-	article.obj_article_details > div.row > div.main_entry {
-		width: 100%;
-		float: none;
-	}
-	article.obj_article_details > div.row > div.entry_details {
-		width: 100%;
-		float: none;
-	}
-}
 
-@media (min-width: 1200px) {
-	article.obj_article_details > div.row > div.main_entry {
-		width: 100%;
-		float: none;
-	}
-	article.obj_article_details > div.row > div.entry_details {
-		width: 100%;
-		float: none;
-	}
-}
-@media (min-width: 768px) {
-	article.obj_article_details > div.row > div.main_entry {
-		width: 100%;
-		float: none;
-	}
-	article.obj_article_details > div.row > div.entry_details {
-		width: 100%;
-		float: none;
-	}
-}
 
-/* correct headdings margins */
-h2.title.panel-title.collapsed {
-	margin: 0;
-}
+
