@@ -143,7 +143,10 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		// Return false if no XML galleys available
-		if (!$xmlGalley) return false;
+		if (!$xmlGalley) {
+            $output .= $smarty->fetch($this->getTemplatePath() . 'abstract.tpl');
+		    return false;
+        }
 
 		// Parsing JATS XML
         $document = new DOMDocument;

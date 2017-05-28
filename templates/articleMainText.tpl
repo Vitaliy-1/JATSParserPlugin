@@ -8,7 +8,13 @@
  * Gives main structure of the article document
  *}
 
+
 <div class="article-text">
+    {** get abstract *}
+    {if $article->getLocalizedAbstract()}
+        {include file="`$path_template`/abstract.tpl"}
+    {/if}
+    {** get sections *}
 {foreach from=$sections item=sect}
     <div class="panwrap">
         <div class="section">
@@ -52,6 +58,7 @@
     </div>
 {/foreach}
     {** writing references *}
+{if $references->getTitle() != NULL}
 <div class="panwrap">
     <div class = "section">
         <h2 class="title references">{$references->getTitle()}</h2>
@@ -93,4 +100,5 @@
         </div>
     </div>
 </div>
+{/if}
 </div>

@@ -22,6 +22,10 @@
     <a class="reftable" href="#{$parCont->getRid()}">
         {$parCont->getContent()}
     </a>
+{elseif get_class($parCont) == "XrefVideo"}
+    <a class="refvideo" href="#{$parCont->getRid()}">
+        {$parCont->getContent()}
+    </a>
 {elseif get_class($parCont) == "Italic"}
     <i>{$parCont->getContent()}</i>
 {elseif get_class($parCont) == "Bold"}

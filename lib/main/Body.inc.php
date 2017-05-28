@@ -19,12 +19,14 @@ import("plugins.generic.jatsParser.lib.classes.Xref");
 import("plugins.generic.jatsParser.lib.classes.Italic");
 import("plugins.generic.jatsParser.lib.classes.XrefFig");
 import("plugins.generic.jatsParser.lib.classes.XrefTable");
+import("plugins.generic.jatsParser.lib.classes.XrefVideo");
 import("plugins.generic.jatsParser.lib.classes.Bold");
 import("plugins.generic.jatsParser.lib.classes.Table");
 import("plugins.generic.jatsParser.lib.classes.Row");
 import("plugins.generic.jatsParser.lib.classes.Cell");
 import("plugins.generic.jatsParser.lib.classes.Figure");
 import("plugins.generic.jatsParser.lib.classes.JatsList");
+import("plugins.generic.jatsParser.lib.classes.Video");
 
 class Body
 {
@@ -68,7 +70,7 @@ class Body
             $subsections->append($section);
         }
 
-        foreach ($xpath->evaluate("title|p|fig|sec|table-wrap|list", $sec) as $secContent) {
+        foreach ($xpath->evaluate("title|p|fig|sec|table-wrap|list|media", $sec) as $secContent) {
 
             if ($secContent->tagName == "title") {
                 $section->setTitle(trim($secContent->nodeValue));
@@ -182,6 +184,27 @@ class Body
                     $figure->setLink($graphicLinksNode->getAttribute("xlink:href"));
                 }
 
+            } elseif ($secContent->tagName == "media") {
+                $video = new Video();
+                $section->getContent()->offsetSet(null, $video);
+                $video->setId($secContent->getAttribute("id"));
+                $video->setLink($secContent->getAttribute("xlink:href"));
+                foreach ($xpath->evaluate("label", $secContent) as $labelNode) {
+                    $video->setLabel($labelNode->nodeValue);
+                }
+                foreach ($xpath->evaluate("caption/title", $secContent) as $videoTitleNode) {
+                    $videoTitle = new ParContent();
+                    $videoTitle->setType("video-title");
+                    $video->getTitle()->offsetSet(null, $videoTitle);
+                    self::paragraphParsing($videoTitleNode, $videoTitle);
+                }
+                foreach ($xpath->evaluate("caption/p", $secContent) as $videoCaptionNode) {
+                    $videoCaption = new ParContent();
+                    $videoCaption->setType("video-caption");
+                    $video->getContent()->offsetSet(null, $videoCaption);
+                    self::paragraphParsing($videoCaptionNode, $videoCaption);
+                }
+
             } elseif ($secContent->tagName == "sec") {
                 if ($section->getType() == "sec") {
                     $section->getContent()->offsetSet(0, $subsections);
@@ -208,19 +231,24 @@ class Body
                 $parText = new ParText();
                 $parText->setContent($parContent->nodeValue);
                 $paragraphContent->getContent()->offsetSet(null, $parText);
-            } else if ($parContent->tagName == "xref") {
+            } elseif ($parContent->tagName == "xref") {
                 if ($parContent->getAttribute("ref-type") == "bibr") {
                     $ref = new Xref();
                     $ref->setRid($parContent->getAttribute("rid"));
                     $ref->setContent($parContent->nodeValue);
                     $paragraphContent->getContent()->offsetSet(null, $ref);
-                } else if ($parContent->getAttribute("ref-type") == "table") {
+                } elseif ($parContent->getAttribute("ref-type") == "table") {
                     $ref = new XrefTable();
                     $ref->setRid($parContent->getAttribute("rid"));
                     $ref->setContent($parContent->nodeValue);
                     $paragraphContent->getContent()->offsetSet(null, $ref);
-                } else if ($parContent->getAttribute("ref-type") == "fig") {
+                } elseif ($parContent->getAttribute("ref-type") == "fig") {
                     $ref = new XrefFig();
+                    $ref->setRid($parContent->getAttribute("rid"));
+                    $ref->setContent($parContent->nodeValue);
+                    $paragraphContent->getContent()->offsetSet(null, $ref);
+                } elseif ($parContent->getAttribute("ref-type") == "other") {
+                    $ref = new XrefVideo();
                     $ref->setRid($parContent->getAttribute("rid"));
                     $ref->setContent($parContent->nodeValue);
                     $paragraphContent->getContent()->offsetSet(null, $ref);
@@ -244,9 +272,9 @@ class Body
      */
     public function listParsing(DOMXPath $xpath, DOMElement $secContent, JatsList $listContent)
     {
-        if ($secContent->getAttribute("list-type") == "ordered" || $secContent->getAttribute("list-type") == "order") {
+        if ($secContent->getAttribute("list-type") == "ordered" || $secContent->getAttribute("list-type") == "order" || $secContent->getAttribute("list-type") == "roman-lower") {
             $listContent->setType("list-ordered");
-        } elseif ($secContent->getAttribute("list-type") == null || $secContent->getAttribute("list-type") == "unordered" || $secContent->getAttribute("list-type") == "bullet") {
+        } elseif ($secContent->getAttribute("list-type") == null || $secContent->getAttribute("list-type") == "unordered" || $secContent->getAttribute("list-type") == "bullet" || $secContent->getAttribute("list-type") == "simple") {
             $listContent->setType("list-unordered");
         }
         foreach ($xpath->evaluate("list-item/p", $secContent) as $listItem) {

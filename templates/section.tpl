@@ -30,7 +30,7 @@
             {/foreach}
         </ol>
     {elseif $secCont->getType() == "list-unordered"}
-        <ol class="unordered-1">
+        <ul class="unordered-1">
             {foreach from=$secCont->getContent() item=jatsList}
                 <li class="in-ordered">
                     <p class="inlist">
@@ -41,7 +41,7 @@
                     </p>
                 </li>
             {/foreach}
-        </ol>
+        </ul>
     {/if}
 {/strip}{elseif get_class($secCont) == "Table"}
     <div class="figure-wrap table">
@@ -133,11 +133,11 @@
     </div>
 {elseif get_class($secCont) == "Figure"}
     <div class="figure-wrap fig">
-        <div class="{$secCont->getId()}">
+        <div id="{$secCont->getId()}">
             {strip}
                 {if $secCont->getLabel() != NULL}
-                    <strong>{$secCont->getLabel()}</strong>
                     <p class="figure-title">
+                    <strong>{$secCont->getLabel()}</strong>
                         {foreach from=$secCont->getContent() item=figurePars}
                             {if $figurePars->getType() == "figure-title"}
                                 {foreach from=$figurePars item=parCont}
@@ -166,6 +166,43 @@
 
             <div class="figure-comments">
                 {$smarty.capture.figureComments}
+            </div>
+        </div>
+    </div>
+{elseif get_class($secCont) == "Video"}
+    <div class="figure-wrap video">
+        <div id="{$secCont->getId()}">
+            {strip}
+                {if $secCont->getLabel() != NULL}
+                    <p class="video-title">
+                        <strong>{$secCont->getLabel()}</strong>
+                        {foreach from=$secCont->getTitle() item=figurePars}
+                            {if $figurePars->getType() == "video-title"}
+                                {foreach from=$figurePars item=parCont}
+                                    {include file="`$path_template`/paragraph.tpl"}
+                                {/foreach}
+                            {/if}
+                        {/foreach}
+                    </p>
+                {/if}
+            {/strip}
+
+            <iframe width="100%" height="360px" src="{$secCont->getLink()}" frameborder="0" allowfullscreen></iframe>
+
+            {capture name="videoComments"}
+                {foreach from=$secCont->getContent() item=videoCaptionPars}
+                    {if $videoCaptionPars->getType() == "video-caption"}
+                        <p class="comments">
+                            {foreach from=$figureCaptionPars item=parCont}
+                                {include file="`$path_template`/paragraph.tpl"}
+                            {/foreach}
+                        </p>
+                    {/if}
+                {/foreach}
+            {/capture}
+
+            <div class="video-comments">
+                {$smarty.capture.videoComments}
             </div>
         </div>
     </div>

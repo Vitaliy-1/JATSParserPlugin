@@ -139,7 +139,9 @@ div.page.page_article:after {
 div.fornav.col-lg-5.col-md-5 {
     background-color: white;
     border-radius: 5px;
+    border-top-left-radius: 0;
     padding: 20px;
+    margin-top: 34px;
     box-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
 @media (min-width: 992px) {
@@ -214,4 +216,9 @@ div.page.page_article {
     padding-top: 0;
     padding-left: 0;
     padding-right: 0;
+}
+
+/* download galleys list */
+div.item.galleys li.list-group-item {
+    padding: 0;
 }

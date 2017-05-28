@@ -23,7 +23,7 @@
             {/foreach}
         </ol>
     {elseif $parCont->getType() == "list-unordered"}
-        <ol class="unordered-1">
+        <ul class="unordered-1">
             {foreach from=$parCont->getContent() item=jatsList}
                 <li class="in-ordered">
                     <p class=""inlist>
@@ -34,7 +34,7 @@
                     </p>
                 </li>
             {/foreach}
-        </ol>
+        </ul>
     {/if}
 {/if}
 {/strip}
