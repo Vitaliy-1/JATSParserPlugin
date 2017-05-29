@@ -443,6 +443,7 @@ ul.ui-tabs-nav.ui-corner-all.ui-helper-reset.ui-helper-clearfix.ui-widget-header
 }
 
 div#article_page_tabs {
+    margin: 0;
     padding: 0;
     border: 0;
 }
@@ -489,6 +490,8 @@ div.item.issue div.panel-body > a.title {
     cursor: pointer;
     padding: 3px;
 }
+
+
 
 /* authors */
 ul.item.authors {
