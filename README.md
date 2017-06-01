@@ -1,5 +1,5 @@
 # JATSParserPlugin
-OJS3 Plugin for parsing JATS XML and displaying it on article detail page.  
+OJS3 Plugin for parsing JATS XML and displaying it on article detail page. For correct displaying should be used in conjunction with modified [default Manuscript theme](https://github.com/Vitaliy-1/defaultManuscript) or user's theme should be changed accordingly.  
 ## How to use?
 1. Clone or download
 2. Rename to `jatsParser`
