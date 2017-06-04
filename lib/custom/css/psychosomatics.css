@@ -81,6 +81,7 @@ nav.bs-docs-sidebar.affix {
     box-shadow: 0 0 5px rgba(0,0,0,0.5);
     right: 55px;
     z-index: 2;
+    overflow-y: auto;
 }
 
 .affix-bottom {
@@ -243,17 +244,34 @@ span.ref-full > a.doi, span.ref-full > a.pmid {
     background: rgba(11, 157, 217, 0.075);
     color: #1B6685;
     border-bottom: 1px solid rgba(11, 157, 217, 0.4);
-    padding-right: 3px;
+    padding-right: 5px;
     padding-left: 3px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-radius: 4px;
     margin-right: 7px;
 }
+span.ref-full > a.doi:hover, span.ref-full > a.pmid:hover {
+    background: #1B6685;
+    color: #fff;
+    text-decoration: none;
+}
+
 span.ref-full > a.url {
     background: rgba(145, 187, 4, 0.15);
     color: #495A11;
     border-bottom: 1px solid rgba(145, 187, 4, 0.6);
     padding-right: 3px;
     padding-left: 3px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-radius: 4px;
     margin-right: 7px;
+}
+span.ref-full > a.url:hover {
+    background: #839c53;
+    color: #fff;
+    text-decoration: none;
 }
 
 ol.references {

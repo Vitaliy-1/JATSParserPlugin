@@ -222,3 +222,10 @@ div.page.page_article {
 div.item.galleys li.list-group-item {
     padding: 0;
 }
+
+/* back links to citation in-text inside references */
+li.ref button.tocite {
+    background-image: none;
+    margin-top: 7px;
+    color: rgba(77, 89, 102, 0.8);
+}

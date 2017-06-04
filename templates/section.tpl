@@ -148,8 +148,16 @@
                     </p>
                 {/if}
             {/strip}
-            <div class="imagewrap">
-                <img src="{$secCont->getLink()}">
+            <div class="imagewrap">{** check if link is from galley attachments*}
+                {if strpos($secCont->getLink(), "/") == false}
+                    {foreach from=$imageUrlArray key=fileName item=urlLink}
+                        {if $fileName == $secCont->getLink()}
+                            <img src="{$urlLink}">
+                        {/if}
+                    {/foreach}
+                {else}
+                    <img src="{$secCont->getLink()}">
+                {/if}
             </div>
 
             {capture name="figureComments"}
