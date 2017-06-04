@@ -18,4 +18,5 @@
     <message key="jatsParser.navigation.details">Details</message>
     <message key="jatsParser.navigation.metrics">Metrics</message>
     <message key="jatsParser.openAccess.label">open access</message>
+    <message key="jatsParser.references.link">Find in text</message>
 </locale>

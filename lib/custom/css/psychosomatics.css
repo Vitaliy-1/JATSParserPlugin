@@ -517,3 +517,7 @@ ul.item.authors {
     padding-right: 18px;
 }
 
+/* right navigational menu*/
+div.fornav {
+    position: relative;
+}

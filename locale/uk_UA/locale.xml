@@ -18,4 +18,5 @@
     <message key="jatsParser.navigation.details">Деталі</message>
     <message key="jatsParser.navigation.metrics">Метрика</message>
     <message key="jatsParser.openAccess.label">вільний доступ</message>
+    <message key="jatsParser.references.link">Знайти у тексті статті</message>
 </locale>

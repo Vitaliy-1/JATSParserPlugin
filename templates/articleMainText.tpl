@@ -72,7 +72,7 @@
                             <span class="bib" id="{$reference->getId()}">
                                 {include file="`$path_template`/vancouver/journal_article.tpl"}
                                 <button type="button" class="tocite btn btn-default btn-xs" id="to-{$reference->getId()}">
-                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> Find in text
+                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> {translate key="jatsParser.references.link"}
                                 </button>
                             </span>
                         </li>
@@ -82,7 +82,7 @@
                             <span class="bib" id="{$reference->getId()}">
                                 {include file="`$path_template`/vancouver/book.tpl"}
                                 <button type="button" class="tocite btn btn-default btn-xs" id="to-{$reference->getId()}">
-                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> Find in text
+                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> {translate key="jatsParser.references.link"}
                                 </button>
                             </span>
                         </li>
@@ -92,7 +92,7 @@
                             <span class="bib" id="{$reference->getId()}">
                                 {include file="`$path_template`/vancouver/chapter.tpl"}
                                 <button type="button" class="tocite btn btn-default btn-xs" id="to-{$reference->getId()}">
-                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> Find in text
+                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> {translate key="jatsParser.references.link"}
                                 </button>
                             </span>
                         </li>
@@ -102,7 +102,7 @@
                             <span class="bib" id="{$reference->getId()}">
                                 {include file="`$path_template`/vancouver/conference.tpl"}
                                 <button type="button" class="tocite btn btn-default btn-xs" id="to-{$reference->getId()}">
-                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> Find in text
+                                    <span class="glyphicon glyphicon-circle-arrow-up" aria-hidden="true"></span> {translate key="jatsParser.references.link"}
                                 </button>
                             </span>
                         </li>
