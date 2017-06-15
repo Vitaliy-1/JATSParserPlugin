@@ -34,9 +34,9 @@ class Body
     function bodyParsing (DOMXPath $xpath)
     {
         $sections = new ArrayObject();
-        $subsections = new ArrayObject();
-        $subsubsections = new ArrayObject();
         foreach ($xpath->evaluate("/article/body/sec") as $sec) {
+            $subsections = new ArrayObject();
+            $subsubsections = new ArrayObject();
             self::sectionParsing($xpath, $sec, $sections, $subsections, $subsubsections);
         }
         return $sections;
@@ -57,7 +57,6 @@ class Body
         foreach ($ifSubSecs as $ifSubSec) {
         }
         foreach ($ifSubSubSecs as $ifSubSubSec) {
-
         }
         if ($ifSubSec == null) {
             $section->setType("sec");

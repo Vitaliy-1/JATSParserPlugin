@@ -9,7 +9,7 @@
  *}
 
 
-{if get_class($secCont) == "ParContent" && $secCont->getType() == "paragraph"}{strip}
+{if (get_class($secCont) == "ParContent" || get_class($subSecCont) == "ParContent" || get_class($subSubSecCont) == "ParContent") && $secCont->getType() == "paragraph"}{strip}
     <p class="for-sections">
         {foreach from=$secCont item=parCont}
             {include file="`$path_template`/paragraph.tpl"}

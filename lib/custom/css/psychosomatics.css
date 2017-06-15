@@ -27,7 +27,7 @@ body p {
     color: grey;
 }
 .pkp_structure_main h1 {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Play', sans-serif;
     padding-left: 18px;
     padding-right: 18px;
     font-weight: 600;
@@ -452,7 +452,7 @@ ul.ui-tabs-nav.ui-corner-all.ui-helper-reset.ui-helper-clearfix.ui-widget-header
 }
 
 ul.ui-tabs-nav.ui-corner-all.ui-helper-reset.ui-helper-clearfix.ui-widget-header > li:first-child {
-    border-left: 0;
+    border-left: 1px solid #c5c5c5;
     margin-right: 2px;
 }
 
@@ -465,9 +465,7 @@ div#article_page_tabs {
     padding: 0;
     border: 0;
 }
-li#for_floating_right {
 
-}
 div.before_title {
     background: linear-gradient(to bottom, #f6f6f6, #fff);
     -webkit-box-shadow: 0px -3px 6px -3px rgba(0,0,0,0.5);
@@ -501,15 +499,20 @@ div.panel.panel-default.output > div.panel-heading {
 }
 
 /* right panel issue */
-div.item.issue div.panel-body > a.title {
+div.item.issue div.panel-body a.title {
     background: rgba(11, 157, 217, 0.075);
     color: #1B6685;
     border-bottom: 1px solid rgba(11, 157, 217, 0.4);
     cursor: pointer;
-    padding: 3px;
+    padding: 3px 5px 3px 5px;
+    border-radius: 5px;
 }
 
-
+div.item.issue div.panel-body a.title:hover {
+    background: #1B6685;
+    color: #fff;
+    text-decoration: none;
+}
 
 /* authors */
 ul.item.authors {

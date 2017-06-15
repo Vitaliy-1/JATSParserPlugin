@@ -26,20 +26,20 @@
                     {include file="`$path_template`/section.tpl"}
                     {if get_class($secCont) == "ArrayObject"}
                         {foreach from=$secCont item=subSec}
-                            <div class="section">
+                            <div class="subsection">
                                 <h3 class="title">{$subSec->getTitle()}</h3>
                             </div>
-                            <div class="forpan">
-                                <div class="panel-body">
+                            <div class="subforpan">
+                                <div class="subpanel-body">
                                     {foreach from=$subSec->getContent() item=secCont}
                                         {include file="`$path_template`/section.tpl"}
                                         {if get_class($secCont) == "ArrayObject"}
                                             {foreach from=$secCont item=subSubSec}
-                                                <div class="section">
+                                                <div class="subsubsection">
                                                     <h4 class="title">{$subSubCont->getTitle()}</h4>
                                                 </div>
-                                                <div class="forpan">
-                                                    <div class="panel-body">
+                                                <div class="subsubforpan">
+                                                    <div class="subsubpanel-body">
                                                         {foreach from=$subSubSec->getContent() item=secCont}
                                                             {include file="`$path_template`/section.tpl"}
                                                         {/foreach}
