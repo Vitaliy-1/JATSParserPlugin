@@ -206,10 +206,10 @@ class Body
 
             } elseif ($secContent->tagName == "sec") {
                 if ($section->getType() == "sec") {
-                    $section->getContent()->offsetSet(0, $subsections);
+                    $section->getContent()->append($subsections);
                 }
                 if ($section->getType() == "sub") {
-                    $section->getContent()->offsetSet(0, $subsubsections);
+                    $section->getContent()->append($subsubsections);
                 }
 
                 /* Recursion for parsing subsections and subsubsection from XML */
