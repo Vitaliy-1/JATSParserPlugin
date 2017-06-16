@@ -24,33 +24,29 @@
             <div class="panel-body">
                 {foreach from=$sect->getContent() item=secCont}
                     {include file="`$path_template`/section.tpl"}
-                    {if get_class($secCont) == "ArrayObject"}
-                        {foreach from=$secCont item=subSec}
-                            <div class="subsection">
-                                <h3 class="title">{$subSec->getTitle()}</h3>
+                    {if get_class($secCont) == "ArticleSection"}
+                        <div class="subsection">
+                            <h3 class="title">{$secCont->getTitle()}</h3>
+                        </div>
+                        <div class="subforpan">
+                            <div class="subpanel-body">
+                                {foreach from=$secCont->getContent() item=secCont}
+                                    {include file="`$path_template`/section.tpl"}
+                                    {if get_class($secCont) == "ArticleSection"}
+                                        <div class="subsubsection">
+                                            <h4 class="title">{$secCont->getTitle()}</h4>
+                                        </div>
+                                        <div class="subsubforpan">
+                                            <div class="subsubpanel-body">
+                                                {foreach from=$secCont->getContent() item=secCont}
+                                                    {include file="`$path_template`/section.tpl"}
+                                                {/foreach}
+                                            </div>
+                                        </div>
+                                    {/if}
+                                {/foreach}
                             </div>
-                            <div class="subforpan">
-                                <div class="subpanel-body">
-                                    {foreach from=$subSec->getContent() item=secCont}
-                                        {include file="`$path_template`/section.tpl"}
-                                        {if get_class($secCont) == "ArrayObject"}
-                                            {foreach from=$secCont item=subSubSec}
-                                                <div class="subsubsection">
-                                                    <h4 class="title">{$subSubCont->getTitle()}</h4>
-                                                </div>
-                                                <div class="subsubforpan">
-                                                    <div class="subsubpanel-body">
-                                                        {foreach from=$subSubSec->getContent() item=secCont}
-                                                            {include file="`$path_template`/section.tpl"}
-                                                        {/foreach}
-                                                    </div>
-                                                </div>
-                                            {/foreach}
-                                        {/if}
-                                    {/foreach}
-                                </div>
-                            </div>
-                        {/foreach}
+                        </div>
                     {/if}
                 {/foreach}
             </div>

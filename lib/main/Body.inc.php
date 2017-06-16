@@ -32,12 +32,23 @@ class Body
 {
 
     function bodyParsing (DOMXPath $xpath)
+        /* for parasing sections, subsections, subsubsections */
     {
         $sections = new ArrayObject();
         foreach ($xpath->evaluate("/article/body/sec") as $sec) {
-            $subsections = new ArrayObject();
-            $subsubsections = new ArrayObject();
-            self::sectionParsing($xpath, $sec, $sections, $subsections, $subsubsections);
+            $section = new ArticleSection();
+            $sections->append($section);
+            self::sectionParsing($xpath, $sec, $section);
+            foreach ($xpath->evaluate("sec", $sec) as $subsec) {
+                $subSection = new ArticleSection();
+                $section->getContent()->append($subSection);
+                self::sectionParsing($xpath, $subsec, $subSection);
+                foreach ($xpath->evaluate("sec", $subsec) as $subsubsec) {
+                    $subSubSection = new ArticleSection();
+                    $subSection->getContent()->append($subSubSection);
+                    self::sectionParsing($xpath, $subsec, $subSubSection);
+                }
+            }
         }
         return $sections;
     }
@@ -46,29 +57,9 @@ class Body
      * @param $xpath
      * @param $sec -> our section DOM Node
      * @param $sections -> our section as ArrayObject
-     * @param $subsections - our subsection as ArrayObject
-     * @param $subsubsections - our subsubsection as ArrayObject
      */
-    function sectionParsing(DOMXPath $xpath, DOMElement $sec, ArrayObject $sections, ArrayObject $subsections, ArrayObject $subsubsections)
+    function sectionParsing(DOMXPath $xpath, DOMElement $sec, ArticleSection $section)
     {
-        $section = new ArticleSection();
-        $ifSubSecs = $xpath->evaluate("parent::sec", $sec);
-        $ifSubSubSecs = $xpath->evaluate("parent::sec/parent::sec", $sec);
-        foreach ($ifSubSecs as $ifSubSec) {
-        }
-        foreach ($ifSubSubSecs as $ifSubSubSec) {
-        }
-        if ($ifSubSec == null) {
-            $section->setType("sec");
-            $sections->append($section);
-        } elseif ($ifSubSec != null && $ifSubSubSec == null) {
-            $section->setType("sub");
-            $subsections->append($section);
-        } elseif ($ifSubSec != null && $ifSubSubSec != null) {
-            $section->setType("subsub");
-            $subsections->append($section);
-        }
-
         foreach ($xpath->evaluate("title|p|fig|sec|table-wrap|list|media", $sec) as $secContent) {
 
             if ($secContent->tagName == "title") {
@@ -204,17 +195,6 @@ class Body
                     self::paragraphParsing($videoCaptionNode, $videoCaption);
                 }
 
-            } elseif ($secContent->tagName == "sec") {
-                if ($section->getType() == "sec") {
-                    $section->getContent()->append($subsections);
-                }
-                if ($section->getType() == "sub") {
-                    $section->getContent()->append($subsubsections);
-                }
-
-                /* Recursion for parsing subsections and subsubsection from XML */
-
-                self::sectionParsing($xpath, $secContent, $sections, $subsections, $subsubsections);
             }
         }
     }
