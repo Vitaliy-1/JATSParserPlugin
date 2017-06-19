@@ -201,8 +201,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$output .= $smarty->fetch($this->getTemplatePath() . 'articleMainText.tpl');
 		
 		return false;
-
-
 	}
 	/**
 	 * Return string containing date

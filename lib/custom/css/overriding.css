@@ -136,7 +136,7 @@ div.page.page_article:after {
     }
 }
 
-div.fornav.col-lg-5.col-md-5 {
+div.fornav {
     background-color: white;
     border-radius: 5px;
     border-top-left-radius: 0;
@@ -157,18 +157,6 @@ div.fornav.col-lg-5.col-md-5 {
     }
 }
 
-/* overriding article blocks */
-@media (min-width: 1200px) {
-    div.pkp_structure_content.has_sidebar > div#pkp_content_main {
-        width: 58.33333333%;
-    }
-}
-
-@media (min-width: 992px) {
-    div.pkp_structure_content.has_sidebar > div#pkp_content_main {
-        width: 58.33333333%;
-    }
-}
 
 /* overriding OJS breadcrumbs on article page */
 nav.cmp_breadcrumbs {
