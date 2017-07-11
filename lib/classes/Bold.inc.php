@@ -13,13 +13,14 @@
 class Bold extends ParContent {
     private $content;
 
+    public function __construct() {
+        $this->content = new ArrayObject(array());
+    }
     public function getContent()
     {
+        if ($this->content == null) {
+            $this->content = new ArrayObject();
+        }
         return $this->content;
-    }
-
-    public function setContent($content)
-    {
-        $this->content = $content;
     }
 }

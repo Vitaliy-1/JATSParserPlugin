@@ -17,6 +17,7 @@
 {** writing year, volume, issue, pages*}
 {strip}
 <span class="ref-source">
+    {$reference->getSource()}.
     {if $reference->getVolume() == NULL && $reference->getIssue() == NULL && $reference->getFpage() == NULL && $reference->getLpage() == NULL}
         {$reference->getYear()}
     {else}

@@ -7,6 +7,7 @@
  * A template to be included via Templates::Article::Main hook.
  * for writing article paragraphs
  *}
+
 {strip}
 {if get_class($parCont) == "ParText"}
     {$parCont->getContent()}
@@ -27,8 +28,20 @@
         {$parCont->getContent()}
     </a>
 {elseif get_class($parCont) == "Italic"}
-    <i>{$parCont->getContent()}</i>
+    <i>
+        {foreach from=$parCont->getContent() item=parCont}
+            {include file="`$path_template`/paragraph.tpl"}
+        {/foreach}
+    </i>
 {elseif get_class($parCont) == "Bold"}
-    <b>{$parCont->getContent()}</b>
+    <b>
+        {foreach from=$parCont->getContent() item=parCont}
+            {include file="`$path_template`/paragraph.tpl"}
+        {/foreach}
+    </b>
+{elseif get_class($parCont) == "Sup"}
+    <sup>{$parCont->getContent()}</sup>
+{elseif get_class($parCont) == "Sub"}
+    <sub>{$parCont->getContent()}</sub>
 {/if}
 {/strip}

@@ -17,6 +17,8 @@ import("plugins.generic.jatsParser.lib.classes.ParContent");
 import("plugins.generic.jatsParser.lib.classes.ParText");
 import("plugins.generic.jatsParser.lib.classes.Xref");
 import("plugins.generic.jatsParser.lib.classes.Italic");
+import("plugins.generic.jatsParser.lib.classes.Sup");
+import("plugins.generic.jatsParser.lib.classes.Sub");
 import("plugins.generic.jatsParser.lib.classes.XrefFig");
 import("plugins.generic.jatsParser.lib.classes.XrefTable");
 import("plugins.generic.jatsParser.lib.classes.XrefVideo");
@@ -203,8 +205,7 @@ class Body
      * @param $secContent -> XML section Node content
      * @param $paragraphContent -> Cell or ParContent object
      */
-    function paragraphParsing(DOMElement $secContent, $paragraphContent)
-    {
+    function paragraphParsing(DOMElement $secContent, $paragraphContent) {
         foreach ($secContent->childNodes as $parContent) {
             if ($parContent->nodeType == XML_TEXT_NODE) {
                 $parText = new ParText();
@@ -232,14 +233,22 @@ class Body
                     $ref->setContent($parContent->nodeValue);
                     $paragraphContent->getContent()->offsetSet(null, $ref);
                 }
-            } else if ($parContent->tagName == "italic") {
+            } elseif ($parContent->tagName == "italic") {
                 $italic = new Italic();
-                $italic->setContent(trim($parContent->nodeValue));
                 $paragraphContent->getContent()->offsetSet(null, $italic);
-            } else if ($parContent->tagName == "bold") {
+                self::paragraphParsing($parContent, $italic);
+            } elseif ($parContent->tagName == "bold") {
                 $bold = new Bold();
-                $bold->setContent($parContent->nodeValue);
                 $paragraphContent->getContent()->offsetSet(null, $bold);
+                self::paragraphParsing($parContent, $bold);
+            } elseif ($parContent->tagName == "sup") {
+                $sup = new Sup();
+                $sup->setContent($parContent->nodeValue);
+                $paragraphContent->getContent()->offsetSet(null, $sup);
+            } elseif ($parContent->tagName == "sub") {
+                $sub = new Sub();
+                $sub->setContent($parContent->nodeValue);
+                $paragraphContent->getContent()->offsetSet(null, $sub);
             }
         }
     }
