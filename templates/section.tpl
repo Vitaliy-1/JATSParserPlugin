@@ -107,11 +107,11 @@
                         {if $row->getType() == "flat"}
                             <tr>
                                 {foreach from=$row->getContent() item=cell}
-                                    <th colspan="{$cell->getColspan()}" rowspan="{$cell->getRowspan()}">
+                                    <td colspan="{$cell->getColspan()}" rowspan="{$cell->getRowspan()}">
                                         {foreach from=$cell->getContent() item=parCont}
                                             {include file="`$path_template`/paragraph.tpl"}
                                         {/foreach}
-                                    </th>
+                                    </td>
                                 {/foreach}
                             </tr>
                         {/if}
