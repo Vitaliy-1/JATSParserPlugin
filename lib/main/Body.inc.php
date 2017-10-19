@@ -48,7 +48,7 @@ class Body
                 foreach ($xpath->evaluate("sec", $subsec) as $subsubsec) {
                     $subSubSection = new ArticleSection();
                     $subSection->getContent()->append($subSubSection);
-                    self::sectionParsing($xpath, $subsec, $subSubSection);
+                    self::sectionParsing($xpath, $subsubsec, $subSubSection);
                 }
             }
         }
