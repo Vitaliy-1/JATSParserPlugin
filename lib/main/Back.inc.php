@@ -195,7 +195,11 @@ class Back
                 } else {
                     $bibitemJournal->setDoi("https://doi.org/" . trim($journalArticlePubId->nodeValue));
                 }
-            } elseif ($journalArticlePubId->getAttribute("pub-id-type") == "pmid") {
+            }
+        }
+
+        foreach ($xpath->evaluate("pub-id", $elementCitation) as $journalArticlePubId) {
+            if ($journalArticlePubId->getAttribute("pub-id-type") == "pmid") {
                 if (strpos($journalArticlePubId->nodeValue, "http") !== false) {
                     $bibitemJournal->setPmid(trim($journalArticlePubId->nodeValue));
                 } else {
