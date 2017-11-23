@@ -39,6 +39,12 @@ class Body
         $sections = new ArrayObject();
         foreach ($xpath->evaluate("/article/body/sec") as $sec) {
             $section = new ArticleSection();
+            $subSecNodes = $xpath->query("sec", $sec);
+            if ($subSecNodes->length === 0) {
+                $section->setHasSection(false);
+            } else {
+                $section->setHasSection(true);
+            }
             $sections->append($section);
             self::sectionParsing($xpath, $sec, $section);
             foreach ($xpath->evaluate("sec", $sec) as $subsec) {

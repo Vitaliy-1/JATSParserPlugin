@@ -23,9 +23,9 @@
     {elseif $name->getGivenname() != NULL && $i+1 == $reference->getName()|count}
         {$name->getGivenname()}.
     {/if}
-    {/strip} {/foreach}{strip}
-        {if $reference->getCollab() != NULL}
-            {$reference->getCollab()}.
-        {/if}
-    {/strip}
+{/strip} {/foreach}{strip}
+    {if $reference->getCollab() != NULL}
+        {$reference->getCollab()}.
+    {/if}
+{/strip}
 </span>

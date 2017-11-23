@@ -15,6 +15,7 @@ class ArticleSection {
     private $title;
     private $type;
     private $content;
+    private $hasSection;
 
     public function __construct() {
         $this->content = new ArrayObject(array());
@@ -50,5 +51,21 @@ class ArticleSection {
             $this->content = new ArrayObject();
         }
         return $this->content;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getHasSection()
+    {
+        return $this->hasSection;
+    }
+
+    /**
+     * @param boolean $hasSection
+     */
+    public function setHasSection($hasSection)
+    {
+        $this->hasSection = $hasSection;
     }
 }

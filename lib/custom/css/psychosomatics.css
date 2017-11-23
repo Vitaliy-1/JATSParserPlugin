@@ -17,6 +17,19 @@ body p {
     /* font-family: 'Open Sans', sans-serif; */
     color: grey;
 }
+@media (max-width: 991px) {
+    div.article-html-views {
+        padding-left: 20px;
+    }
+}
+@media (max-width: 767px) {
+    div.article-html-views {
+        padding-left: 0;
+    }
+    div.item.downloads_chart div.value {
+        overflow-x: auto;
+    }
+}
 
 .pkp_structure_main h2 {
     font-weight: normal;

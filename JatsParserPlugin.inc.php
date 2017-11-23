@@ -27,7 +27,7 @@ class JatsParserPlugin extends GenericPlugin {
 		if ($success && $this->getEnabled()) {
 			
 			// TODO: how do you define a sequence for all plugins using this hook?
-			HookRegistry::register('Templates::Article::Main', array($this, 'embedHtml'));
+			HookRegistry::register('Templates::Article::Main', array($this, 'embedHtml'), HOOK_SEQUENCE_CORE);
 			
 			// Add stylesheet and javascript
 			HookRegistry::register('TemplateManager::display',array($this, 'displayCallback'));
@@ -113,10 +113,10 @@ class JatsParserPlugin extends GenericPlugin {
 		if ($template != 'frontend/pages/article.tpl') return false;
 		
 		$templateMgr = $params[0];
-		$templateMgr->addStylesheet('jatsParser', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'psychosomatics.css');
-        $templateMgr->addStylesheet('jatsParser2', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'overriding.css');
+		//$templateMgr->addStylesheet('jatsParser', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'psychosomatics.css');
+        //$templateMgr->addStylesheet('jatsParser2', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'overriding.css');
 
-        $templateMgr->addJavaScript('jatsParser', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR .'psychosomatics.js');
+       // $templateMgr->addJavaScript('jatsParser', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR .'psychosomatics.js');
 		
 		$templateMgr->addJavaScript('mathJax', '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=MML_HTMLorMML-full');
 
@@ -138,14 +138,25 @@ class JatsParserPlugin extends GenericPlugin {
 
 		foreach ($articleArrays->getGalleys() as $galley) {
 			if ($galley && in_array($galley->getFileType(), array('application/xml', 'text/xml'))) {
-				$xmlGalley = $galley;
+				$xmlGalleys[] = $galley;
 			}
 		}
 
 		// Return false if no XML galleys available
-		if (!$xmlGalley) {
+		if (!$xmlGalleys) {
             $output .= $smarty->fetch($this->getTemplatePath() . 'abstract.tpl');
 		    return false;
+        }
+
+        $xmlGalley = null;
+        foreach($xmlGalleys as $xmlNumber => $xmlGalleyOne) {
+            if ($xmlNumber > 0) {
+                if ($xmlGalleyOne->getLocale() == AppLocale::getLocale()) {
+                    $xmlGalley = $xmlGalleyOne;
+                }
+            } else {
+                $xmlGalley = $xmlGalleyOne;
+            }
         }
 
         // managing references

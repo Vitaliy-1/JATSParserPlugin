@@ -46,7 +46,7 @@
 {/strip}{elseif get_class($secCont) == "Table"}
     <div class="figure-wrap table">
         <div class="fig-box" id="{$secCont->getId()}">
-            <table>
+            <table class="table table-responsive">
                 {foreach from=$secCont->getContent() item=tableTitles}
                     {if $tableTitles->getType() == "table-title"}
                         <caption class="table-title">
@@ -64,7 +64,7 @@
                         {if $row->getType() == "head"}
                             <tr>
                                 {foreach from=$row->getContent() item=cell}
-                                    <th colspan="{$cell->getColspan()}" rowspan="{$cell->getRowspan()}">
+                                    <th scope="col" colspan="{$cell->getColspan()}" rowspan="{$cell->getRowspan()}">
                                         {foreach from=$cell->getContent() item=parCont}
                                             {include file="`$path_template`/paragraph.tpl"}
                                         {/foreach}
@@ -76,7 +76,7 @@
                 {/capture}
 
 
-                <thead>
+                <thead class="thead-dark">
                 {$smarty.capture.insideTableHead}
                 </thead>
 
@@ -133,7 +133,7 @@
     </div>
 {elseif get_class($secCont) == "Figure"}
     <div class="figure-wrap fig">
-        <div id="{$secCont->getId()}">
+        <figure class="figure" id="{$secCont->getId()}">
             {strip}
                 {if $secCont->getLabel() != NULL}
                     <p class="figure-title">
@@ -152,11 +152,11 @@
                 {if strpos($secCont->getLink(), "/") == false}
                     {foreach from=$imageUrlArray key=fileName item=urlLink}
                         {if $fileName == $secCont->getLink()}
-                            <img src="{$urlLink}">
+                            <img src="{$urlLink}" class="figure-img img-fluid rounded">
                         {/if}
                     {/foreach}
                 {else}
-                    <img src="{$secCont->getLink()}">
+                    <img src="{$secCont->getLink()}" class="figure-img img-fluid rounded">
                 {/if}
             </div>
 
@@ -172,10 +172,10 @@
                 {/foreach}
             {/capture}
 
-            <div class="figure-comments">
+            <figcaption class="figure-caption">
                 {$smarty.capture.figureComments}
-            </div>
-        </div>
+            </figcaption>
+        </figure>
     </div>
 {elseif get_class($secCont) == "Video"}
     <div class="figure-wrap video">

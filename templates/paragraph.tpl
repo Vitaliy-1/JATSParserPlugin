@@ -12,9 +12,24 @@
 {if get_class($parCont) == "ParText"}
     {$parCont->getContent()}
 {elseif get_class($parCont) == "Xref"}
-    <a class="ref-tip btn btn-info" rid="{$parCont->getRid()}">
+    {foreach from=$references->getReferences() item=reference}
+        {if $reference->getId() == $parCont->getRid()}
+            {* get data from journal articles *}
+            {if get_class($reference) == "BibitemJournal" && $reference->getTitle() != null}
+                {assign var="refTitle" value=$reference->getTitle()}
+            {elseif get_class($reference) == "BibitemBook" && $reference->getSource() != null}
+                {assign var="refTitle" value=$reference->getSource()}
+            {elseif get_class($reference) == "BibitemChapter" && $reference->getChapterTitle() != null}
+                {assign var="refTitle" value=$reference->getChapterTitle()}
+            {elseif get_class($reference) == "BibitemConf" && $reference->getSource() != null}
+                {assign var="refTitle" value=$reference->getSource()}
+            {/if}
+        {/if}
+    {/foreach}
+    <a class="intext-citation" tabindex="0" data-trigger="focus" data-toggle="popover" title="{$refTitle}" rid="{$parCont->getRid()}">
         {$parCont->getContent()}
     </a>
+
 {elseif get_class($parCont) == "XrefFig"}
     <a class="reffigure" href="#{$parCont->getRid()}">
         {$parCont->getContent()}
