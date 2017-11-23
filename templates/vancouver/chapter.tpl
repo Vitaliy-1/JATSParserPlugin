@@ -15,40 +15,49 @@
 {include file="`$path_template`/vancouver/names.tpl"}
 
 {** writing book editors, title, publisher name, year etc. *}
-<span class="ref-source">{if $reference->getEditor() != NULL}{strip}
-        In: {/strip}{foreach from=$reference->getEditor() key=i item=name}{$name->getSurname()} {strip}
-            {foreach from=$name->getInitials() key=j item=initial}
-                {if $initial != NULL && $j+1 < $name->getInitials()|@count}
-                    {$initial}
-                {elseif $initial != NULL && $i+1 < $reference->getEditor()|count}
-                    {$initial},
-                {elseif $initial != NULL && $i+1 == $reference->getEditor()|count}
-                    {$initial},
-                {/if}
-            {/foreach}
+<span class="ref-source">
+    {if $reference->getEditor() != NULL}
+        In: {foreach from=$reference->getEditor() key=i item=name}
+                {$name->getSurname()}
+                {foreach from=$name->getInitials() key=j item=initial}
+                    {if $initial != NULL && $j+1 < $name->getInitials()|@count}
+                        {$initial}
+                    {elseif $initial != NULL && $i+1 < $reference->getEditor()|count}
+                        {$initial},
+                    {elseif $initial != NULL && $i+1 == $reference->getEditor()|count}
+                        {$initial},
+                    {/if}
+                {/foreach}
             {if $name->getGivenname() != NULL && $i+1 < $reference->getEditor()|count}
                 {$name->getGivenname()},
             {elseif $name->getGivenname() != NULL && $i+1 == $reference->getEditor()|count}
                 {$name->getGivenname()},
             {/if}
-        {/strip} {/foreach}ed. {strip}
+        {/foreach}
+        {if $reference->getEditor()|@count == 1}
+            ed.
+        {else}
+            eds.
+        {/if}
         {if $reference->getCollabEditor() != NULL}
             {$reference->getCollabEditor()}.
         {/if}
-    {/strip}{/if}{strip}
+    {/if}
+        {if $reference->getSource() != NULL}
+            {$reference->getSource()}.
+        {/if}
         {if $reference->getPublisherLoc() != NULL && $reference->getPublisherName() != NULL}
             {$reference->getPublisherLoc()}:
         {elseif $reference->getPublisherLoc() != NULL && $reference->getPublisherName() == NULL}
             {$reference->getPublisherLoc()}
-        {/if}{/strip} {strip}
+        {/if}
         {if $reference->getPublisherName() != NULL && $reference->getYear() != NULL}
             {$reference->getPublisherName()};
         {elseif $reference->getPublisherName() != NULL && $reference->getYear() == NULL}
             {$reference->getPublisherName()}
-        {/if}{/strip} {strip}
+        {/if}
         {if $reference->getYear() != NULL}
             {$reference->getYear()}
         {/if}
         .
-    {/strip}
 </span>
