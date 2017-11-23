@@ -41,7 +41,7 @@
 {/strip}
 
 {** writing URL, DOI, PMID*}
-{if $reference->getDoi() != NULL || $reference->getPmid != NULL || $reference->getUrl() != NULL}
+{if $reference->getDoi() != NULL || $reference->getPmid() != NULL || $reference->getUrl() != NULL}
     {include file="`$path_template`/vancouver/links.tpl"}
 {/if}
 
