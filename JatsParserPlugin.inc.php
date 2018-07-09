@@ -2,40 +2,36 @@
 /**
  * @file plugins/generic/jatsParser/JatsParserPlugin.inc.php
  *
- * Copyright (c) 2017 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
+ * Copyright (c) 2017 Vitalii Bezsheiko
  * Distributed under the GNU GPL v3.
  *
  * @class JatsParserSettingsForm
  * @ingroup plugins_generic_jatsParser
  *
  */
+	
+require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 
 import('lib.pkp.classes.plugins.GenericPlugin');
-import("plugins.generic.jatsParser.lib.main.Body");
-import("plugins.generic.jatsParser.lib.main.Back");
+
+use JATSParser\Body\Document as Document;
+use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
+use JATSParser\HTML\Document as HTMLDocument;
 
 class JatsParserPlugin extends GenericPlugin {
-	/**
-	 * Called as a plugin is registered to the registry
-	 * @param $category String Name of category plugin was registered to
-	 * @return boolean True iff plugin initialized successfully; if false,
-	 * 	the plugin will not be registered.
-	 */
-	function register($category, $path) {
-		$success = parent::register($category, $path);
-		if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return true;
-		if ($success && $this->getEnabled()) {
-			
-			// TODO: how do you define a sequence for all plugins using this hook?
-			HookRegistry::register('Templates::Article::Main', array($this, 'embedHtml'), HOOK_SEQUENCE_CORE);
-			
-			// Add stylesheet and javascript
-			HookRegistry::register('TemplateManager::display',array($this, 'displayCallback'));
-			
-		
+	
+	function register($category, $path, $mainContextId = null) {
+		if (parent::register($category, $path, $mainContextId)) {
+			if ($this->getEnabled()) {
+				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
+				HookRegistry::register('ArticleHandler::download', array($this, 'xmlDownload'));
+				$this->_registerTemplateResource();
+			}
+			return true;
 		}
-		return $success;
+		return false;
 	}
+	
 	/**
 	 * Get the plugin display name.
 	 * @return string
@@ -43,6 +39,7 @@ class JatsParserPlugin extends GenericPlugin {
 	function getDisplayName() {
 		return __('plugins.generic.jatsParser.displayName');
 	}
+	
 	/**
 	 * Get the plugin description.
 	 * @return string
@@ -50,6 +47,14 @@ class JatsParserPlugin extends GenericPlugin {
 	function getDescription() {
 		return __('plugins.generic.jatsParser.description');
 	}
+	
+	/**
+	 * @copydoc Plugin::getTemplatePath()
+	 */
+	function getTemplatePath($inCore = false) {
+		return $this->getTemplateResourceName() . ':templates/';
+	}
+	
 	/**
 	 * @copydoc Plugin::getActions()
 	 */
@@ -96,133 +101,258 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 		return parent::manage($args, $request);
 	}
-	/**
-	 * @copydoc PKPPlugin::getTemplatePath
-	 */
-	function getTemplatePath($inCore = false) {
-		return parent::getTemplatePath($inCore) . 'templates/';
-	}
-	
 	
 	/**
-	 * Insert stylesheet and js
-	 */
-	function displayCallback($hookName, $params) {
-		$template = $params[1];
-			
-		if ($template != 'frontend/pages/article.tpl') return false;
-		
-		$templateMgr = $params[0];
-		//$templateMgr->addStylesheet('jatsParser', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'psychosomatics.css');
-        //$templateMgr->addStylesheet('jatsParser2', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'overriding.css');
-
-       // $templateMgr->addJavaScript('jatsParser', Request::getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'custom' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR .'psychosomatics.js');
-		
-		$templateMgr->addJavaScript('mathJax', '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=MML_HTMLorMML-full');
-
-		
-		return false;
-	}
-	
-	
-	/**
-	 * Convert and embed html to abstract page footer
+	 * Present the article wrapper page.
 	 * @param $hookName string
-	 * @param $params array
+	 * @param $args array
+	 * @return bool
 	 */
-	function embedHtml($hookName, $params) {
-		$smarty =& $params[1];
-		$output =& $params[2];
-
-        $articleArrays = $smarty->get_template_vars('article');
-
-		foreach ($articleArrays->getGalleys() as $galley) {
-			if ($galley && in_array($galley->getFileType(), array('application/xml', 'text/xml'))) {
-				$xmlGalleys[] = $galley;
+	function articleViewCallback($hookName, $args) {
+		$request =& $args[0];
+		$issue =& $args[1];
+		$galley =& $args[2];
+		$article =& $args[3];
+		
+		$xmlGalley = null;
+		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
+			$xmlGalley = $galley;
+		}
+		
+		if (!$xmlGalley) return false;
+		
+		$submissionFile = $xmlGalley->getFile();
+		$jatsDocument = new Document($submissionFile->getFilePath());
+		
+		$templateMgr = TemplateManager::getManager($request);
+		$htmlDocument = $this->htmlCreation($templateMgr, $jatsDocument, $xmlGalley);
+		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
+		
+		$templateMgr->addStyleSheet('styles', $baseUrl . '/app/app.min.css');
+		$templateMgr->addStyleSheet('fontawesome', 'https://use.fontawesome.com/releases/v5.1.0/css/all.css');
+		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
+		$templateMgr->addJavaScript('javascript', $baseUrl . '/app/app.js');
+		
+		$templateMgr->assign(array(
+			'issue' => $issue,
+			'article' => $article,
+			'galley' => $galley,
+			'htmlDocument' => $htmlDocument->saveHTML(),
+			'pluginUrl' => $baseUrl,
+		));
+		
+		$templateMgr->display($this->getTemplatePath() . 'articleView.tpl');
+		
+		return true;
+	}
+	
+	/**
+	 * Present rewritten XML.
+	 * @param $hookName string
+	 * @param $args array (PublishedArticle, SubmissionFile, submission file id)
+	 * @return bool
+	 */
+	function xmlDownload ($hookName, $args) {
+		$galley =& $args[1];
+		$fileId =& $args[2];
+		
+		$embeddedXml = null;
+		
+		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() ==="text/xml") && $galley->getFileId() == $fileId) {
+			$embeddedXml = $galley;
+		}
+		
+		if (!$embeddedXml) return false;
+		
+		
+		
+		
+		/* PHP Object model of JATS XML
+		 * @var $submissionFile  SubmissionFile
+		 */
+		//$jatsDocument = new Document($submissionFile->getFilePath());
+		// HTML DOM
+		//$htmlDocument = $this->htmlCreation($templateMgr, $jatsDocument, $embeddedXml);
+		// assigning DOM as a string to Smarty
+		
+		//$templateMgr->assign("htmlGalley", $htmlDocument->getHmtlForGalley());
+		
+		// Handling PDFs; don't do anything if article already has downloaded PDF
+		//if ($boolEmbeddedPdf || !$embeddedXml) return false;
+		// The string for PDF generating requests
+		/*
+		$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
+		$templateMgr->assign("generatePdfUrl", $generatePdfUrl);
+		
+		if ($request->getQueryString() !== CREATE_PDF_QUERY) return false;
+		$this->pdfCreation($articleArrays, $request, $htmlDocument, $issueArrays, $templateMgr);
+		*/
+		
+		// TODO Display JATS XML as HTML
+		/*
+		$pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
+		$context = PKPApplication::getRequest()->getContext();
+		$contextId = $context ? $context->getId() : 0;
+		print_r($pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin'));
+		*/
+	}
+	
+	/**
+	 * @param $articleArrays PublishedArticle
+	 * @param $request PKPRequest
+	 * @param $htmlDocument HTMLDocument
+	 * @param $issueArrays Issue
+	 * @param $templateMgr TemplateManager
+	 */
+	private function pdfCreation($articleArrays, $request, $htmlDocument, $issueArrays, $templateMgr): void
+	{
+		$journal = $request->getJournal();
+		
+		// extends TCPDF object
+		$pdfDocument = new TCPDFDocument();
+		
+		$pdfDocument->setTitle($articleArrays->getLocalizedFullTitle());
+		
+		// get the logo
+		
+		$journal = $request->getContext();
+		$pdfHeaderLogo = __DIR__ . "/jatsParser/logo/logo.jpg";
+		
+		$pdfDocument->SetCreator(PDF_CREATOR);
+		$pdfDocument->SetAuthor($articleArrays->getAuthorString());
+		$pdfDocument->SetSubject($articleArrays->getLocalizedSubject());
+		
+		
+		$articleDataString = $issueArrays->getIssueIdentification();
+		if ($articleArrays->getPages()) {
+			$articleDataString .= ", ". $articleArrays->getPages();
+		}
+		
+		if ($articleArrays->getSectionTitle()) {
+			$articleDataString .= "\n" . $articleArrays->getSectionTitle();
+		}
+		
+		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getLocalizedName(), $articleDataString);
+		
+		$pdfDocument->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+		$pdfDocument->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+		$pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+		$pdfDocument->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+		$pdfDocument->SetHeaderMargin(PDF_MARGIN_HEADER);
+		$pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
+		$pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+		$pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
+		
+		$pdfDocument->AddPage();
+		
+		/* An example of using translations inside PHP */
+		//$translate = $templateMgr->smartyTranslate(array('key' =>'common.abstract'), $templateMgr);
+		
+		// Article title
+		
+		$pdfDocument->SetFillColor(255, 255, 255);
+		$pdfDocument->SetFont('dejavuserif', 'B', 20);
+		$pdfDocument->MultiCell('', '', $articleArrays->getLocalizedFullTitle(), 0, 'L', 1, 1, '' ,'', true);
+		$pdfDocument->Ln(6);
+		
+		// Article's authors
+		if (count($articleArrays->getAuthors()) > 0) {
+			/* @var $author Author */
+			foreach ($articleArrays->getAuthors() as $author) {
+				$pdfDocument->SetFont('dejavuserif', 'I', 10);
+				
+				// Calculating the line height for author name and affiliation
+				
+				$authorLineWidth = 60;
+				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, htmlspecialchars($author->getFullName()));
+				
+				$affiliationLineWidth = 110;
+				$afilliationStringHeight = $pdfDocument->getStringHeight(110, htmlspecialchars($author->getLocalizedAffiliation()));
+				
+				$authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
+				
+				// Writing affiliations into cells
+				$pdfDocument->MultiCell($authorLineWidth, 0, htmlspecialchars($author->getFullName()), 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
+				$pdfDocument->SetFont('dejavuserif', '', 10);
+				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, htmlspecialchars($author->getLocalizedAffiliation()), 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
+			}
+			$pdfDocument->Ln(6);
+		}
+		
+		// Abstract
+		if ($articleArrays->getLocalizedAbstract()) {
+			$pdfDocument->setCellPaddings(5, 5, 5, 5);
+			$pdfDocument->SetFillColor(248, 248, 255);
+			$pdfDocument->SetFont('dejavuserif', '', 10);
+			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 140, 0)));
+			$pdfDocument->writeHTMLCell('', '', '', '', $articleArrays->getLocalizedAbstract(), 'B', 1, 1, true, 'J', true);
+			$pdfDocument->Ln(4);
+		}
+		
+		// Text (goes from JATSParser
+		$pdfDocument->setCellPaddings(0, 0, 0, 0);
+		$pdfDocument->SetFont('dejavuserif', '', 10);
+		
+		$htmlString = $htmlDocument->getHtmlForTCPDF();
+		$pdfDocument->writeHTML($htmlString, true, false, true, false, '');
+		
+		$pdfDocument->Output('article.pdf', 'I');
+	}
+	
+	/**
+	 * @param $jatsDocument Document
+	 * @param $templateMgr TemplateManager
+	 * @return HTMLDocument HTMLDocument
+	 * @brief preparation of HTML file
+	 */
+	private function htmlCreation($templateMgr, $jatsDocument, $embeddedXml): HTMLDocument
+	{
+		// HTML DOM
+		$htmlDocument = new HTMLDocument($jatsDocument);
+		
+		// Add the link to images
+		
+		$submissionFile = $embeddedXml->getFile();
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		import('lib.pkp.classes.submission.SubmissionFile'); // Constants
+		$embeddableFiles = array_merge(
+			$submissionFileDao->getLatestRevisions($submissionFile->getSubmissionId(), SUBMISSION_FILE_PROOF),
+			$submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getFileId(), $submissionFile->getSubmissionId(), SUBMISSION_FILE_DEPENDENT)
+		);
+		$referredArticle = null;
+		$articleDao = DAORegistry::getDAO('ArticleDAO');
+		$imageUrlArray = array();
+		foreach ($embeddableFiles as $embeddableFile) {
+			$params = array();
+			if ($embeddableFile->getFileType() == 'image/png' || $embeddableFile->getFileType() == 'image/jpeg') {
+				// Ensure that the $referredArticle object refers to the article we want
+				if (!$referredArticle || $referredArticle->getId() != $embeddedXml->getSubmissionId()) {
+					$referredArticle = $articleDao->getById($embeddedXml->getSubmissionId());
+				}
+				$fileUrl = Application::getRequest()->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $embeddedXml->getBestGalleyId(), $embeddableFile->getFileId()), $params);
+				$imageUrlArray[$embeddableFile->getOriginalFileName()] = $fileUrl;
 			}
 		}
-
-		// Return false if no XML galleys available
-		if (!$xmlGalleys) {
-            $output .= $smarty->fetch($this->getTemplatePath() . 'abstract.tpl');
-		    return false;
-        }
-
-        $xmlGalley = null;
-        foreach($xmlGalleys as $xmlNumber => $xmlGalleyOne) {
-            if ($xmlNumber > 0) {
-                if ($xmlGalleyOne->getLocale() == AppLocale::getLocale()) {
-                    $xmlGalley = $xmlGalleyOne;
-                }
-            } else {
-                $xmlGalley = $xmlGalleyOne;
-            }
-        }
-
-        // managing references
-        $submissionFile = $xmlGalley->getFile();
-
-        $submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-        import('lib.pkp.classes.submission.SubmissionFile'); // Constants
-        $embeddableFiles = array_merge(
-            $submissionFileDao->getLatestRevisions($submissionFile->getSubmissionId(), SUBMISSION_FILE_PROOF),
-            $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getFileId(), $submissionFile->getSubmissionId(), SUBMISSION_FILE_DEPENDENT)
-        );
-        $referredArticle = null;
-        $articleDao = DAORegistry::getDAO('ArticleDAO');
-
-        $imageUrlArray = array();
-        foreach ($embeddableFiles as $embeddableFile) {
-            $params = array();
-
-            if ($embeddableFile->getFileType()=='image/png' || $embeddableFile->getFileType()=='image/jpeg') {
-
-                // Ensure that the $referredArticle object refers to the article we want
-                if (!$referredArticle || $referredArticle->getId() != $galley->getSubmissionId()) {
-                    $referredArticle = $articleDao->getById($galley->getSubmissionId());
-                }
-                $fileUrl = Application::getRequest()->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $galley->getBestGalleyId(), $embeddableFile->getFileId()), $params);
-
-                $imageUrlArray[$embeddableFile->getOriginalFileName()] = $fileUrl;
-            }
-
-        }
-        $smarty->assign('imageUrlArray', $imageUrlArray);
-
-
-
-
-
-		// Parsing JATS XML
-        $document = new DOMDocument;
-        $document->load($xmlGalley->getFile()->getFilePath());
-        $xpath = new DOMXPath($document);
-
-		$body = new Body();
-        $sections = $body->bodyParsing($xpath);
-
-        /* Assigning references */
-        $back = new Back();
-        $references = $back->parsingBack($xpath);
-
-		// Assigning variables to article template
-        $smarty->assign('sections', $sections);
-        $smarty->assign('references', $references);
-        $smarty->assign('path_template',$this->getTemplatePath());
-		$output .= $smarty->fetch($this->getTemplatePath() . 'articleMainText.tpl');
 		
-		return false;
+		// Replace link with actual path
+		$xpath = new \DOMXPath($htmlDocument);
+		$imageLinks = $xpath->evaluate("//img");
+		foreach ($imageLinks as $imageLink) {
+			if ($imageLink->hasAttribute("src")) {
+				array_key_exists($imageLink->getAttribute("src"), $imageUrlArray);
+				$imageLink->setAttribute("src", $imageUrlArray[$imageLink->getAttribute("src")]);
+			}
+		}
+		
+		// Localization of reference list title
+		$referenceTitles = $xpath->evaluate("//h2[@id='reference-title']");
+		$translateReference = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
+		if ($referenceTitles->lenght > 0) {
+			foreach ($referenceTitles as $referenceTitle) {
+				$referenceTitle->nodeValue = $translateReference;
+			}
+		}
+		
+		return $htmlDocument;
 	}
-	/**
-	 * Return string containing date
-	 * @param $text String to be formatted
-	 * @param $format Date format, default DATE_W3C
-	 * @return string
-	 */	
-
-    public static function formatDate($text, $format = DATE_W3C){
-        $date = new \DateTime($text);
-        return $date->format($format);
-    }
 }
-?>

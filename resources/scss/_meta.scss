@@ -1,0 +1,17 @@
+.galley-article-meta {
+	margin-top: 50px;
+	margin-bottom: 50px;
+	flex-direction: column;
+	
+	.galley-article-section-title {
+		text-transform: uppercase;
+		font-size: 13px;
+		color: $muted-text-color;
+		margin-bottom: 20px;
+		text-align: center;
+	}
+	
+	h1 {
+		text-align: center;
+	}
+}

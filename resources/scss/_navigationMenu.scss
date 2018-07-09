@@ -1,0 +1,44 @@
+.intraarticle-menu {
+	.nav-link {
+		color: black;
+	}
+}
+
+.intraarticle-menu {
+	position: sticky;
+	top: 0;
+	display: block;
+	overflow-y: auto;
+	height: 99vh;
+}
+
+#article-navigation-menu-items {
+	> .nav-link {
+		font-size: 15px;
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+	
+	.nav-subtitle {
+		font-size: 13px;
+		padding-top: 2px;
+		padding-bottom: 2px;
+		margin-top: 0;
+		margin-bottom: 0;
+	}
+	
+	i {
+		padding-right: 5px;
+	}
+	
+	.nav-link.active {
+		background-color: white;
+		color: black;
+		
+		i:before {
+			background-color: $light-blue;
+			border-radius: 10px;
+			color: $light-cyan;
+		}
+	}
+}

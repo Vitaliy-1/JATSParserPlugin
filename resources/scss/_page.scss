@@ -1,0 +1,61 @@
+// Typography
+
+.article-container {
+	p, li, table, figure, a, div, span {
+		font-family: $primary-font;
+		font-size: 16px;
+		line-height: 1.55;
+	}
+	
+	h1, h2, h3, h4 {
+		font-family: $primary-font;
+		color: black;
+	}
+	
+	h1 {
+		font-size: 42px;
+	}
+	
+	h2 {
+		font-size: 26px;
+		margin-bottom: 12px;
+		
+		&:not(:first-child){
+			margin-top: 34px;
+		}
+	}
+	
+	h3 {
+		font-size: 24px;
+	}
+	
+	h4 {
+		font-size: 22px;
+	}
+}
+
+// container
+
+.article-container {
+	margin-top: 100px;
+	margin-bottom: 100px;
+}
+
+@media (min-width: 1200px) {
+	.article-container.container {
+		max-width: 1400px;
+	}
+}
+
+// right details block
+.details-wrapper {
+	> div:first-child {
+		margin-top: 50px;
+	}
+	
+	> div:not(:first-child) {
+		margin-top: 30px;
+	}
+}
+
+
