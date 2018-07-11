@@ -12,3 +12,21 @@
 	padding-left: 0;
 	padding-right: 0;
 }
+
+.left-article-block {
+	margin-top: 50px;
+}
+
+.galley-pdf-link-wrapper {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	
+	a {
+		color: black;
+		padding: 10px;
+		border: 1px solid $light-grey;
+		text-align: center;
+		background-color: white;
+	}
+}

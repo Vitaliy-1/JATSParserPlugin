@@ -1,9 +1,9 @@
-table {
-	width: 100%;
-	max-width: 100%;
+.table-wrapper {
+	overflow-x: auto;
+	margin-bottom: 30px;
 }
 
-thead th, thead td {
-	vertical-align: bottom;
-	border-bottom: 2px solid #dee2e6;
+.table-wrapper thead th {
+	vertical-align: middle;
+	text-align: center;
 }

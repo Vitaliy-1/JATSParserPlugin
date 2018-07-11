@@ -18,12 +18,15 @@ use JATSParser\Body\Document as Document;
 use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
 use JATSParser\HTML\Document as HTMLDocument;
 
+define("CREATE_PDF_QUERY", "download=pdf");
+
 class JatsParserPlugin extends GenericPlugin {
 	
 	function register($category, $path, $mainContextId = null) {
 		if (parent::register($category, $path, $mainContextId)) {
 			if ($this->getEnabled()) {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
+				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
 				HookRegistry::register('ArticleHandler::download', array($this, 'xmlDownload'));
 				$this->_registerTemplateResource();
 			}
@@ -114,6 +117,16 @@ class JatsParserPlugin extends GenericPlugin {
 		$galley =& $args[2];
 		$article =& $args[3];
 		
+		// TODO Check if Lens Plugin is enabled
+		/*
+		$pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
+		$context = PKPApplication::getRequest()->getContext();
+		$contextId = $context ? $context->getId() : 0;
+		print_r($pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin'));
+		*/
+		
+		if ($request->getQueryString() === CREATE_PDF_QUERY) return false;
+		
 		$xmlGalley = null;
 		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
 			$xmlGalley = $galley;
@@ -125,8 +138,12 @@ class JatsParserPlugin extends GenericPlugin {
 		$jatsDocument = new Document($submissionFile->getFilePath());
 		
 		$templateMgr = TemplateManager::getManager($request);
+		
+		//creating HTML Document
 		$htmlDocument = $this->htmlCreation($templateMgr, $jatsDocument, $xmlGalley);
+		
 		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
+		$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
 		
 		$templateMgr->addStyleSheet('styles', $baseUrl . '/app/app.min.css');
 		$templateMgr->addStyleSheet('fontawesome', 'https://use.fontawesome.com/releases/v5.1.0/css/all.css');
@@ -139,6 +156,7 @@ class JatsParserPlugin extends GenericPlugin {
 			'galley' => $galley,
 			'htmlDocument' => $htmlDocument->saveHTML(),
 			'pluginUrl' => $baseUrl,
+			'generatePdfUrl' => $generatePdfUrl,
 		));
 		
 		$templateMgr->display($this->getTemplatePath() . 'articleView.tpl');
@@ -147,7 +165,39 @@ class JatsParserPlugin extends GenericPlugin {
 	}
 	
 	/**
-	 * Present rewritten XML.
+	 * Hadnling request to PDF download page.
+	 * @param $hookName string
+	 * @param $args array
+	 * @return bool
+	 *
+	 */
+	function pdfViewCallback($hookName, $args) {
+		/* @var $request Request */
+		$request =& $args[0];
+		$issue =& $args[1];
+		$galley =& $args[2];
+		$article =& $args[3];
+		
+		if ($request->getQueryString() !== CREATE_PDF_QUERY) return false;
+		
+		$xmlGalley = null;
+		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
+			$xmlGalley = $galley;
+		}
+		
+		if (!$xmlGalley) return false;
+		
+		$submissionFile = $xmlGalley->getFile();
+		$jatsDocument = new Document($submissionFile->getFilePath());
+		$htmlDocument = new HTMLDocument($jatsDocument);
+		
+		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
+		
+		return true;
+	}
+	
+	/**
+	 * Present XML.
 	 * @param $hookName string
 	 * @param $args array (PublishedArticle, SubmissionFile, submission file id)
 	 * @return bool
@@ -164,72 +214,51 @@ class JatsParserPlugin extends GenericPlugin {
 		
 		if (!$embeddedXml) return false;
 		
-		
-		
-		
-		/* PHP Object model of JATS XML
-		 * @var $submissionFile  SubmissionFile
-		 */
-		//$jatsDocument = new Document($submissionFile->getFilePath());
-		// HTML DOM
-		//$htmlDocument = $this->htmlCreation($templateMgr, $jatsDocument, $embeddedXml);
-		// assigning DOM as a string to Smarty
-		
-		//$templateMgr->assign("htmlGalley", $htmlDocument->getHmtlForGalley());
-		
-		// Handling PDFs; don't do anything if article already has downloaded PDF
-		//if ($boolEmbeddedPdf || !$embeddedXml) return false;
-		// The string for PDF generating requests
-		/*
-		$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
-		$templateMgr->assign("generatePdfUrl", $generatePdfUrl);
-		
-		if ($request->getQueryString() !== CREATE_PDF_QUERY) return false;
-		$this->pdfCreation($articleArrays, $request, $htmlDocument, $issueArrays, $templateMgr);
-		*/
-		
-		// TODO Display JATS XML as HTML
-		/*
-		$pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
-		$context = PKPApplication::getRequest()->getContext();
-		$contextId = $context ? $context->getId() : 0;
-		print_r($pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin'));
-		*/
 	}
 	
 	/**
-	 * @param $articleArrays PublishedArticle
+	 * @param $article PublishedArticle
 	 * @param $request PKPRequest
 	 * @param $htmlDocument HTMLDocument
-	 * @param $issueArrays Issue
-	 * @param $templateMgr TemplateManager
+	 * @param $issue Issue
+	 * @param
 	 */
-	private function pdfCreation($articleArrays, $request, $htmlDocument, $issueArrays, $templateMgr): void
+	private function pdfCreation(PublishedArticle $article, Request $request, HTMLDocument $htmlDocument, Issue $issue, ArticleGalley $xmlGalley): void
 	{
-		$journal = $request->getJournal();
+		// HTML preparation
+		$xpath = new \DOMXPath($htmlDocument);
+		$this->imageUrlReplacement($xmlGalley, $xpath);
+		
+		// Special treatment for table head
+		$tableHeadRows = $xpath->evaluate("//thead/tr");
+		foreach ($tableHeadRows as $tableHeadRow) {
+			$tableHeadRow->setAttribute("align", "center");
+			$tableHeadRow->setAttribute("style", "background-color:#f2e6ff;");
+		}
+		
 		
 		// extends TCPDF object
 		$pdfDocument = new TCPDFDocument();
 		
-		$pdfDocument->setTitle($articleArrays->getLocalizedFullTitle());
+		$pdfDocument->setTitle($article->getLocalizedFullTitle());
 		
 		// get the logo
 		
 		$journal = $request->getContext();
-		$pdfHeaderLogo = __DIR__ . "/jatsParser/logo/logo.jpg";
+		$pdfHeaderLogo = __DIR__ . "/JATSParser/logo/logo.jpg";
 		
 		$pdfDocument->SetCreator(PDF_CREATOR);
-		$pdfDocument->SetAuthor($articleArrays->getAuthorString());
-		$pdfDocument->SetSubject($articleArrays->getLocalizedSubject());
+		$pdfDocument->SetAuthor($article->getAuthorString());
+		$pdfDocument->SetSubject($article->getLocalizedSubject());
 		
 		
-		$articleDataString = $issueArrays->getIssueIdentification();
-		if ($articleArrays->getPages()) {
-			$articleDataString .= ", ". $articleArrays->getPages();
+		$articleDataString = $issue->getIssueIdentification();
+		if ($article->getPages()) {
+			$articleDataString .= ", ". $article->getPages();
 		}
 		
-		if ($articleArrays->getSectionTitle()) {
-			$articleDataString .= "\n" . $articleArrays->getSectionTitle();
+		if ($article->getSectionTitle()) {
+			$articleDataString .= "\n" . $article->getSectionTitle();
 		}
 		
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getLocalizedName(), $articleDataString);
@@ -252,13 +281,13 @@ class JatsParserPlugin extends GenericPlugin {
 		
 		$pdfDocument->SetFillColor(255, 255, 255);
 		$pdfDocument->SetFont('dejavuserif', 'B', 20);
-		$pdfDocument->MultiCell('', '', $articleArrays->getLocalizedFullTitle(), 0, 'L', 1, 1, '' ,'', true);
+		$pdfDocument->MultiCell('', '', $article->getLocalizedFullTitle(), 0, 'L', 1, 1, '' ,'', true);
 		$pdfDocument->Ln(6);
 		
 		// Article's authors
-		if (count($articleArrays->getAuthors()) > 0) {
+		if (count($article->getAuthors()) > 0) {
 			/* @var $author Author */
-			foreach ($articleArrays->getAuthors() as $author) {
+			foreach ($article->getAuthors() as $author) {
 				$pdfDocument->SetFont('dejavuserif', 'I', 10);
 				
 				// Calculating the line height for author name and affiliation
@@ -280,12 +309,12 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 		
 		// Abstract
-		if ($articleArrays->getLocalizedAbstract()) {
+		if ($article->getLocalizedAbstract()) {
 			$pdfDocument->setCellPaddings(5, 5, 5, 5);
 			$pdfDocument->SetFillColor(248, 248, 255);
 			$pdfDocument->SetFont('dejavuserif', '', 10);
 			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 140, 0)));
-			$pdfDocument->writeHTMLCell('', '', '', '', $articleArrays->getLocalizedAbstract(), 'B', 1, 1, true, 'J', true);
+			$pdfDocument->writeHTMLCell('', '', '', '', $article->getLocalizedAbstract(), 'B', 1, 1, true, 'J', true);
 			$pdfDocument->Ln(4);
 		}
 		
@@ -309,9 +338,30 @@ class JatsParserPlugin extends GenericPlugin {
 	{
 		// HTML DOM
 		$htmlDocument = new HTMLDocument($jatsDocument);
+		$xpath = new \DOMXPath($htmlDocument);
 		
-		// Add the link to images
+		$this->imageUrlReplacement($embeddedXml, $xpath);
 		
+		
+		// Localization of reference list title
+		$referenceTitles = $xpath->evaluate("//h2[@id='reference-title']");
+		$translateReference = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
+		if ($referenceTitles->lenght > 0) {
+			foreach ($referenceTitles as $referenceTitle) {
+				$referenceTitle->nodeValue = $translateReference;
+			}
+		}
+		
+		return $htmlDocument;
+	}
+	
+	/**
+	 * @param $embeddedXml
+	 * @param $xpath
+	 * @brief replacement for url to figures with actuall path
+	 */
+	private function imageUrlReplacement($embeddedXml, $xpath): void
+	{
 		$submissionFile = $embeddedXml->getFile();
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
 		import('lib.pkp.classes.submission.SubmissionFile'); // Constants
@@ -335,7 +385,6 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 		
 		// Replace link with actual path
-		$xpath = new \DOMXPath($htmlDocument);
 		$imageLinks = $xpath->evaluate("//img");
 		foreach ($imageLinks as $imageLink) {
 			if ($imageLink->hasAttribute("src")) {
@@ -343,16 +392,5 @@ class JatsParserPlugin extends GenericPlugin {
 				$imageLink->setAttribute("src", $imageUrlArray[$imageLink->getAttribute("src")]);
 			}
 		}
-		
-		// Localization of reference list title
-		$referenceTitles = $xpath->evaluate("//h2[@id='reference-title']");
-		$translateReference = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
-		if ($referenceTitles->lenght > 0) {
-			foreach ($referenceTitles as $referenceTitle) {
-				$referenceTitle->nodeValue = $translateReference;
-			}
-		}
-		
-		return $htmlDocument;
 	}
 }

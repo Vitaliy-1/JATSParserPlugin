@@ -40,3 +40,8 @@ $(document).ready(function () {
 	$('body').scrollspy({target: '#article-navbar'});
 });
 
+// handling tables
+(function () {
+	$('table').addClass("table").wrap("<div class='table-wrapper'></div>")
+})();
+
