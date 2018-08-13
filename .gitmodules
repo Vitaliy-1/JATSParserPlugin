@@ -1,3 +1,4 @@
 [submodule "JATSParser"]
 	path = JATSParser
 	url = https://github.com/Vitaliy-1/JATSParser.git
+	master = master
