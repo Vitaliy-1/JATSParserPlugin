@@ -43,15 +43,17 @@ class JatsParserSettingsForm extends Form {
 	 * Initialize form data.
 	 */
 	function initData() {
+		$contextId = $this->_journalId ;
+		$plugin = $this->_plugin;
 		
-		
+		$this->setData('references', $plugin->getSetting($contextId, 'references'));
 	}
 
 	/**
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-	
+		$this->readUserVars(array('references'));
 	
 	}
 
@@ -69,7 +71,9 @@ class JatsParserSettingsForm extends Form {
 	 * Save settings.
 	 */
 	function execute() {
+		$plugin = $this->_plugin;
+		$contextId = $this->_journalId ;
 		
-	
+		$plugin->updateSetting($contextId, 'references', $this->getData('references'));
 	}
 }

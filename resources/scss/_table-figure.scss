@@ -1,0 +1,178 @@
+.table-wrapper {
+	overflow-x: auto;
+	margin-bottom: 30px;
+}
+
+.table-wrapper thead th {
+	vertical-align: middle;
+	text-align: center;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+table caption {
+	color: #6c757d;
+}
+
+.label {
+	font-weight: bold;
+}
+
+figure .notes {
+	font-size: 14px;
+	&:before {
+		content: "*";
+	}
+}
+
+figure {
+	position: relative;
+	background-color: #EAE7ED;
+	overflow: hidden;
+	
+	& .figure {
+		height: 180px;
+		max-width: 300px;
+		padding-top: 20px;
+		padding-left: 20px;
+		position: relative;
+	}
+	
+	& img {
+		max-width: 100%;
+		max-height: 100%;
+		display: block;
+		cursor: pointer;
+	}
+	
+	& .caption {
+		padding: 0 20px 0 20px;
+		margin: 0;
+		position: relative;
+		max-height: 120px;
+		
+		& .ellipsis {
+			position: absolute;
+			bottom: 0;
+			z-index: 2;
+			right: 0;
+			padding-left: 2px;
+			background-color: #EAE7ED;
+			padding-right: 40px;
+			display: inline-block;
+		}
+	}
+	
+	.figure-image-expand {
+		position: absolute;
+		right: -8px;
+		top: 8px;
+		padding: 8px;
+		color: white;
+		background-color: rgba(42, 42, 42, 0.9);
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+		cursor: pointer;
+		
+		&:hover {
+			font-size: 23px;
+			background-color: rgba(42, 42, 42, 1);
+		}
+	}
+	
+	svg.svg-inline--fa.fa-w-14.fa-expand-arrows-alt {
+		width: 2em;
+		height: 1.7em;
+	}
+
+	& .download-image {
+		position: absolute;
+		bottom: -8px;
+		right: -8px;
+		padding: 6px;
+		border: 0;
+		box-shadow: none;
+		-webkit-border-radius: 5px;
+		-moz-border-radius: 5px;
+		border-radius: 5px;
+		background-color: rgba(42, 42, 42, 0.9);
+		color: white;
+		line-height: 0.85rem;
+		
+		&:hover {
+			text-decoration: none;
+			font-size: 17px;
+			background-color: rgba(42, 42, 42, 1);
+		}
+	}
+}
+
+// figure image modal
+.modal-window {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.4);
+	z-index: 9;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow-y: auto;
+	
+	& .modal-content {
+		position: relative;
+		animation: animatetop 1s;
+		box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2), 0 4px 20px 0 rgba(0,0,0,0.19);
+		margin: auto;
+		max-width: 80%;
+		margin-top: 30px;
+		margin-bottom: 30px;
+		padding-left: 15px;
+		padding-right: 15px;
+		padding-bottom: 15px;
+	}
+	
+	& img {
+		padding-top: 25px;
+	}
+	
+	& .caption {
+		padding-top: 15px;
+	}
+	
+	& .label {
+		font-size: 21px;
+		padding-right: 5px;
+	}
+	
+	& .title {
+		font-size: 20px;
+		font-style: italic;
+	}
+	
+	& .ellipsis {
+		display: none;
+	}
+	
+	& .notes {
+		display: block;
+	}
+	
+	& .close-modal {
+		position: absolute;
+		top: 0;
+		right: 0;
+		cursor: pointer;
+		padding-top: 2px;
+		padding-right: 5px;
+		
+		&:hover {
+			font-size: 40px;
+		}
+	}
+}

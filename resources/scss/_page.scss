@@ -36,6 +36,12 @@
 	}
 }
 
+ul > li {
+	&:before {
+		content: unset;
+	}
+}
+
 // container
 
 .article-container {
@@ -59,5 +65,4 @@
 		margin-top: 30px;
 	}
 }
-
 

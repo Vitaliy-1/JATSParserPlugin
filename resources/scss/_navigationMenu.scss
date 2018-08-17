@@ -17,10 +17,13 @@
 }
 
 #article-navigation-menu-items {
-	> .nav-link {
+	.nav-link {
 		font-size: 15px;
 		padding-top: 4px;
 		padding-bottom: 4px;
+		border: 0;
+		box-shadow: none;
+		-webkit-box-shadow: none;
 	}
 	
 	.nav-subtitle {

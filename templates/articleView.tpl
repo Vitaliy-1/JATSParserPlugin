@@ -7,6 +7,8 @@
  * @brief Page for displaying JATS XML galley as HTML
  *}
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 {include file="frontend/components/headerHead"}
 {include file="frontend/components/header.tpl" pageTitleTranslated=$article->getLocalizedTitle()|escape}
 
@@ -78,15 +80,74 @@
 
 		{* Authors' list *}
 		{if $article->getAuthors()}
-			<ul class="galley-authors-list col-xl-6 offset-xl-3">
-				{foreach from=$article->getAuthors() item=author key=authorNumber}
-					<li class="galley-author-item">
-						<span>
-							{$author->getFullName()|escape}{if $authorNumber+1 !== $article->getAuthors()|@count},{/if}
-						</span>
-					</li>
+			<ul class="authors-string">
+				{foreach from=$article->getAuthors() item=authorString key=authorStringKey}
+					{strip}
+						<li>
+							<a class="jatsparser-author-string-href" href="#author-{$authorStringKey+1}">
+								<span>{$authorString->getFullName()|escape}</span>
+								<sup class="author-symbol author-plus">+</sup>
+								<sup class="author-symbol author-minus hide">&minus;</sup>
+							</a>
+							{if $authorString->getOrcid()}
+								<a class="orcidImage" href="{$authorString->getOrcid()|escape}"><img src="{$baseUrl}/{$jatsParserOrcidImage}"></a>
+							{/if}
+						</li>
+					{/strip}
 				{/foreach}
 			</ul>
+
+			{* Authors *}
+			{assign var="authorCount" value=$article->getAuthors()|@count}
+			{assign var="authorBioIndex" value=0}
+			<div class="article-details-authors">
+				{foreach from=$article->getAuthors() item=author key=authorKey}
+					<div class="article-details-author hideAuthor" id="author-{$authorKey+1}">
+						{if $author->getLocalizedAffiliation()}
+							<div class="article-details-author-affiliation">{$author->getLocalizedAffiliation()|escape}</div>
+						{/if}
+						{if $author->getOrcid()}
+							<div class="article-details-author-orcid">
+								<a href="{$author->getOrcid()|escape}" target="_blank">
+									{$orcidIcon}
+									{$author->getOrcid()|escape}
+								</a>
+							</div>
+						{/if}
+						{if $author->getLocalizedBiography()}
+							<a class="article-details-bio-toggle" data-toggle="modal" data-target="#authorBiographyModal{$smarty.foreach.authorLoop.index}">
+								{translate key="plugins.themes.healthSciences.article.authorBio"}
+							</a>
+							{* Store author biographies to print as modals in the footer *}
+							<div
+									class="modal fade"
+									id="authorBiographyModal{$smarty.foreach.authorLoop.index}"
+									tabindex="-1"
+									role="dialog"
+									aria-labelledby="authorBiographyModalTitle{$smarty.foreach.authorLoop.index}"
+									aria-hidden="true"
+							>
+								<div class="modal-dialog" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<div class="modal-title" id="authorBiographyModalTitle{$smarty.foreach.authorLoop.index}">
+												{$author->getFullName()|escape}
+											</div>
+											<button type="button" class="close" data-dismiss="modal" aria-label="{translate|escape key="common.close"}">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body">
+											{$author->getLocalizedBiography()}
+										</div>
+									</div>
+								</div>
+							</div>
+						{/if}
+					</div>
+				{/foreach}
+			</div>
+
 		{/if}
 
 		{* Keywords *}

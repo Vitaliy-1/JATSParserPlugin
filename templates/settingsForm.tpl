@@ -18,10 +18,17 @@
 	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="jatsParserSettingsFormNotification"}
 
-	<div id="description">{translate key="plugins.generic.jatsParser.manager.settings.description"}</div>
+	<div id="description">{translate key="plugins.generic.jatsParser.settings.description"}</div>
+
+	{fbvFormArea id="webFeedSettingsFormArea"}
+		{fbvFormSection list=true}
+			{fbvElement type="radio" id="jatsReferences" name="references" value="jatsReferences" checked=$references|compare:"jatsReferences" label="plugins.generic.jatsParser.settings.jatsReferences"}
+			{fbvElement type="radio" id="ojsReferences" name="references" value="ojsReferences" checked=$references|compare:"ojsReferences" label="plugins.generic.jatsParser.settings.ojsReferences"}
+		{fbvElement type="radio" id="defaultReferences" name="references" value="defaultReferences" checked=$references|compare:"defaultReferences" label="plugins.generic.jatsParser.settings.defaultReferences"}
+		{/fbvFormSection}
+	{/fbvFormArea}
 
 	{fbvFormButtons}
-
 	<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 
 </form>

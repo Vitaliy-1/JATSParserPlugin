@@ -11,12 +11,22 @@
   -->
 
 <locale name="en_US" full_name="U.S. English">
-    <message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
-    <message key="plugins.generic.jatsParser.description">Converts JATS XML to HTML through Smarty templates and show on the article abstract pages</message>
-    <message key="jatsParser.galleys.info">View article in other formats</message>
-    <message key="jatsParser.navigation.article">Article</message>
-    <message key="jatsParser.navigation.details">Details</message>
-    <message key="jatsParser.navigation.metrics">Metrics</message>
-    <message key="jatsParser.openAccess.label">open access</message>
-    <message key="jatsParser.references.link">Find in text</message>
+	<message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
+	<message key="plugins.generic.jatsParser.description">Converts JATS XML to HTML through Smarty templates and show on
+		the article abstract pages
+	</message>
+	<message key="jatsParser.galleys.info">View article in other formats</message>
+	<message key="jatsParser.navigation.article">Article</message>
+	<message key="jatsParser.navigation.details">Details</message>
+	<message key="jatsParser.navigation.metrics">Metrics</message>
+	<message key="jatsParser.openAccess.label">open access</message>
+	<message key="jatsParser.references.link">Find in text</message>
+	
+	<!-- Plugin settings -->
+	<message key="plugins.generic.jatsParser.settings.description">JATSParser plugin settings menu</message>
+	<message key="plugins.generic.jatsParser.settings.jatsReferences">Force to display references from JATS XML
+	</message>
+	<message key="plugins.generic.jatsParser.settings.ojsReferences">Force to display parsed references from OJS
+	</message>
+	<message key="plugins.generic.jatsParser.settings.defaultReferences">Default</message>
 </locale>

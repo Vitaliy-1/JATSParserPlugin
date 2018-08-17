@@ -11,12 +11,23 @@
   -->
 
 <locale name="uk_UA" full_name="Ukrainian">
-    <message key="plugins.generic.jatsParser.displayName">JATSParser плагін</message>
-    <message key="plugins.generic.jatsParser.description">Перетворює JATS XML в HTML через шаблони Smarty та показує на сторінці анотації</message>
-    <message key="jatsParser.galleys.info">Переглянути статтю в інших форматах</message>
-    <message key="jatsParser.navigation.article">Стаття</message>
-    <message key="jatsParser.navigation.details">Деталі</message>
-    <message key="jatsParser.navigation.metrics">Метрика</message>
-    <message key="jatsParser.openAccess.label">вільний доступ</message>
-    <message key="jatsParser.references.link">Знайти у тексті статті</message>
+	<message key="plugins.generic.jatsParser.displayName">JATSParser плагін</message>
+	<message key="plugins.generic.jatsParser.description">Перетворює JATS XML в HTML через шаблони Smarty та показує на
+		сторінці анотації
+	</message>
+	<message key="jatsParser.galleys.info">Переглянути статтю в інших форматах</message>
+	<message key="jatsParser.navigation.article">Стаття</message>
+	<message key="jatsParser.navigation.details">Деталі</message>
+	<message key="jatsParser.navigation.metrics">Метрика</message>
+	<message key="jatsParser.openAccess.label">вільний доступ</message>
+	<message key="jatsParser.references.link">Знайти у тексті статті</message>
+	
+	<!-- Plugin settings -->
+	<message key="plugins.generic.jatsParser.settings.description">Форма налаштувань для плагіна JATSParser</message>
+	<message key="plugins.generic.jatsParser.settings.jatsReferences">Примусово відображати перелік посилань з JATS XML
+	</message>
+	<message key="plugins.generic.jatsParser.settings.ojsReferences">Примусово відображати перелік посилань з OJS
+	</message>
+	<message key="plugins.generic.jatsParser.settings.defaultReferences">За замовчуванням</message>
+
 </locale>
