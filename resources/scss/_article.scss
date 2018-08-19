@@ -155,6 +155,10 @@
 
 .references {
 	list-style-type: decimal;
+	
+	& li:before {
+		content: unset;
+	}
 }
 
 // For mobiles
