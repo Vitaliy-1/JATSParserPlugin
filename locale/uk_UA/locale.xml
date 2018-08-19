@@ -12,9 +12,7 @@
 
 <locale name="uk_UA" full_name="Ukrainian">
 	<message key="plugins.generic.jatsParser.displayName">JATSParser плагін</message>
-	<message key="plugins.generic.jatsParser.description">Перетворює JATS XML в HTML через шаблони Smarty та показує на
-		сторінці анотації
-	</message>
+	<message key="plugins.generic.jatsParser.description">Перетворює JATS XML в HTML та PDF для відображення на сторінці галереї</message>
 	<message key="jatsParser.galleys.info">Переглянути статтю в інших форматах</message>
 	<message key="jatsParser.navigation.article">Стаття</message>
 	<message key="jatsParser.navigation.details">Деталі</message>

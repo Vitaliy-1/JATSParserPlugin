@@ -1,3 +1,12 @@
+/**
+ * @file plugins/generic/jatsParser/resources/javascript/main.js
+ *
+ * Copyright (c) 2017-2018 Vitalii Bezsheiko
+ * Distributed under the GNU GPL v3.
+ *
+ * Plugin's scripts are here
+ */
+
 // Navigation inside an article
 (function () {
 
@@ -44,9 +53,18 @@ $(document).ready(function () {
 // handling figures
 
 (function () {
-	var imageEnlarge = document.createElement('i');
-	$(imageEnlarge).addClass('fas fa-expand-arrows-alt fa-lg figure-image-expand');
-	$('.figure').append(imageEnlarge);
+	var figure = document.getElementsByClassName('figure');
+	
+	for (var i = 0; i < figure.length; i++) {
+		var imageEnlargeLink = document.createElement('a');
+		imageEnlargeLink.classList.add('image-enlarge-link');
+		figure.item(i).appendChild(imageEnlargeLink);
+		
+		var imageEnlarge = document.createElement('i');
+		imageEnlarge.classList.add('fas', 'fa-expand-arrows-alt', 'fa-lg', 'figure-image-expand');
+		imageEnlargeLink.appendChild(imageEnlarge);
+	}
+	
 })();
 
 (function () {
@@ -62,7 +80,7 @@ $(document).ready(function () {
 		}
 		
 		var figImage = figure.item(i).getElementsByTagName('img')[0];
-		var imageEnlarge =  figure.item(i).getElementsByClassName('figure-image-expand')[0];
+		var imageEnlarge =  figure.item(i).getElementsByClassName('image-enlarge-link')[0];
 		var boxImage = figure.item(i).getElementsByClassName('figure')[0];
 		
 		// Download figure image link
@@ -74,6 +92,7 @@ $(document).ready(function () {
 		downloadImageLink.appendChild(downloadIcon);
 		downloadImageLink.href = figImage.src;
 		
+		var imageEnlargeSvg = figure.item(i).getElementsByTagName('svg')[0];
 		// Activate modal on click
 		figImage.addEventListener('click', openModal);
 		imageEnlarge.addEventListener('click', openModal);

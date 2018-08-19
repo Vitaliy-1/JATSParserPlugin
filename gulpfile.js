@@ -1,3 +1,11 @@
+/**
+ * @file plugins/generic/jatsParser/gulpfile.js
+ *
+ * Copyright (c) 2017-2018 Vitalii Bezsheiko
+ * Distributed under the GNU GPL v3.
+ *
+ */
+
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var concat = require('gulp-concat');

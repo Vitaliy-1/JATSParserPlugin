@@ -1,8 +1,4 @@
 <?php
-
-/**
- * @defgroup plugins_generic_jatsParser JATS Parser on PHP
- */
  
 /**
  * @file plugins/generic/jatsParser/index.php

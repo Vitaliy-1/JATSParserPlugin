@@ -4,7 +4,7 @@
 /**
 * @file plugins/generic/jatsParser/JatsParserSettingsForm.inc.php
 *
- * Copyright (c) 2017 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
+ * Copyright (c) 2017-2018 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
 * Distributed under the GNU GPL v3.
  *
  * @class JatsParserSettingsForm

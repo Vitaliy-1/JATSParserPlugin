@@ -12,9 +12,7 @@
 
 <locale name="en_US" full_name="U.S. English">
 	<message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
-	<message key="plugins.generic.jatsParser.description">Converts JATS XML to HTML through Smarty templates and show on
-		the article abstract pages
-	</message>
+	<message key="plugins.generic.jatsParser.description">The plugin transforms JATS XML into HTML and PDF for viewing on the journal's front-end</message>
 	<message key="jatsParser.galleys.info">View article in other formats</message>
 	<message key="jatsParser.navigation.article">Article</message>
 	<message key="jatsParser.navigation.details">Details</message>

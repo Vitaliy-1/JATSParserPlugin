@@ -2,7 +2,7 @@
 /**
  * @file plugins/generic/jatsParser/JatsParserPlugin.inc.php
  *
- * Copyright (c) 2017 Vitalii Bezsheiko
+ * Copyright (c) 2017-2018 Vitalii Bezsheiko
  * Distributed under the GNU GPL v3.
  *
  * @class JatsParserSettingsForm
@@ -143,8 +143,8 @@ class JatsParserPlugin extends GenericPlugin {
 		$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
 		
 		$templateMgr->addStyleSheet('styles', $baseUrl . '/app/app.min.css');
-		$templateMgr->addStyleSheet('fontawesome', 'https://use.fontawesome.com/releases/v5.1.0/css/all.css');
 		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
+		$templateMgr->addJavaScript('fontawesome', 'https://use.fontawesome.com/releases/v5.2.0/js/all.js');
 		$templateMgr->addJavaScript('javascript', $baseUrl . '/app/app.min.js');
 		
 		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';

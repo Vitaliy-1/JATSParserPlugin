@@ -1,3 +1,12 @@
+/**
+ * plugins/generic/jatsParser/resources/scss/_table-figure.scss
+ *
+ * Copyright (c) 2017 Vitaliy Bezsheiko, MD
+ * Distributed under the GNU GPL v3.
+ *
+ * Stylesheet for rendering figures and tables
+ */
+
 .table-wrapper {
 	overflow-x: auto;
 	margin-bottom: 30px;
@@ -66,27 +75,37 @@ figure {
 		}
 	}
 	
-	.figure-image-expand {
+	.image-enlarge-link {
 		position: absolute;
 		right: -8px;
 		top: 8px;
-		padding: 8px;
+		padding: 6px;
 		color: white;
 		background-color: rgba(42, 42, 42, 0.9);
 		-webkit-border-radius: 5px;
 		-moz-border-radius: 5px;
 		border-radius: 5px;
 		cursor: pointer;
+		box-shadow: none;
+		border-bottom: 0;
+		-webkit-box-shadow: none;
 		
 		&:hover {
-			font-size: 23px;
+			font-size: 17px;
 			background-color: rgba(42, 42, 42, 1);
 		}
 	}
 	
 	svg.svg-inline--fa.fa-w-14.fa-expand-arrows-alt {
-		width: 2em;
-		height: 1.7em;
+		width: 1.4em;
+		height: 1em;
+		color: white;
+	}
+	
+	svg.svg-inline--fa.fa-download {
+		width: 1.4em;
+		height: 1em;
+		color: white;
 	}
 
 	& .download-image {
