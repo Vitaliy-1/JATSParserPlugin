@@ -9,7 +9,7 @@
  * @ingroup plugins_generic_jatsParser
  *
  */
-	
+
 require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 
 import('lib.pkp.classes.plugins.GenericPlugin');
@@ -21,27 +21,26 @@ use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
 define("CREATE_PDF_QUERY", "download=pdf");
 
 class JatsParserPlugin extends GenericPlugin {
-	
+
 	function register($category, $path, $mainContextId = null) {
 		if (parent::register($category, $path, $mainContextId)) {
-			
+
 			// Return false if Lens is enabled
 			$pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
 			$context = PKPApplication::getRequest()->getContext();
 			$contextId = $context ? $context->getId() : 0;
 			$lensSettings = $pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin');
-			
+
 			if ($this->getEnabled() && !$lensSettings['enabled']) {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
 				HookRegistry::register('ArticleHandler::download', array($this, 'xmlDownload'));
-				$this->_registerTemplateResource();
 			}
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Get the plugin display name.
 	 * @return string
@@ -49,7 +48,7 @@ class JatsParserPlugin extends GenericPlugin {
 	function getDisplayName() {
 		return __('plugins.generic.jatsParser.displayName');
 	}
-	
+
 	/**
 	 * Get the plugin description.
 	 * @return string
@@ -57,14 +56,7 @@ class JatsParserPlugin extends GenericPlugin {
 	function getDescription() {
 		return __('plugins.generic.jatsParser.description');
 	}
-	
-	/**
-	 * @copydoc Plugin::getTemplatePath()
-	 */
-	function getTemplatePath($inCore = false) {
-		return $this->getTemplateResourceName() . ':templates/';
-	}
-	
+
 	/**
 	 * @copydoc Plugin::getActions()
 	 */
@@ -109,7 +101,7 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 		return parent::manage($args, $request);
 	}
-	
+
 	/**
 	 * Present the article wrapper page.
 	 * @param $hookName string
@@ -121,34 +113,34 @@ class JatsParserPlugin extends GenericPlugin {
 		$issue =& $args[1];
 		$galley =& $args[2];
 		$article =& $args[3];
-		
+
 		if ($request->getQueryString() === CREATE_PDF_QUERY) return false;
-		
+
 		$xmlGalley = null;
 		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
 			$xmlGalley = $galley;
 		}
-		
+
 		if (!$xmlGalley) return false;
-		
+
 		$submissionFile = $xmlGalley->getFile();
 		$jatsDocument = new Document($submissionFile->getFilePath());
-		
+
 		$templateMgr = TemplateManager::getManager($request);
-		
+
 		//creating HTML Document
 		$htmlDocument = $this->htmlCreation($article, $templateMgr, $jatsDocument, $xmlGalley, $request);
-		
+
 		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
 		$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
-		
+
 		$templateMgr->addStyleSheet('styles', $baseUrl . '/app/app.min.css');
 		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
 		$templateMgr->addJavaScript('fontawesome', 'https://use.fontawesome.com/releases/v5.2.0/js/all.js');
 		$templateMgr->addJavaScript('javascript', $baseUrl . '/app/app.min.js');
-		
+
 		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';
-		
+
 		$templateMgr->assign(array(
 			'issue' => $issue,
 			'article' => $article,
@@ -158,12 +150,12 @@ class JatsParserPlugin extends GenericPlugin {
 			'generatePdfUrl' => $generatePdfUrl,
 			'jatsParserOrcidImage' => $orcidImage,
 		));
-		
-		$templateMgr->display($this->getTemplatePath() . 'articleView.tpl');
-		
+
+		$templateMgr->display($this->getTemplateResource('articleView.tpl'));
+
 		return true;
 	}
-	
+
 	/**
 	 * Hadnling request to PDF download page.
 	 * @param $hookName string
@@ -177,32 +169,32 @@ class JatsParserPlugin extends GenericPlugin {
 		$issue =& $args[1];
 		$galley =& $args[2];
 		$article =& $args[3];
-		
+
 		if ($request->getQueryString() !== CREATE_PDF_QUERY) return false;
-		
+
 		$xmlGalley = null;
 		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
 			$xmlGalley = $galley;
 		}
-		
+
 		if (!$xmlGalley) return false;
-		
+
 		$submissionFile = $xmlGalley->getFile();
 		$jatsDocument = new Document($submissionFile->getFilePath());
-		
+
 		$parseReferences = $this->getSetting($request->getContext()->getId(), 'references');
-		
+
 		if ($parseReferences === "ojsReferences") {
 			$htmlDocument = new JATSParserDocument($jatsDocument, false);
 		} else {
 			$htmlDocument = new JATSParserDocument($jatsDocument);
 		}
-		
+
 		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Present XML.
 	 * @param $hookName string
@@ -212,17 +204,17 @@ class JatsParserPlugin extends GenericPlugin {
 	function xmlDownload ($hookName, $args) {
 		$galley =& $args[1];
 		$fileId =& $args[2];
-		
+
 		$embeddedXml = null;
-		
+
 		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() ==="text/xml") && $galley->getFileId() == $fileId) {
 			$embeddedXml = $galley;
 		}
-		
+
 		if (!$embeddedXml) return false;
-		
+
 	}
-	
+
 	/**
 	 * @param $article PublishedArticle
 	 * @param $request PKPRequest
@@ -235,44 +227,44 @@ class JatsParserPlugin extends GenericPlugin {
 		// HTML preparation
 		$xpath = new \DOMXPath($htmlDocument);
 		$templateMgr = TemplateManager::getManager($request);
-		
+
 		$this->imageUrlReplacement($xmlGalley, $xpath);
 		$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
-		
+
 		// Special treatment for table head
 		$tableHeadRows = $xpath->evaluate("//thead/tr");
 		foreach ($tableHeadRows as $tableHeadRow) {
 			$tableHeadRow->setAttribute("align", "center");
 			$tableHeadRow->setAttribute("style", "background-color:#f2e6ff;");
 		}
-		
-		
+
+
 		// extends TCPDF object
 		$pdfDocument = new TCPDFDocument();
-		
+
 		$pdfDocument->setTitle($article->getLocalizedFullTitle());
-		
+
 		// get the logo
-		
+
 		$journal = $request->getContext();
 		$pdfHeaderLogo = __DIR__ . "/JATSParser/logo/logo.jpg";
-		
+
 		$pdfDocument->SetCreator(PDF_CREATOR);
 		$pdfDocument->SetAuthor($article->getAuthorString());
 		$pdfDocument->SetSubject($article->getLocalizedSubject());
-		
-		
+
+
 		$articleDataString = $issue->getIssueIdentification();
 		if ($article->getPages()) {
 			$articleDataString .= ", ". $article->getPages();
 		}
-		
+
 		if ($article->getSectionTitle()) {
 			$articleDataString .= "\n" . $article->getSectionTitle();
 		}
-		
+
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getLocalizedName(), $articleDataString);
-		
+
 		$pdfDocument->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 		$pdfDocument->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 		$pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
@@ -281,35 +273,35 @@ class JatsParserPlugin extends GenericPlugin {
 		$pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
 		$pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 		$pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
-		
+
 		$pdfDocument->AddPage();
-		
+
 		/* An example of using translations inside PHP */
 		//$translate = $templateMgr->smartyTranslate(array('key' =>'common.abstract'), $templateMgr);
-		
+
 		// Article title
-		
+
 		$pdfDocument->SetFillColor(255, 255, 255);
 		$pdfDocument->SetFont('dejavuserif', 'B', 20);
 		$pdfDocument->MultiCell('', '', $article->getLocalizedFullTitle(), 0, 'L', 1, 1, '' ,'', true);
 		$pdfDocument->Ln(6);
-		
+
 		// Article's authors
 		if (count($article->getAuthors()) > 0) {
 			/* @var $author Author */
 			foreach ($article->getAuthors() as $author) {
 				$pdfDocument->SetFont('dejavuserif', 'I', 10);
-				
+
 				// Calculating the line height for author name and affiliation
-				
+
 				$authorLineWidth = 60;
 				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, htmlspecialchars($author->getFullName()));
-				
+
 				$affiliationLineWidth = 110;
 				$afilliationStringHeight = $pdfDocument->getStringHeight(110, htmlspecialchars($author->getLocalizedAffiliation()));
-				
+
 				$authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
-				
+
 				// Writing affiliations into cells
 				$pdfDocument->MultiCell($authorLineWidth, 0, htmlspecialchars($author->getFullName()), 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
 				$pdfDocument->SetFont('dejavuserif', '', 10);
@@ -317,7 +309,7 @@ class JatsParserPlugin extends GenericPlugin {
 			}
 			$pdfDocument->Ln(6);
 		}
-		
+
 		// Abstract
 		if ($article->getLocalizedAbstract()) {
 			$pdfDocument->setCellPaddings(5, 5, 5, 5);
@@ -327,18 +319,18 @@ class JatsParserPlugin extends GenericPlugin {
 			$pdfDocument->writeHTMLCell('', '', '', '', $article->getLocalizedAbstract(), 'B', 1, 1, true, 'J', true);
 			$pdfDocument->Ln(4);
 		}
-		
+
 		// Text (goes from JATSParser
 		$pdfDocument->setCellPaddings(0, 0, 0, 0);
 		$pdfDocument->SetFont('dejavuserif', '', 10);
-		
+
 		$htmlString = $htmlDocument->getHtmlForTCPDF();
-		
+
 		$pdfDocument->writeHTML($htmlString, true, false, true, false, '');
-		
+
 		$pdfDocument->Output('article.pdf', 'I');
 	}
-	
+
 	/**
 	 * @param $article PublishedArticle
 	 * @param $jatsDocument Document
@@ -350,21 +342,21 @@ class JatsParserPlugin extends GenericPlugin {
 	private function htmlCreation($article, $templateMgr, $jatsDocument, $embeddedXml, $request): JATSParserDocument
 	{
 		$context = $request->getContext();
-		
+
 		$parseReferences = $this->getSetting($context->getId(), 'references');
 		if ($parseReferences === "ojsReferences") {
 			$htmlDocument = new JATSParserDocument($jatsDocument, false);
 		} else {
 			$htmlDocument = new JATSParserDocument($jatsDocument, true);
 		}
-		
+
 		// HTML DOM
 		$xpath = new \DOMXPath($htmlDocument);
-		
+
 		$this->imageUrlReplacement($embeddedXml, $xpath);
-		
+
 		$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
-		
+
 		// Localization of reference list title
 		$referenceTitles = $xpath->evaluate("//h2[@id='reference-title']");
 		$translateReference = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
@@ -373,11 +365,11 @@ class JatsParserPlugin extends GenericPlugin {
 				$referenceTitle->nodeValue = $translateReference;
 			}
 		}
-		
-		
+
+
 		return $htmlDocument;
 	}
-	
+
 	/**
 	 * @param $embeddedXml
 	 * @param $xpath
@@ -406,7 +398,7 @@ class JatsParserPlugin extends GenericPlugin {
 				$imageUrlArray[$embeddableFile->getOriginalFileName()] = $fileUrl;
 			}
 		}
-		
+
 		// Replace link with actual path
 		$imageLinks = $xpath->evaluate("//img");
 		foreach ($imageLinks as $imageLink) {
@@ -416,7 +408,7 @@ class JatsParserPlugin extends GenericPlugin {
 			}
 		}
 	}
-	
+
 	/**
 	 * @param $article
 	 * @param $templateMgr
@@ -428,13 +420,13 @@ class JatsParserPlugin extends GenericPlugin {
 		$citationDao = DAORegistry::getDAO('CitationDAO');
 		$parsedCitations = $citationDao->getBySubmissionId($article->getId());
 		$parseReferences = $this->getSetting($request->getContext()->getId(), 'references');
-		
+
 		if (($htmlDocument->useOjsReferences() && $parsedCitations && $parseReferences !== 'jatsReferences') || ($parseReferences === 'ojsReferences' && $parsedCitations)) {
 			$referenceTitle = $htmlDocument->createElement('h2');
 			$referenceTitle->setAttribute('id', 'reference-title');
 			$referenceTitle->setAttribute('class', 'article-section-title');
 			$referenceTitle->nodeValue = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
-			
+
 			$htmlDocument->appendChild($referenceTitle);
 			$referenceList = $htmlDocument->createElement('ol');
 			$htmlDocument->appendChild($referenceList);
@@ -443,7 +435,7 @@ class JatsParserPlugin extends GenericPlugin {
 				$referenceItem->nodeValue = $templateMgr->smartyEscape($parsedCitation->getRawCitation());
 				$referenceList->appendChild($referenceItem);
 			}
-			
+
 		}
 	}
 }
