@@ -25,18 +25,18 @@ class JatsParserSettingsForm extends Form {
 
 	/**
 	 * Constructor
-	 * @param $plugin EmbedGalleyPlugin
+	 * @param $plugin JATSParserPlugin
 	 * @param $journalId int
 	 */
 	function __construct($plugin, $journalId) {
 		$this->_journalId = $journalId;
 		$this->_plugin = $plugin;
 
-		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
+		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
 		$this->addCheck(new FormValidatorPost($this));
 		$this->addCheck(new FormValidatorCSRF($this));
-		
+
 	}
 
 	/**
@@ -45,7 +45,7 @@ class JatsParserSettingsForm extends Form {
 	function initData() {
 		$contextId = $this->_journalId ;
 		$plugin = $this->_plugin;
-		
+
 		$this->setData('references', $plugin->getSetting($contextId, 'references'));
 	}
 
@@ -54,7 +54,7 @@ class JatsParserSettingsForm extends Form {
 	 */
 	function readInputData() {
 		$this->readUserVars(array('references'));
-	
+
 	}
 
 	/**
@@ -73,7 +73,7 @@ class JatsParserSettingsForm extends Form {
 	function execute() {
 		$plugin = $this->_plugin;
 		$contextId = $this->_journalId ;
-		
+
 		$plugin->updateSetting($contextId, 'references', $this->getData('references'));
 	}
 }
