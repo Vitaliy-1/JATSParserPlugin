@@ -131,6 +131,11 @@ class JatsParserPlugin extends GenericPlugin {
 		//creating HTML Document
 		$htmlDocument = $this->htmlCreation($article, $templateMgr, $jatsDocument, $xmlGalley, $request);
 
+		// Recording a view
+		import('lib.pkp.classes.file.SubmissionFileManager');
+		$submissionFileManager = new SubmissionFileManager($article->getContextId(), $article->getId());
+		$submissionFileManager->recordView($xmlGalley->getFile());
+
 		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
 		$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
 
@@ -193,26 +198,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
 
 		return true;
-	}
-
-	/**
-	 * Present XML.
-	 * @param $hookName string
-	 * @param $args array (PublishedArticle, SubmissionFile, submission file id)
-	 * @return bool
-	 */
-	function xmlDownload ($hookName, $args) {
-		$galley =& $args[1];
-		$fileId =& $args[2];
-
-		$embeddedXml = null;
-
-		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() ==="text/xml") && $galley->getFileId() == $fileId) {
-			$embeddedXml = $galley;
-		}
-
-		if (!$embeddedXml) return false;
-
 	}
 
 	/**
