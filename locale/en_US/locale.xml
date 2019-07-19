@@ -23,11 +23,11 @@
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Settings</message>
 	<message key="plugins.generic.jatsParser.settings.description">JATSParser plugin settings menu</message>
-	<message key="plugins.generic.jatsParser.settings.jatsReferences">Force to display references from JATS XML
-	</message>
-	<message key="plugins.generic.jatsParser.settings.ojsReferences">Force to display parsed references from OJS
-	</message>
+	<message key="plugins.generic.jatsParser.settings.jatsReferences">Force to display references from JATS XML</message>
+	<message key="plugins.generic.jatsParser.settings.ojsReferences">Force to display parsed references from OJS</message>
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">Default</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">Allow plugin to display converted JATS XML galleys on article landing page. By default the first XML galley fetched will be displayed. This can be changed individually via JATS Parser galley settings under each uploaded galley.</message>
+	<message key="plugins.generic.jatsParser.settings.display.articlePage">Display JATS XML on article landing page</message>
 
 	<!-- Plugin galley settings -->
 	<message key="plugins.generic.jatsParser.galley.settings.display">Display Settings</message>

@@ -47,14 +47,14 @@ class JatsParserSettingsForm extends Form {
 		$plugin = $this->_plugin;
 
 		$this->setData('references', $plugin->getSetting($contextId, 'references'));
+		$this->setData('displayOnArticlePage', $plugin->getSetting($contextId, 'displayOnArticlePage'));
 	}
 
 	/**
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('references'));
-
+		$this->readUserVars(array('references', 'displayOnArticlePage'));
 	}
 
 	/**
@@ -75,5 +75,6 @@ class JatsParserSettingsForm extends Form {
 		$contextId = $this->_journalId ;
 
 		$plugin->updateSetting($contextId, 'references', $this->getData('references'));
+		$plugin->updateSetting($contextId, 'displayOnArticlePage', $this->getData('displayOnArticlePage'));
 	}
 }
