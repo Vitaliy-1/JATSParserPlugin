@@ -34,7 +34,13 @@ class JatsParserPlugin extends GenericPlugin {
 			if ($this->getEnabled() && !$lensSettings['enabled']) {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
+				HookRegistry::register('Templates::Article::Footer::PageFooter', array($this, 'embeddedXmlGalley'), HOOK_SEQUENCE_CORE);
 				HookRegistry::register('ArticleHandler::download', array($this, 'xmlDownload'));
+
+				// Add an option to set default XML galley to display in the ArticleGalley form (only when editing galley)
+				HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
+				HookRegistry::register('articlegalleydao::getAdditionalFieldNames', array($this, 'addArticleGalleyDAOFieldNames'));
+				HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
 			}
 			return true;
 		}
@@ -157,7 +163,6 @@ class JatsParserPlugin extends GenericPlugin {
 		));
 
 		$templateMgr->display($this->getTemplateResource('articleView.tpl'));
-
 		return true;
 	}
 
@@ -198,6 +203,105 @@ class JatsParserPlugin extends GenericPlugin {
 		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
 
 		return true;
+	}
+
+	/**
+	 * @param $hookName string
+	 * @param $args array (PublishedArticle, SubmissionFile, submission file id)
+	 * @return boolean
+	 * @brief display parsed XML on article landing page
+	 */
+	function embeddedXmlGalley($hookName, $args) {
+		$templateMgr =& $args[1];
+		$output =& $args[2];
+
+		$article = $templateMgr->getTemplateVars('article');
+		$galleys = $templateMgr->getTemplateVars('primaryGalleys');
+
+		$xmlGalley = null;
+		foreach ($galleys as $galley) {
+			if (($galley->getFileType() === "application/xml" || $galley->getFileType() ==="text/xml")) {
+				$xmlGalley = $galley;
+				break;
+			}
+		}
+
+		if ($xmlGalley == null) return false;
+
+		$request = Application::getRequest();
+		$jatsDocument = new Document($xmlGalley->getFile()->getFilePath());
+		$htmlDocument = $this->htmlCreation($article, $templateMgr, $jatsDocument, $xmlGalley, $request);
+		$templateMgr->assign('htmlDocument', $htmlDocument->saveHTML());
+		$output .= $templateMgr->fetch($this->getTemplateResource('articleFooter.tpl'));
+
+		return false;
+	}
+
+	/**
+	 * @param $hookName string
+	 * @param $args array (PKPTemplateManager, template, cache id, compile id, result)
+	 * @return boolean
+	 * @brief display parsed XML on article landing page
+	 */
+	function templateFetchCallback($hookName, $args) {
+
+		$templateMgr = $args[0];
+		$template = $args[1];
+		$request = $this->getRequest();
+		$router = $request->getRouter();
+		$dispatcher = $router->getDispatcher();
+
+		if ($template == 'controllers/grid/gridRow.tpl') {
+			$row = $templateMgr->getTemplateVars('row');
+			$data = $row->getData();
+			if (!is_array($data) &&
+				(get_class($data) == "ArticleGalley") &&
+				in_array($data->getFileType(), array("application/xml", "text/xml"))) {
+
+				/* @var $data ArticleGalley */
+				import('lib.pkp.classes.linkAction.request.AjaxModal');
+				$row->addAction(new LinkAction(
+					'jatsParser',
+					new AjaxModal(
+						$dispatcher->url($request, ROUTE_PAGE, null, 'jatsParser', 'settings', null,
+							array(
+								'galleyId' => $data->getId(),
+								'submissionId' => $data->getSubmissionId()
+							)
+						),
+						__("plugins.generic.jatsParser.workflow.settings")
+					),
+					__('plugins.generic.jatsParser.workflow.settings'),
+					null
+				));
+
+			}
+		}
+	}
+
+	/**
+	 * @param $hookName string
+	 * @param $args array
+	 */
+	function addArticleGalleyDAOFieldNames($hookName, $args) {
+		$fields =& $args[1];
+		$fields[] = 'jatsParserDisplayDefaultXml';
+	}
+
+	function callbackLoadHandler($hookName, $args) {
+		$page = $args[0];
+		$op = $args[1];
+
+		switch ("$page/$op") {
+			case 'jatsParser/settings':
+			case 'jatsParser/updateGalleySettings':
+				define('HANDLER_CLASS', 'JatsParserHandler');
+				define('JATSPARSER_PLUGIN_NAME', $this->getName());
+				$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR . 'JatsParserHandler.inc.php';
+				break;
+		}
+
+		return false;
 	}
 
 	/**

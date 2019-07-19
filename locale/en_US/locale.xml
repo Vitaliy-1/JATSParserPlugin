@@ -19,12 +19,19 @@
 	<message key="jatsParser.navigation.metrics">Metrics</message>
 	<message key="jatsParser.openAccess.label">open access</message>
 	<message key="jatsParser.references.link">Find in text</message>
-	
+
 	<!-- Plugin settings -->
+	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Settings</message>
 	<message key="plugins.generic.jatsParser.settings.description">JATSParser plugin settings menu</message>
 	<message key="plugins.generic.jatsParser.settings.jatsReferences">Force to display references from JATS XML
 	</message>
 	<message key="plugins.generic.jatsParser.settings.ojsReferences">Force to display parsed references from OJS
 	</message>
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">Default</message>
+
+	<!-- Plugin galley settings -->
+	<message key="plugins.generic.jatsParser.galley.settings.display">Display Settings</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.description">This settings are applied to XML galleys on individual basis.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">This option allows to choose JATS XML galley that will be displayed on article landing page. Note that for this option to work, "Display galleys on article landing page" should be enabled via plugin's settings. By default the plugin will pick up the first uploaded XML galley.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">Display as a default</message>
 </locale>
