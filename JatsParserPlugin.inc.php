@@ -32,6 +32,8 @@ class JatsParserPlugin extends GenericPlugin {
 			$lensSettings = $pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin');
 
 			if ($this->getEnabled() && !$lensSettings['enabled']) {
+				$this->import('classes.JatsParserGalleyDAO');
+				DAORegistry::registerDAO('JatsParserGalleyDAO', new JatsParserGalleyDAO());
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
 				HookRegistry::register('Templates::Article::Footer::PageFooter', array($this, 'embeddedXmlGalley'), HOOK_SEQUENCE_CORE);

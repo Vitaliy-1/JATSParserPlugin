@@ -35,9 +35,8 @@ class JatsParserGalleyForm extends Form {
 	}
 
 	function initData() {
-		$this->setData(array(
-			'jatsParserDisplayDefaultXml' => $this->_articleGalley->getData('jatsParserDisplayDefaultXml')
-		));
+		$galleyLocale = $this->_articleGalley->getLocale();
+		$this->setData('jatsParserDisplayDefaultXml', $this->_articleGalley->getData('jatsParserDisplayDefaultXml', $galleyLocale));
 
 		parent::initData();
 	}
@@ -48,7 +47,7 @@ class JatsParserGalleyForm extends Form {
 	}
 
 	function execute() {
-		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
+		$articleGalleyDao = DAORegistry::getDAO('JatsParserGalleyDAO');
 		$currentGalley = $this->_articleGalley;
 
 		$displayDefaultXml = $this->getData('jatsParserDisplayDefaultXml');
@@ -57,14 +56,14 @@ class JatsParserGalleyForm extends Form {
 		if ($displayDefaultXml) {
 			$galleyDaoFactory = $articleGalleyDao->getGalleysBySetting('jatsParserDisplayDefaultXml', 1, $this->_submissionId);
 			while ($galley = $galleyDaoFactory->next()) {
-				if (($galley->getId() != $currentGalley->getId()) && ($galley->getData('jatsParserDisplayDefaultXml'))) {
+				if (($galley->getId() != $currentGalley->getId()) && ($galley->getData('jatsParserDisplayDefaultXml', $currentGalley->getLocale()))) {
 					$galley->setData('jatsParserDisplayDefaultXml', null);
 					$articleGalleyDao->updateLocaleFields($galley);
 				}
 			}
 		}
 
-		$currentGalley->setData('jatsParserDisplayDefaultXml', $displayDefaultXml);
+		$currentGalley->setData('jatsParserDisplayDefaultXml', $displayDefaultXml, $currentGalley->getLocale());
 
 		$articleGalleyDao->updateLocaleFields($currentGalley);
 
