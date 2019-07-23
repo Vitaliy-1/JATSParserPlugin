@@ -55,7 +55,7 @@ class JatsParserGalleyForm extends Form {
 
 		// Update settings for other galley from this submission that have jatsParserDisplayDefaultXml 'On'
 		if ($displayDefaultXml) {
-			$galleyDaoFactory = $articleGalleyDao->getGalleysBySetting('jatsParserDisplayDefaultXml', 'On', $this->_submissionId);
+			$galleyDaoFactory = $articleGalleyDao->getGalleysBySetting('jatsParserDisplayDefaultXml', 1, $this->_submissionId);
 			while ($galley = $galleyDaoFactory->next()) {
 				if (($galley->getId() != $currentGalley->getId()) && ($galley->getData('jatsParserDisplayDefaultXml'))) {
 					$galley->setData('jatsParserDisplayDefaultXml', null);

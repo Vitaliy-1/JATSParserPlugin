@@ -25,7 +25,7 @@
 		{fbvFormSection list=true}
 			<div class="instruct">{translate key="plugins.generic.jatsParser.galley.settings.display.description"}</div>
 			<p class="pkp_help">{translate key="plugins.generic.jatsParser.galley.settings.displayDefault.description"}</p>
-			{fbvElement type="checkbox" id="jatsParserDisplayDefaultXml" name="jatsParserDisplayDefaultXml" checked=$jatsParserDisplayDefaultXml label="plugins.generic.jatsParser.galley.settings.displayDefault"}
+			{fbvElement type="checkbox" id="jatsParserDisplayDefaultXml" name="jatsParserDisplayDefaultXml" checked=$jatsParserDisplayDefaultXml label="plugins.generic.jatsParser.galley.settings.displayDefault" value="1"}
 		{/fbvFormSection}
 	{/fbvFormArea}
 
