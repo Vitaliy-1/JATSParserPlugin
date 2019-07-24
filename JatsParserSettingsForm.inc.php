@@ -75,6 +75,14 @@ class JatsParserSettingsForm extends Form {
 		$contextId = $this->_journalId ;
 
 		$plugin->updateSetting($contextId, 'references', $this->getData('references'));
-		$plugin->updateSetting($contextId, 'displayOnArticlePage', $this->getData('displayOnArticlePage'));
+
+		$displayOnArticlePage = $this->getData('displayOnArticlePage');
+
+		if (!$displayOnArticlePage) {
+			$displayOnArticlePage = false;
+		} else {
+			$displayOnArticlePage = true;
+		}
+		$plugin->updateSetting($contextId, 'displayOnArticlePage', $displayOnArticlePage);
 	}
 }
