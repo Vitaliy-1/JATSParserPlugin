@@ -6,5 +6,10 @@
  *}
 
 <article id="jatsParserFullText">
+	{if $convertedPdfUrl}
+		<p>
+			<a href="{$convertedPdfUrl}">Read as PDF</a>
+		</p>
+	{/if}
 	{$htmlDocument}
 </article>

@@ -122,7 +122,9 @@ class JatsParserPlugin extends GenericPlugin {
 		$galley =& $args[2];
 		$article =& $args[3];
 
-		if ($request->getQueryString() === CREATE_PDF_QUERY) return false;
+		$contextId = $request->getContext()->getId();
+
+		if (($request->getQueryString() === CREATE_PDF_QUERY) && ($this->getSetting($contextId, 'convertToPdf'))) return false;
 
 		$xmlGalley = null;
 		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
@@ -145,7 +147,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$submissionFileManager->recordView($xmlGalley->getFile());
 
 		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
-		$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
 
 		$templateMgr->addStyleSheet('styles', $baseUrl . '/app/app.min.css');
 		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
@@ -160,9 +161,13 @@ class JatsParserPlugin extends GenericPlugin {
 			'galley' => $galley,
 			'htmlDocument' => $htmlDocument->saveHTML(),
 			'pluginUrl' => $baseUrl,
-			'generatePdfUrl' => $generatePdfUrl,
 			'jatsParserOrcidImage' => $orcidImage,
 		));
+
+		if ($this->getSetting($contextId, 'convertToPdf')) {
+			$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
+			$templateMgr->assign('generatePdfUrl', $generatePdfUrl);
+		}
 
 		$templateMgr->display($this->getTemplateResource('articleView.tpl'));
 		return true;
@@ -182,7 +187,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$galley =& $args[2];
 		$article =& $args[3];
 
-		if ($request->getQueryString() !== CREATE_PDF_QUERY) return false;
+		if (($request->getQueryString() !== CREATE_PDF_QUERY) || (!$this->getSetting($request->getContext()->getId(), 'convertToPdf'))) return false;
 
 		$xmlGalley = null;
 		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
@@ -216,24 +221,67 @@ class JatsParserPlugin extends GenericPlugin {
 	function embeddedXmlGalley($hookName, $args) {
 		$templateMgr =& $args[1];
 		$output =& $args[2];
+		$request = $this->getRequest();
+		$context = $request->getContext();
+
+		if (!$this->getSetting($context->getId(), "displayOnArticlePage")) return false;
 
 		$article = $templateMgr->getTemplateVars('article');
 		$galleys = $templateMgr->getTemplateVars('primaryGalleys');
 
-		$xmlGalley = null;
+		$locale = AppLocale::getLocale();
+		$primaryLocale = AppLocale::getPrimaryLocale();
+
+		// Determine what galley to display depending on galley's and request locale
+		$xmlGalleys = array();
+		$defaultGalley = null;
+		$localizedDefaultGalley = null;
+
 		foreach ($galleys as $galley) {
-			if (($galley->getFileType() === "application/xml" || $galley->getFileType() ==="text/xml")) {
-				$xmlGalley = $galley;
-				break;
+			$defaultGalleySetting = $galley->getData("jatsParserDisplayDefaultXml", $primaryLocale);
+			$localizedDefaultGalleySetting = $galley->getData("jatsParserDisplayDefaultXml", $locale);
+			if (($galley->getFileType() === "application/xml" || $galley->getFileType() === "text/xml")) {
+				$xmlGalleys[$galley->getLocale()] = $galley;
+			}
+
+			if ($defaultGalleySetting) {
+				$defaultGalley = $galley;
+			}
+
+			if ($localizedDefaultGalleySetting) {
+				$localizedDefaultGalley = $galley;
 			}
 		}
 
-		if ($xmlGalley == null) return false;
+		if (empty($xmlGalleys)) return false;
 
+		if ($localizedDefaultGalley) {
+			$xmlGalley = $localizedDefaultGalley;
+		} else if ($defaultGalley) {
+			/* @var $defaultGalley ArticleGalley */
+			$xmlGalley = $defaultGalley;
+		} else if ($xmlGalleys[$locale]) {
+			// Last localized galley fetched
+			$xmlGalley = $xmlGalleys[$locale];
+		} else if ($xmlGalleys[$primaryLocale]) {
+			// Last galley fetched in primary locale
+			$xmlGalley = $xmlGalleys[$primaryLocale];
+		} else {
+			// Finally give up
+			$xmlGalley = $xmlGalleys[0];
+		}
+
+		// Convert JATS and assign HTML
 		$request = Application::getRequest();
+		$contextId = $request->getContext()->getId();
+
 		$jatsDocument = new Document($xmlGalley->getFile()->getFilePath());
 		$htmlDocument = $this->htmlCreation($article, $templateMgr, $jatsDocument, $xmlGalley, $request);
 		$templateMgr->assign('htmlDocument', $htmlDocument->saveHTML());
+		if ($this->getSetting($contextId, 'convertToPdf')) {
+			$convertedPdfUrl = $request->getCompleteUrl() . DIRECTORY_SEPARATOR . $xmlGalley->getId() . '?' . CREATE_PDF_QUERY;
+			$templateMgr->assign('convertedPdfUrl', $convertedPdfUrl);
+		}
 		$output .= $templateMgr->fetch($this->getTemplateResource('articleFooter.tpl'));
 
 		return false;
@@ -243,7 +291,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param $hookName string
 	 * @param $args array (PKPTemplateManager, template, cache id, compile id, result)
 	 * @return boolean
-	 * @brief display parsed XML on article landing page
+	 * @brief galley-level settings for the plugin
 	 */
 	function templateFetchCallback($hookName, $args) {
 

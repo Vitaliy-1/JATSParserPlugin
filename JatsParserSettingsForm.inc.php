@@ -48,13 +48,14 @@ class JatsParserSettingsForm extends Form {
 
 		$this->setData('references', $plugin->getSetting($contextId, 'references'));
 		$this->setData('displayOnArticlePage', $plugin->getSetting($contextId, 'displayOnArticlePage'));
+		$this->setData('convertToPdf', $plugin->getSetting($contextId, 'convertToPdf'));
 	}
 
 	/**
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('references', 'displayOnArticlePage'));
+		$this->readUserVars(array('references', 'displayOnArticlePage', 'convertToPdf'));
 	}
 
 	/**
@@ -77,12 +78,19 @@ class JatsParserSettingsForm extends Form {
 		$plugin->updateSetting($contextId, 'references', $this->getData('references'));
 
 		$displayOnArticlePage = $this->getData('displayOnArticlePage');
-
 		if (!$displayOnArticlePage) {
 			$displayOnArticlePage = false;
 		} else {
 			$displayOnArticlePage = true;
 		}
 		$plugin->updateSetting($contextId, 'displayOnArticlePage', $displayOnArticlePage);
+
+		$convertToPdf = $this->getData('convertToPdf');
+		if (!$convertToPdf) {
+			$convertToPdf = false;
+		} else {
+			$convertToPdf = true;
+		}
+		$plugin->updateSetting($contextId, 'convertToPdf', $convertToPdf);
 	}
 }

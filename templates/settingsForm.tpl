@@ -27,6 +27,9 @@
 			{fbvElement type="radio" id="defaultReferences" name="references" value="defaultReferences" checked=$references|compare:"defaultReferences" label="plugins.generic.jatsParser.settings.defaultReferences"}
 		{/fbvFormSection}
 		{fbvFormSection list=true}
+			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.display.pdf"}
+		{/fbvFormSection}
+		{fbvFormSection list=true}
 			<p class="pkp_help">{translate key="plugins.generic.jatsParser.galley.settings.display.articlePage.description"}</p>
 			{fbvElement type="checkbox" id="displayOnArticlePage" name="displayOnArticlePage" checked=$displayOnArticlePage label="plugins.generic.jatsParser.settings.display.articlePage"}
 		{/fbvFormSection}

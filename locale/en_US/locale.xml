@@ -28,6 +28,7 @@
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">Default</message>
 	<message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">Allow plugin to display converted JATS XML galleys on article landing page. By default the first XML galley fetched will be displayed. This can be changed individually via JATS Parser galley settings under each uploaded galley.</message>
 	<message key="plugins.generic.jatsParser.settings.display.articlePage">Display JATS XML on article landing page</message>
+	<message key="plugins.generic.jatsParser.settings.display.pdf">Convert JATS XML to PDF</message>
 
 	<!-- Plugin galley settings -->
 	<message key="plugins.generic.jatsParser.galley.settings.display">Display Settings</message>
