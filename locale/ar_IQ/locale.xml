@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/jatsParser/locale/ar_IQ/locale.xml
+  *
+  * Copyright (c) 2017 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
+  * Distributed under the GNU GPL v3.
+  *
+  * jatsParser plugin localization strings
+  -->
+
+<locale name="ar_IQ" full_name="العربية">
+	<message key="plugins.generic.jatsParser.displayName">إضافة محلل تركيبة وسوم المقالة</message>
+	<message key="plugins.generic.jatsParser.description">هذه الإضافة تحول صيغة JATS XML إلى صيغة HTML و PDF لأغراض المعاينة على صفحات المجلة</message>
+	<message key="jatsParser.galleys.info">معاينة المقالة بصيغ أخرى</message>
+	<message key="jatsParser.navigation.article">المقالة</message>
+	<message key="jatsParser.navigation.details">التفاصيل</message>
+	<message key="jatsParser.navigation.metrics">المقاييس</message>
+	<message key="jatsParser.openAccess.label">الوصول المفتوح</message>
+	<message key="jatsParser.references.link">العثور ضمن النص</message>
+
+	<!-- Plugin settings -->
+	<message key="plugins.generic.jatsParser.workflow.settings">إعدادات الإضافة JATS</message>
+	<message key="plugins.generic.jatsParser.settings.description">قائمة إعدادات إضافة محلل تركيبة وسوم المقالة</message>
+	<message key="plugins.generic.jatsParser.settings.jatsReferences">فرض عرض المراجع من صيغة JATS XML</message>
+	<message key="plugins.generic.jatsParser.settings.ojsReferences">فرض عرض المراجع المحللة من نظام المجلات المفتوحة</message>
+	<message key="plugins.generic.jatsParser.settings.defaultReferences">الإفتراضي</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">السماح للإضافة بعرض الألواح الطباعية المحولة بصيغة JATS XML في صفحة تواجد المقالة. إفتراضياً، أول لوح طباعي بصيغة XML يتم جلبه هو ما يتم عرضه. هذا الحال يمكن تعديله عبر إعدادات محلل تركيبة وسوم المقالة ضمن كل لوح طباعي يجري رفعه إلى الموقع.</message>
+	<message key="plugins.generic.jatsParser.settings.display.articlePage">عرض صيغة JATS XML عند صفحة تواجد المقالة</message>
+	<message key="plugins.generic.jatsParser.settings.display.pdf">تحويل JATS XML إلى PDF</message>
+
+	<!-- Plugin galley settings -->
+	<message key="plugins.generic.jatsParser.galley.settings.display">إعدادات العرض</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.description">هذه الإعدادات تطبق على الألواح الطباعية بصيغة XML على أساس فردي.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">هذا الخيار يسمح بانتخاب اللوح الطباعي بصيغة JATS XML الذي سيتم عرضه في صفحة تواجد المقالة. لاحظ أنه من أجل أن يكون هذا الخيار فعالاً، "عرض الألواح الطباعية على صفحة تواجد المقالة" ينبغي تمكينه عبر إعدادات الإضافة. إفتراضياً، الإضافة ستأخذ أول لوح طباعي بصيغة XML جرى رفعه إلى الموقع.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">إعرضه إفتراضياً</message>
+</locale>
