@@ -13,7 +13,7 @@ OJS3 Plugin for parsing JATS XML and displaying it on article detail page.
 4. To change image logo in resulted PDF just replace `JATSParser/logo/logo.jpg` file by yours. 
 ## Requirements
 * PHP 7.1 or higher
-* OJS theme with Bootstrap 4. If the theme doesn't utilize this library, it must be added alongside with jQuery from the plugin main class (it is [quite straightforward](https://github.com/Vitaliy-1/JATSParserPlugin/blob/master/JatsParserPlugin.inc.php#L145-L148)). JATS Parser Plugin is tested with [HealthSciences](https://github.com/pkp/healthSciences), [Classic](https://github.com/Vitaliy-1/classic), and [oldGregg](https://github.com/Vitaliy-1/oldGregg) themes
+* OJS theme with Bootstrap 4. If the theme doesn't utilize this library, it must be added alongside with jQuery from the plugin main class (it is [quite straightforward](https://github.com/Vitaliy-1/JATSParserPlugin/blob/0bfbe3acba6841cbfbec01e220d8ae507cde02af/JatsParserPlugin.inc.php#L145-L148)). JATS Parser Plugin is tested with [HealthSciences](https://github.com/pkp/healthSciences), [Classic](https://github.com/Vitaliy-1/classic), and [oldGregg](https://github.com/Vitaliy-1/oldGregg) themes
 * OJS 3.1+
 * Lens Galley Plugin must be turned off
 ## Examples
