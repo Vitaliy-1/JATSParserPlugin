@@ -33,7 +33,7 @@
 
 	<!-- Plugin galley settings -->
 	<message key="plugins.generic.jatsParser.galley.settings.display">Display Settings</message>
-	<message key="plugins.generic.jatsParser.galley.settings.display.description">This settings are applied to XML galleys on individual basis.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.description">These settings are applied to XML galleys on individual basis.</message>
 	<message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">This option allows to choose JATS XML galley that will be displayed on article landing page. Note that for this option to work, "Display galleys on article landing page" should be enabled via plugin's settings. By default the plugin will pick up the first uploaded XML galley.</message>
 	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">Display as a default</message>
 </locale>
