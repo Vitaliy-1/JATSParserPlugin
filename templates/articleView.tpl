@@ -137,7 +137,7 @@
 											</button>
 										</div>
 										<div class="modal-body">
-											{$author->getLocalizedBiography()}
+											{$author->getLocalizedBiography()|strip_unsafe_html}
 										</div>
 									</div>
 								</div>
