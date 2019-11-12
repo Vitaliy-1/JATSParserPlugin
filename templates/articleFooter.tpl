@@ -8,7 +8,7 @@
 <article id="jatsParserFullText">
 	{if $convertedPdfUrl}
 		<p>
-			<a href="{$convertedPdfUrl}">Read as PDF</a>
+			<a href="{$convertedPdfUrl}">{translate key="jatsParser.pdf.read.label"}</a>
 		</p>
 	{/if}
 	{$htmlDocument}
