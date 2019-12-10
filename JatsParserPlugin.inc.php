@@ -148,10 +148,9 @@ class JatsParserPlugin extends GenericPlugin {
 
 		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
 
-		$templateMgr->addStyleSheet('styles', $baseUrl . '/app/app.min.css');
+		$templateMgr->addStyleSheet('jatsParserStyles', $baseUrl . '/resources/styles/jatsParser.css');
 		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
-		$templateMgr->addJavaScript('fontawesome', 'https://use.fontawesome.com/releases/v5.2.0/js/all.js');
-		$templateMgr->addJavaScript('javascript', $baseUrl . '/app/app.min.js');
+		$templateMgr->addJavaScript('jatsParserJavascript', $baseUrl . '/resources/javascript/jatsParser.js');
 
 		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';
 

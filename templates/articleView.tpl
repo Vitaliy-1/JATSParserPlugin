@@ -11,25 +11,26 @@
 
 {include file="frontend/components/header.tpl" pageTitleTranslated=$article->getLocalizedTitle()|escape}
 
-<div class="article-container container">
-	<div class="galley-article-meta row">
+<div class="jatsParser__container">
+
+	<div class="jatsParser__meta">
 		{* Cover image *}
 		{if $article->getLocalizedCoverImage() || $issue->getLocalizedCoverImage()}
-			<div class="article_cover_wrapper">
+			<div class="jatsParser__cover-wrapper">
 				{if $article->getLocalizedCoverImage()}
-					<img class="galley-cover-image img-fluid img-thumbnail" src="{$article->getLocalizedCoverImageUrl()|escape}"{if $article->getLocalizedCoverImageAltText()} alt="{$article->getLocalizedCoverImageAltText()|escape}"{/if}>
+					<img class="jatsParser__cover" src="{$article->getLocalizedCoverImageUrl()|escape}"{if $article->getLocalizedCoverImageAltText()} alt="{$article->getLocalizedCoverImageAltText()|escape}"{/if}>
 				{else}
 					<a href="{url page="issue" op="view" path=$issue->getBestIssueId()}">
-						<img class="galley-cover-image img-fluid img-thumbnail" src="{$issue->getLocalizedCoverImageUrl()|escape}"{if $issue->getLocalizedCoverImageAltText()} alt="{$issue->getLocalizedCoverImageAltText()|escape}"{/if}>
+						<img class="jatsParser__cover" src="{$issue->getLocalizedCoverImageUrl()|escape}"{if $issue->getLocalizedCoverImageAltText()} alt="{$issue->getLocalizedCoverImageAltText()|escape}"{/if}>
 					</a>
 				{/if}
 			</div>
 		{/if}
-		<div class="galley-meta-row">
+		<div class="jatsParser__meta-row">
 
 			{* Section title *}
 			{if $article->getSectionTitle()}
-				<div class="galley-article-section-title">
+				<div class="jatsParser__meta-section-title">
 					{$article->getSectionTitle()|escape}
 				</div>
 			{/if}
@@ -42,12 +43,12 @@
 				{assign var=pubId value=$article->getStoredPubId($pubIdPlugin->getPubIdType())}
 				{if $pubId}
 					{assign var="doiUrl" value=$pubIdPlugin->getResolvingURL($currentJournal->getId(), $pubId)|escape}
-					<div class="galley-article-doi">
-						<span class="galley-doi-label">
+					<div class="jatsParser__meta-doi">
+						<span class="jatsParser__doi-label">
 							{capture assign=translatedDOI}{translate key="plugins.pubIds.doi.readerDisplayName"}{/capture}
 							{translate key="semicolon" label=$translatedDOI}
 						</span>
-						<span class="galley-doi-value">
+						<span class="jatsParser__meta-doi-value">
 							<a href="{$doiUrl}">
 								{* maching DOI's (with new and old format) *}
 								{$doiUrl|regex_replace:"/http.*org\//":" "}
@@ -59,14 +60,14 @@
 
 			{* Submitted date *}
 			{if $article->getDateSubmitted()}
-				<div class="galley-article-date-submitted">
+				<div class="jatsParser__meta-date-submitted">
 					<span>{translate key="submissions.submitted"}:<span> <span>{$article->getDateSubmitted()|date_format:$dateFormatShort}</span>
 				</div>
 			{/if}
 
 			{* Published date *}
 			{if $article->getDatePublished()}
-				<div class="galley-article-date-published">
+				<div class="jatsParser__meta-date-published">
 					<span>{translate key="submissions.published"}:<span> <span>{$article->getDatePublished()|date_format:$dateFormatShort}</span>
 				</div>
 			{/if}
@@ -74,22 +75,22 @@
 
 		{* Article title *}
 		{if $article->getLocalizedFullTitle()}
-			<h1>{$article->getLocalizedFullTitle()|escape}</h1>
+			<h1 class="jatsParser__meta-title">{$article->getLocalizedFullTitle()|escape}</h1>
 		{/if}
 
 		{* Authors' list *}
 		{if $article->getAuthors()}
-			<ul class="authors-string">
+			<ul class="jatsParser__meta-authors">
 				{foreach from=$article->getAuthors() item=authorString key=authorStringKey}
 					{strip}
 						<li>
-							<a class="jatsparser-author-string-href" href="#author-{$authorStringKey+1}">
-								<span>{$authorString->getFullName()|escape}</span>
-								<sup class="author-symbol author-plus">+</sup>
-								<sup class="author-symbol author-minus hide">&minus;</sup>
+							<a class="jatsParser__meta-author-string-href" href="#author-{$authorStringKey+1}">
+								<span class="jatsParser__meta-author">{$authorString->getFullName()|escape}</span>
+								<sup class="jatsParser__meta-symbol jatsParser__symbol-plus">+</sup>
+								<sup class="jatsParser__meta-symbol jatsParser__symbol-minus jatsParser__hide">&minus;</sup>
 							</a>
 							{if $authorString->getOrcid()}
-								<a class="orcidImage" href="{$authorString->getOrcid()|escape}"><img src="{$baseUrl}/{$jatsParserOrcidImage}"></a>
+								<a class="jatsParser__meta-orcidImage" href="{$authorString->getOrcid()|escape}"><img src="{$baseUrl}/{$jatsParserOrcidImage}"></a>
 							{/if}
 						</li>
 					{/strip}
@@ -99,47 +100,23 @@
 			{* Authors *}
 			{assign var="authorCount" value=$article->getAuthors()|@count}
 			{assign var="authorBioIndex" value=0}
-			<div class="article-details-authors">
+			<div class="jatsParser__details-authors">
 				{foreach from=$article->getAuthors() item=author key=authorKey}
-					<div class="article-details-author hideAuthor" id="author-{$authorKey+1}">
+					<div class="jatsParser__details-author jatsParser__hideAuthor" id="jatsParser__author-{$authorKey+1}">
 						{if $author->getLocalizedAffiliation()}
-							<div class="article-details-author-affiliation">{$author->getLocalizedAffiliation()|escape}</div>
-						{/if}
-						{if $author->getOrcid()}
-							<div class="article-details-author-orcid">
-								<a href="{$author->getOrcid()|escape}" target="_blank">
-									{$orcidIcon}
-									{$author->getOrcid()|escape}
-								</a>
-							</div>
+							<div class="jatsParser__details-author-affiliation">{$author->getLocalizedAffiliation()|escape}</div>
 						{/if}
 						{if $author->getLocalizedBiography()}
-							<a class="article-details-bio-toggle" data-toggle="modal" data-target="#authorBiographyModal{$authorKey+1}">
+							<a href="#jatsParser__modal-bio-{$authorKey+1}" class="jatsParser__details-bio-toggle" id="jatsParser__modal-bio-link-{$authorKey+1}">
 								{translate key="plugins.themes.healthSciences.article.authorBio"}
 							</a>
-							{* Store author biographies to print as modals in the footer *}
-							<div
-									class="modal fade"
-									id="authorBiographyModal{$authorKey+1}"
-									tabindex="-1"
-									role="dialog"
-									aria-labelledby="authorBiographyModalTitle{$authorKey+1}"
-									aria-hidden="true"
-							>
-								<div class="modal-dialog" role="document">
-									<div class="modal-content">
-										<div class="modal-header">
-											<div class="modal-title" id="authorBiographyModalTitle{$authorKey+1}">
-												{$author->getFullName()|escape}
-											</div>
-											<button type="button" class="close" data-dismiss="modal" aria-label="{translate|escape key="common.close"}">
-												<span aria-hidden="true">&times;</span>
-											</button>
-										</div>
-										<div class="modal-body">
-											{$author->getLocalizedBiography()|strip_unsafe_html}
-										</div>
-									</div>
+							<div class="jatsParser__modal-bio" id="jatsParser__modal-bio-{$authorKey+1}">
+								<div class="jatsParser__modal-bio-content">
+									<span class="jatsParser__close">&times;</span>
+									<h4 class="jatsParser__modal-bio-name">
+										{$author->getFullName()|escape}
+									</h4>
+									{$author->getLocalizedBiography()|strip_unsafe_html}
 								</div>
 							</div>
 						{/if}
@@ -151,31 +128,31 @@
 
 		{* Keywords *}
 		{if !empty($keywords[$currentLocale])}
-			<div class="galley-keywords-wrapper">
-				<div class="galley-keywords-row">
+			<div class="jatsParser__keywords-wrapper">
+				<div class="jatsParser__keywords-row">
 					{foreach from=$keywords item=keywordArray}
 						{foreach from=$keywordArray item=keyword key=k}
-								<span class="galley-span-keyword">{$keyword|escape}</span>
+								<span class="jatsParser__keyword">{$keyword|escape}</span>
 						{/foreach}
 					{/foreach}
 				</div>
 			</div>
 		{/if}
 	</div>
-	<div class="articleView-data row">
-		<div class="left-article-block col-xl-3">
+	<div class="jatsParser__articleView">
+		<div class="jatsParser__left-article-block">
 			{if $generatePdfUrl}
-				<div class="galley-pdf-link-wrapper">
-					<a class="galley-link-pdf" href="{$generatePdfUrl}">
-						<i class="fas fa-file-pdf fa-2x"></i>
+				<div class="jatsParser__pdf-link-wrapper">
+					<a class="jatsParser__link-pdf" href="{$generatePdfUrl}">
+						{translate key="jatsParser.pdf.read.label"}
 					</a>
 				</div>
 			{/if}
 		</div>
-		<div class="col-xl-6 col-lg-8">
-			<div class="article-fulltext">
+		<div class="jatsParser__center-article-block">
+			<div class="jatsParser__article-fulltext" id="jatsParserFullText">
 				{if $article->getLocalizedAbstract()}
-					<h2 class="article-section-title article-abstract">{translate key="article.abstract"}</h2>
+					<h2 class="article-section-title jatsParser__abstract">{translate key="article.abstract"}</h2>
 					{$article->getLocalizedAbstract()|strip_unsafe_html}
 				{/if}
 
@@ -183,13 +160,13 @@
 
 			</div>
 		</div>
-		<div class="details-wrapper col-xl-3 col-lg-4">
-			<div class="intraarticle-menu">
-				<nav id="article-navbar" class="navbar navbar-light">
-					<nav class="nav nav-pills flex-column" id="article-navigation-menu-items">
+		<div class="jatsParser__right-article-block">
+			<div class="jatsParser__intraarticle-menu">
+				<div id="jatsParser__navbar-article" class="jatsParser__navbar">
+					<nav class="jatsParser__navbar-items" id="jatsParser__navbarItems">
 						{* adding menu by javascript here *}
 					</nav>
-				</nav>
+				</div>
 			</div>
 		</div>
 	</div>
