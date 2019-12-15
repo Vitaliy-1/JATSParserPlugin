@@ -1,21 +1,4 @@
 
-/* Override Default theme style */
-.pkp_structure_main:before, .pkp_structure_main:after {
-	display: none;
-}
-
-@media (min-width: 1200px) {
-
-	.pkp_structure_content {
-		width: 1400px;
-	}
-}
-
-figure {
-	margin-left: 0;
-	margin-right: 0;
-}
-
 .jatsParser__hide {
 	display: none !important;
 }
@@ -156,6 +139,10 @@ figure {
 	padding-right: 15px;
 }
 
+.jatsParser__meta-orcidImage img {
+	max-width: 18px;
+}
+
 /* Title */
 
 h1.jatsParser__meta-title {
@@ -286,6 +273,119 @@ h1.jatsParser__meta-title {
 	color: black;
 	text-decoration: none;
 	cursor: pointer;
+}
+
+/* Figure and table modal */
+
+.jatsParser__container figure, .jatsParser__container table {
+	position: relative;
+}
+
+.jatsParser__expand {
+	position: absolute;
+	top: 0;
+	right: 0;
+	background-color: #fff;
+	border: 2px solid #2f2f2f;
+	cursor: pointer;
+}
+
+.jatsParser__expand:hover {
+	background-color: #2f2f2f;
+	color: #fff;
+	transition: background-color 0.5s ease;
+	-ms-transition: background-color 0.5s ease;
+	-webkit-transition: background-color 0.5s ease;
+}
+
+.jatsParser__modal {
+	position: fixed;
+	width: 100%;
+	z-index: 9999;
+	top: 0;
+	bottom: 0;
+	overflow-y: scroll;
+	height: 100vh;
+	margin: 0;
+	background-color: #fff;
+	padding: 52px 60px;
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+	.jatsParser__modal {
+		padding: 60px 20px 20px 20px;
+	}
+}
+
+@media (max-width: 575px) {
+	.jatsParser__modal {
+		padding: 60px 10px 10px 10px;
+	}
+}
+
+.jatsParser__modal .caption, .jatsParser__modal caption {
+	font-size: 16px;
+	color: #000;
+}
+
+.jatsParser__modal caption {
+	margin-top: 20px;
+}
+
+.jatsParser__modal .notes {
+	margin-top: 5px;
+}
+
+.jatsParser__fade {
+	height: 100vh;
+	overflow-y: hidden;
+	padding-right: 15px;
+	position: fixed;
+}
+
+#jatsParser__close {
+	display: inline-block;
+	font-size: 28px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	padding: 9px 12px 9px 12px;
+	border-left: 2px solid #2f2f2f;
+	border-bottom: 2px solid #2f2f2f;
+	background-color: #fff;
+	border-top: 0;
+	border-right: 0;
+	cursor: pointer;
+}
+
+#jatsParser__close:hover {
+	background-color: #404040;
+	color: #fff
+}
+
+.jatsParser__container table, .jatsParser__container figure {
+	cursor: pointer;
+}
+
+.jatsParser__modal table {
+	margin: auto;
+	overflow: auto;
+	display: block;
+	max-width: fit-content;
+	border-collapse: collapse;
+}
+
+.jatsParser__modal tr {
+	border-top: 1px solid #e7e7e7;
+}
+
+.jatsParser__modal tbody, .jatsParser__modal thead {
+	border: 1px solid #e7e7e7;
+}
+
+.jatsParser__modal td, .jatsParser__modal th {
+	padding: 6px;
+	border-right: 1px solid #e7e7e7;
 }
 
 /* Keywords */
@@ -466,10 +566,14 @@ h1.jatsParser__meta-title {
 }
 
 /* Tables and Figures */
+.jatsParser__container table {
+	border-collapse: collapse;
+}
+
 .jatsParser__container table, .jatsParser__container figure {
 	margin-top: 40px;
 	margin-bottom: 40px;
-	padding: 20px;
+	padding: 30px 30px 20px 20px;
 	display: block;
 	overflow: auto;
 	box-shadow: 0 0 5px #ddd;

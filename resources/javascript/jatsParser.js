@@ -1,3 +1,4 @@
+
 // Navigation inside an article
 
 (function () {
@@ -319,4 +320,65 @@
 		}
 	}
 
+})();
+
+// Modal for figures
+
+(function () {
+	var els = document.querySelectorAll("figure, table");
+	for (var i = 0; i < els.length; i++) {
+		var expandEl = document.createElement("button");
+		expandEl.setAttribute("class", "jatsParser__expand");
+		expandEl.textContent = "\u2197";
+		els.item(i).insertBefore(expandEl, els.item(i).firstChild);
+	}
+})();
+
+(function () {
+	var clicked = false;
+	var figures = document.querySelectorAll("#jatsParserFullText figure, #jatsParserFullText table");
+	var documentBody = document.body;
+	var documentFadeClass = "jatsParser__fade";
+	var pageYoffset = 0;
+	for (var i = 0; i < figures.length; i++) {
+		var expandEl = figures.item(i).querySelector(".jatsParser__expand");
+		expandEl.addEventListener("click", function () {
+			if (clicked) {
+				return false;
+			}
+
+			clicked = true;
+			pageYoffset = window.pageYOffset;
+			var modalContent = null;
+			var parentEl = this.parentElement;
+			if (parentEl.tagName === "figure") {
+				modalContent = parentEl.cloneNode(true);
+				modalContent.setAttribute("id", "modal-" + modalContent.getAttribute("id"));
+			} else {
+				modalContent = document.createElement("div");
+				var clonedContent = parentEl.cloneNode(true);
+				modalContent.appendChild(clonedContent);
+				modalContent.setAttribute("id", "modal-" + clonedContent.getAttribute("id"));
+			}
+
+			modalContent.classList.add("jatsParser__modal");
+			documentBody.classList.add("jatsParser__fade");
+			documentBody.insertBefore(modalContent, documentBody.firstChild);
+			var elToRemove = modalContent.querySelector(".jatsParser__expand");
+			elToRemove.parentElement.removeChild(elToRemove);
+
+			var closeEl = document.createElement("button");
+			closeEl.setAttribute("id", "jatsParser__close");
+			closeEl.setAttribute("aria-label", "close");
+			closeEl.textContent = "\u2199";
+			modalContent.insertBefore(closeEl, modalContent.firstChild);
+
+			closeEl.addEventListener("click", function () {
+				documentBody.removeChild(modalContent);
+				documentBody.classList.remove(documentFadeClass);
+				window.scrollTo(0, pageYoffset);
+				clicked = false;
+			});
+		});
+	}
 })();

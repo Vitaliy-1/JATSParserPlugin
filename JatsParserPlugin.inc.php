@@ -36,8 +36,7 @@ class JatsParserPlugin extends GenericPlugin {
 				DAORegistry::registerDAO('JatsParserGalleyDAO', new JatsParserGalleyDAO());
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
-				HookRegistry::register('Templates::Article::Footer::PageFooter', array($this, 'embeddedXmlGalley'), HOOK_SEQUENCE_CORE);
-				HookRegistry::register('ArticleHandler::download', array($this, 'xmlDownload'));
+				HookRegistry::register('Templates::Article::Main', array($this, 'embeddedXmlGalley'), HOOK_SEQUENCE_CORE);
 
 				// Add an option to set default XML galley to display in the ArticleGalley form (only when editing galley)
 				HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
@@ -122,7 +121,8 @@ class JatsParserPlugin extends GenericPlugin {
 		$galley =& $args[2];
 		$article =& $args[3];
 
-		$contextId = $request->getContext()->getId();
+		$context = $request->getContext();
+		$contextId = $context->getId();
 
 		if (($request->getQueryString() === CREATE_PDF_QUERY) && ($this->getSetting($contextId, 'convertToPdf'))) return false;
 
@@ -152,6 +152,14 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
 		$templateMgr->addJavaScript('jatsParserJavascript', $baseUrl . '/resources/javascript/jatsParser.js');
 
+		// Theme-specific styling for the galley page
+		switch ($context->getSetting("themePluginPath")) {
+			case "default":
+				$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
+				$templateMgr->addJavaScript('jatsParserThemeJavascript', $baseUrl . '/resources/javascript/default/galley.js');
+				break;
+		}
+
 		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';
 
 		$templateMgr->assign(array(
@@ -169,7 +177,8 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		$templateMgr->display($this->getTemplateResource('articleView.tpl'));
-		return true;
+
+		return false;
 	}
 
 	/**
@@ -208,7 +217,7 @@ class JatsParserPlugin extends GenericPlugin {
 
 		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
 
-		return true;
+		return false;
 	}
 
 	/**
@@ -498,7 +507,7 @@ class JatsParserPlugin extends GenericPlugin {
 		// Localization of reference list title
 		$referenceTitles = $xpath->evaluate("//h2[@id='reference-title']");
 		$translateReference = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
-		if ($referenceTitles->lenght > 0) {
+		if ($referenceTitles->length > 0) {
 			foreach ($referenceTitles as $referenceTitle) {
 				$referenceTitle->nodeValue = $translateReference;
 			}
