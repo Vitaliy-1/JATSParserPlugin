@@ -224,7 +224,7 @@
 	var widthMarkerClass = "jatsparser__article-mobile-view";
 	var hideElClass = "jatsParser__hide";
 	var hideSectionContentClass = "jatsParser__hide-content";
-	var clickEvent = false;
+	var clickDisabled = false;
 	accordionEventResize(); // only on page load
 	accordionClick();
 	window.addEventListener("resize", function () {
@@ -262,15 +262,23 @@
 
 	function accordionClick() {
 		var els = document.querySelectorAll("." + widthMarkerClass + " " + "h2.article-section-title");
+
 		if (els.length === 0) {
+			if (!clickDisabled) {
+				var headings = document.querySelectorAll("h2.article-section-title");
+				for (var x = 0; x < headings.length; x++) {
+					headings.item(x).onclick = null;
+				}
+				clickDisabled = true;
+			}
 			return false;
 		}
 
+		var articleWrapperEl = document.getElementById("jatsParserFullText");
+
 		for (var i = 0; i < els.length; i++) {
-			var articleWrapperEl = document.getElementById("jatsParserFullText");
-			if (articleWrapperEl.classList.contains(widthMarkerClass) && !clickEvent) {
-				els.item(i).addEventListener("click", function () {
-					clickEvent = true;
+			if (articleWrapperEl.classList.contains(widthMarkerClass) && !els.item(i).onclick) {
+				els.item(i).onclick = function () {
 					hideSectionContent(els, this);
 					toggleElementRecursively(this);
 
@@ -279,9 +287,10 @@
 						this.scrollIntoView();
 					}
 
-				});
+				};
 			}
 		}
+		clickDisabled = false;
 	}
 
 	function toggleElementRecursively(sectionTitleEl) {
