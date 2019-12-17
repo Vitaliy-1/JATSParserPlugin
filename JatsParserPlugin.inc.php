@@ -157,6 +157,7 @@ class JatsParserPlugin extends GenericPlugin {
 			case "default":
 				$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
 				$templateMgr->addJavaScript('jatsParserThemeJavascript', $baseUrl . '/resources/javascript/default/galley.js');
+				$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
 				break;
 		}
 
