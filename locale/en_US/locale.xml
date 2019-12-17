@@ -13,14 +13,15 @@
 <locale name="en_US" full_name="U.S. English">
 	<message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
 	<message key="plugins.generic.jatsParser.description">The plugin transforms JATS XML into HTML and PDF for viewing on the journal's front-end</message>
-	<message key="jatsParser.galleys.info">View article in other formats</message>
-	<message key="jatsParser.navigation.article">Article</message>
-	<message key="jatsParser.navigation.details">Details</message>
-	<message key="jatsParser.navigation.metrics">Metrics</message>
-	<message key="jatsParser.openAccess.label">open access</message>
-	<message key="jatsParser.references.link">Find in text</message>
-	<message key="jatsParser.pdf.read.label">Read as PDF</message>
-	<message key="jatsParser.pdf.read.symbol-text">PDF</message>
+	<message key="plugins.generic.jatsParser.galleys.info">View article in other formats</message>
+	<message key="plugins.generic.jatsParser.navigation.article">Article</message>
+	<message key="plugins.generic.jatsParser.navigation.details">Details</message>
+	<message key="plugins.generic.jatsParser.navigation.metrics">Metrics</message>
+	<message key="plugins.generic.jatsParser.openAccess.label">open access</message>
+	<message key="plugins.generic.jatsParser.references.link">Find in text</message>
+	<message key="plugins.generic.jatsParser.pdf.read.label">Read as PDF</message>
+	<message key="plugins.generic.jatsParser.pdf.read.symbol-text">PDF</message>
+	<message key="plugins.generic.jatsParser.article.authorBio">Bio</message>
 
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Settings</message>

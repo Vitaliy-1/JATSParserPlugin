@@ -108,7 +108,7 @@
 						{/if}
 						{if $author->getLocalizedBiography()}
 							<a href="#jatsParser__modal-bio-{$authorKey+1}" class="jatsParser__details-bio-toggle" id="jatsParser__modal-bio-link-{$authorKey+1}">
-								{translate key="plugins.themes.healthSciences.article.authorBio"}
+								{translate key="plugins.generic.jatsParser.article.authorBio"}
 							</a>
 							<div class="jatsParser__modal-bio" id="jatsParser__modal-bio-{$authorKey+1}">
 								<div class="jatsParser__modal-bio-content">
@@ -143,8 +143,8 @@
 		<div class="jatsParser__left-article-block">
 			{if $generatePdfUrl}
 				<div class="jatsParser__pdf-link-wrapper">
-					<a class="jatsParser__link-pdf" href="{$generatePdfUrl}" title="{translate key="jatsParser.pdf.read.label"}">
-						<span class="jatsParser__link-pdf-text">{translate key="jatsParser.pdf.read.symbol-text"}</span>
+					<a class="jatsParser__link-pdf" href="{$generatePdfUrl}" title="{translate key="plugins.generic.jatsParser.pdf.read.label"}">
+						<span class="jatsParser__link-pdf-text">{translate key="plugins.generic.jatsParser.pdf.read.symbol-text"}</span>
 					</a>
 				</div>
 			{/if}
