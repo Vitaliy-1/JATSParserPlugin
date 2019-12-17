@@ -8,61 +8,15 @@
 .jatsParser__container {
 	margin-top: 100px;
 	margin-bottom: 100px;
-	font-family: "PT Serif",serif;
-	font-size: 16px;
 	margin-left: auto;
 	margin-right: auto;
-}
-
-.jatsParser__container p,
-.jatsParser__container a,
-.jatsParser__container h1,
-.jatsParser__container h2,
-.jatsParser__container h3,
-.jatsParser__container blockquote,
-.jatsParser__container div,
-.jatsParser__container li,
-.jatsParser__container td,
-.jatsParser__container th,
-.jatsParser__container small,
-.jatsParser__container sup,
-.jatsParser__container sub,
-.jatsParser__container span,
-.jatsParser__container strong {
-	font-family: "PT Serif", serif;
-	line-height: initial;
 }
 
 .jatsParser__container li {
 	margin-bottom: 6px;
 }
 
-.jatsParser__container h1 {
-	font-size: 34px;
-}
 
-.jatsParser__container h2 {
-	font-size: 26px;
-	margin-top: 34px;
-	margin-bottom: 12px;
-}
-
-.jatsParser__container h3 {
-	font-size: 21px;
-	margin-top: 10px;
-	margin-bottom: 12px;
-}
-
-.jatsParser__container h4 {
-	font-size: 19px;
-	margin-top: 8px;
-	margin-bottom: 10px;
-}
-
-.jatsParser__container p {
-	margin-top: 0;
-	margin-bottom: 16px;
-}
 
 @media (min-width: 1200px) {
 	.jatsParser__container {
@@ -146,7 +100,6 @@
 /* Title */
 
 h1.jatsParser__meta-title {
-	font-family: "PT Serif", serif;
 	padding-left: 15px;
 	padding-right: 15px;
 	margin-top: 32px;
@@ -168,11 +121,8 @@ h1.jatsParser__meta-title {
 }
 
 .jatsParser__meta-author-string-href {
-	font-family: "PT Serif",serif;
 	font-size: 16px;
-	line-height: 1.55;
 	text-decoration: none;
-	letter-spacing: 0.2px;
 }
 
 .jatsParser__meta-author-string-href, .jatsParser__meta-orcidImage {
@@ -629,6 +579,7 @@ h1.jatsParser__meta-title {
 /* Tables and Figures */
 .jatsParser__container table {
 	border-collapse: collapse;
+	font-size: smaller;
 }
 
 .jatsParser__container table, .jatsParser__container figure {
@@ -687,7 +638,7 @@ caption .label, .caption .label {
 
 /* References */
 .jatsParser__container .references {
-	padding-left: 0;
+	padding-left: 20px;
 }
 
 .jatsParser__container .references li {
