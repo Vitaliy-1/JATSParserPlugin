@@ -20,6 +20,7 @@
 	<message key="jatsParser.openAccess.label">open access</message>
 	<message key="jatsParser.references.link">Find in text</message>
 	<message key="jatsParser.pdf.read.label">Read as PDF</message>
+	<message key="jatsParser.pdf.read.symbol-text">PDF</message>
 
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Settings</message>

@@ -20,6 +20,7 @@
 	<message key="jatsParser.openAccess.label">вільний доступ</message>
 	<message key="jatsParser.references.link">Знайти у тексті статті</message>
 	<message key="jatsParser.pdf.read.label">Читати як PDF</message>
+	<message key="jatsParser.pdf.read.symbol-text">PDF</message>
 
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.settings.description">Форма налаштувань для плагіна JATSParser</message>

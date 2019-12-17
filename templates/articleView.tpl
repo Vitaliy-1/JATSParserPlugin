@@ -143,8 +143,8 @@
 		<div class="jatsParser__left-article-block">
 			{if $generatePdfUrl}
 				<div class="jatsParser__pdf-link-wrapper">
-					<a class="jatsParser__link-pdf" href="{$generatePdfUrl}">
-						{translate key="jatsParser.pdf.read.label"}
+					<a class="jatsParser__link-pdf" href="{$generatePdfUrl}" title="{translate key="jatsParser.pdf.read.label"}">
+						<span class="jatsParser__link-pdf-text">{translate key="jatsParser.pdf.read.symbol-text"}</span>
 					</a>
 				</div>
 			{/if}
