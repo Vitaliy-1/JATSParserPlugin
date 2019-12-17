@@ -1,8 +1,8 @@
 {**
- * plugins/generic/jatsParser/templates/articleFooter.tpl
+ * plugins/generic/jatsParser/templates/articleMain.tpl
  *
  * @uses $htmlDocument HTML string parsed from JATS XML document
- * @brief Page for displaying JATS XML on article landing page via Templates::Article::Footer::PageFooter hook.
+ * @brief Page for displaying JATS XML on article landing page via Templates::Article::Main hook.
  *}
 
 <article id="jatsParserFullText">

@@ -290,7 +290,7 @@ class JatsParserPlugin extends GenericPlugin {
 			$convertedPdfUrl = $request->getCompleteUrl() . DIRECTORY_SEPARATOR . $xmlGalley->getId() . '?' . CREATE_PDF_QUERY;
 			$templateMgr->assign('convertedPdfUrl', $convertedPdfUrl);
 		}
-		$output .= $templateMgr->fetch($this->getTemplateResource('articleFooter.tpl'));
+		$output .= $templateMgr->fetch($this->getTemplateResource('articleMain.tpl'));
 
 		return false;
 	}
