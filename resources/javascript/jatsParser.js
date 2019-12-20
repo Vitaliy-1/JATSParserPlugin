@@ -141,7 +141,8 @@
 (function () {
 
 	function trackElement(headLvl, navLvl) {
-		// sections position
+
+		// Sections position
 		var sectionTitles = document.getElementsByClassName("article-section-title");
 		var arrayReturn = sectionTitlePos(sectionTitles, headLvl);
 		var closestToZeroElement = arrayReturn[0];
@@ -157,6 +158,14 @@
 
 				var linkTo = navItem.getAttribute("href").trim().substr(1);
 				if (linkTo === closestToZeroElementId) {
+
+					// Remove highlight from the last subheading if next heading is reached
+					if (headLvl === "H3" && !isParentActive(navItem)) {
+						if (navItem.classList.contains("active")) {
+							navItem.classList.remove("active");
+						}
+					}
+
 					if (navItem.classList.contains("active")) {
 						return;
 					}
@@ -166,8 +175,11 @@
 					navItem.classList.remove("active");
 				}
 
+				// Add highlight except to subheadings from different sections
 				if (linkTo === closestToZeroElementId) {
-					navItem.classList.add("active");
+					if (headLvl !== "H3" || isParentActive(navItem)) {
+						navItem.classList.add("active");
+					}
 				}
 			}
 
@@ -216,6 +228,10 @@
 		}
 
 		return [closestToZeroElement, minimum];
+	}
+
+	function isParentActive(navItem) {
+		return navItem.parentElement.previousElementSibling.classList.contains("active");
 	}
 })();
 
