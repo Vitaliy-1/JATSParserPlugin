@@ -363,13 +363,13 @@ class JatsParserPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @param $article PublishedArticle
+	 * @param $article Submission
 	 * @param $request PKPRequest
 	 * @param $htmlDocument HTMLDocument
 	 * @param $issue Issue
 	 * @param
 	 */
-	private function pdfCreation(PublishedArticle $article, Request $request, JATSParserDocument $htmlDocument, Issue $issue, ArticleGalley $xmlGalley): void
+	private function pdfCreation(Submission $article, Request $request, JATSParserDocument $htmlDocument, Issue $issue, ArticleGalley $xmlGalley): void
 	{
 		// HTML preparation
 		$xpath = new \DOMXPath($htmlDocument);
