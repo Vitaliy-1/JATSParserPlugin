@@ -525,6 +525,7 @@ class JatsParserPlugin extends GenericPlugin {
 	private function imageUrlReplacement($embeddedXml, $xpath): void
 	{
 		$submissionFile = $embeddedXml->getFile();
+		$submissionId = $submissionFile->getSubmissionId();
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
 		import('lib.pkp.classes.submission.SubmissionFile'); // Constants
 		$embeddableFiles = array_merge(
@@ -532,14 +533,14 @@ class JatsParserPlugin extends GenericPlugin {
 			$submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getFileId(), $submissionFile->getSubmissionId(), SUBMISSION_FILE_DEPENDENT)
 		);
 		$referredArticle = null;
-		$articleDao = DAORegistry::getDAO('ArticleDAO');
+		$submissionDao = DAORegistry::getDAO('SubmissionDAO');
 		$imageUrlArray = array();
 		foreach ($embeddableFiles as $embeddableFile) {
 			$params = array();
 			if ($embeddableFile->getFileType() == 'image/png' || $embeddableFile->getFileType() == 'image/jpeg') {
 				// Ensure that the $referredArticle object refers to the article we want
-				if (!$referredArticle || $referredArticle->getId() != $embeddedXml->getSubmissionId()) {
-					$referredArticle = $articleDao->getById($embeddedXml->getSubmissionId());
+				if (!$referredArticle || $referredArticle->getId() != $submissionId) {
+					$referredArticle = $submissionDao->getById($submissionId);
 				}
 				$fileUrl = Application::getRequest()->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $embeddedXml->getBestGalleyId(), $embeddableFile->getFileId()), $params);
 				$imageUrlArray[$embeddableFile->getOriginalFileName()] = $fileUrl;
@@ -565,7 +566,7 @@ class JatsParserPlugin extends GenericPlugin {
 	private function ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request): void
 	{
 		$citationDao = DAORegistry::getDAO('CitationDAO');
-		$parsedCitations = $citationDao->getBySubmissionId($article->getId());
+		$parsedCitations = $article->getCitations();
 		$parseReferences = $this->getSetting($request->getContext()->getId(), 'references');
 
 		if (($htmlDocument->useOjsReferences() && $parsedCitations && $parseReferences !== 'jatsReferences') || ($parseReferences === 'ojsReferences' && $parsedCitations)) {
