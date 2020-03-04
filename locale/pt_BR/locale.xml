@@ -8,15 +8,35 @@
   * Distributed under the GNU GPL v3.
   *
   * jatsParser plugin localization strings
+  * Translate by: Job Diogenes Ribeiro Borges
   -->
 
-<locale name="en_US" full_name="U.S. English">
+<locale name="pt_BR" full_name="Portuguese (Brazil)">
     <message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
-    <message key="plugins.generic.jatsParser.description">Converte XML JATS para HTML através da Smarty templates e mostra nas páginas de resumo/abstract</message>
+    <message key="plugins.generic.jatsParser.description">Converte XML JATS para HTML e PDF para ver na paǵina da revista</message>
     <message key="jatsParser.galleys.info">Visualiza artigo em outros formatos</message>
     <message key="jatsParser.navigation.article">Artigo</message>
     <message key="jatsParser.navigation.details">Detalhes</message>
     <message key="jatsParser.navigation.metrics">Métricas</message>
     <message key="jatsParser.openAccess.label">acesso aberto</message>
     <message key="jatsParser.references.link">Procurar no texto</message>
+    <message key="plugins.generic.jatsParser.pdf.read.label">Read as PDF</message>
+	  <message key="plugins.generic.jatsParser.pdf.read.symbol-text">PDF</message>
+	  <message key="plugins.generic.jatsParser.article.authorBio">Bio</message>
+
+	  <!-- Plugin settings -->
+	  <message key="plugins.generic.jatsParser.workflow.settings">Configurações do JATS Parser </message>
+	  <message key="plugins.generic.jatsParser.settings.description">Configurações do menu JATSParser plugin</message>
+	  <message key="plugins.generic.jatsParser.settings.jatsReferences">Força exibir referencias do JATS XML</message>
+	  <message key="plugins.generic.jatsParser.settings.ojsReferences">Forçar a exibir referências analisadas do OJS</message>
+	  <message key="plugins.generic.jatsParser.settings.defaultReferences">Padrão</message>
+	  <message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">Permitir que o plug-in exiba galés XML JATS convertidos na página de destino do artigo. Por padrão, a primeira galera XML buscada será exibida. Isso pode ser alterado individualmente através das configurações da galera do JATS Parser em cada galera carregada.</message>
+	  <message key="plugins.generic.jatsParser.settings.display.articlePage">Exibe o JATS XML na página inicial do artigo</message>
+	  <message key="plugins.generic.jatsParser.settings.display.pdf">Converte JATS XML para PDF</message>
+
+	  <!-- Plugin galley settings -->
+	  <message key="plugins.generic.jatsParser.galley.settings.display">Exibe Configurações</message>
+	  <message key="plugins.generic.jatsParser.galley.settings.display.description">Essas configurações são aplicadas em galeras XML em base individual.</message>
+	  <message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">Essa opção permite escolher a galera XML do JATS que será exibida na página de destino do artigo. Observe que, para que esta opção funcione, "Exibir galeras na página do artigo" deve ser ativado nas configurações do plug-in. Por padrão, o plugin seleciona a primeira galera XML carregada.</message>
+	  <message key="plugins.generic.jatsParser.galley.settings.displayDefault">Exibe como padrão</message>
 </locale>
