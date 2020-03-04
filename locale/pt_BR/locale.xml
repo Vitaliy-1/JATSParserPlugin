@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/jatsParser/locale/en_US/locale.xml
+  *
+  * Copyright (c) 2017 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
+  * Distributed under the GNU GPL v3.
+  *
+  * jatsParser plugin localization strings
+  -->
+
+<locale name="en_US" full_name="U.S. English">
+    <message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
+    <message key="plugins.generic.jatsParser.description">Converte XML JATS para HTML através da Smarty templates e mostra nas páginas de resumo/abstract</message>
+    <message key="jatsParser.galleys.info">Visualiza artigo em outros formatos</message>
+    <message key="jatsParser.navigation.article">Artigo</message>
+    <message key="jatsParser.navigation.details">Detalhes</message>
+    <message key="jatsParser.navigation.metrics">Métricas</message>
+    <message key="jatsParser.openAccess.label">acesso aberto</message>
+    <message key="jatsParser.references.link">Procurar no texto</message>
+</locale>
