@@ -1,0 +1,25 @@
+{
+    "name": "JATSParserPlugin",
+    "description": "OJS3 Plugin for parsing JATS XML and displaying it on article detail page ",
+    "license": "LICENCE",
+    "config": {
+                "vendor-dir": "lib/vendor",
+                "platform": {
+                        "php": "7.2.0"
+                }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "JATSParserPlugin",
+                "version": "2.0.1.1",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/Vitaliy-1/JATSParserPlugin.git",
+                    "reference" : "master"
+                }
+            }
+        }
+    ]    
+}
