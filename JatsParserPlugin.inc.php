@@ -479,7 +479,7 @@ class JatsParserPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @param $article PublishedArticle
+	 * @param $article Submission
 	 * @param $jatsDocument Document
 	 * @param $templateMgr TemplateManager
 	 * @param $request Request
@@ -565,25 +565,39 @@ class JatsParserPlugin extends GenericPlugin {
 	 */
 	private function ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request): void
 	{
-		$citationDao = DAORegistry::getDAO('CitationDAO');
-		$parsedCitations = $article->getCitations();
+		$citations = $article->getCurrentPublication()->getData("citationsRaw");
 		$parseReferences = $this->getSetting($request->getContext()->getId(), 'references');
 
-		if (($htmlDocument->useOjsReferences() && $parsedCitations && $parseReferences !== 'jatsReferences') || ($parseReferences === 'ojsReferences' && $parsedCitations)) {
+		if (($htmlDocument->useOjsReferences() && $citations && $parseReferences !== 'jatsReferences') || ($parseReferences === 'ojsReferences' && $citations)) {
 			$referenceTitle = $htmlDocument->createElement('h2');
 			$referenceTitle->setAttribute('id', 'reference-title');
 			$referenceTitle->setAttribute('class', 'article-section-title');
 			$referenceTitle->nodeValue = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
 
 			$htmlDocument->appendChild($referenceTitle);
-			$referenceList = $htmlDocument->createElement('ol');
-			$htmlDocument->appendChild($referenceList);
-			while ($parsedCitation = $parsedCitations->next()) {
-				$referenceItem = $htmlDocument->createElement('li');
-				$referenceItem->nodeValue = $templateMgr->smartyEscape($parsedCitation->getRawCitation());
-				$referenceList->appendChild($referenceItem);
+
+			$parsedCitations = DAORegistry::getDAO('CitationDAO')->getByPublicationId($article->getId())->toArray();
+			if (!empty($parsedCitations)) {
+				foreach ($parsedCitations as $parsedCitation) {
+					$referenceList = $htmlDocument->createElement('ol');
+					$htmlDocument->appendChild($referenceList);
+					$referenceItem = $htmlDocument->createElement('li');
+					$referenceItem->nodeValue = $templateMgr->smartyEscape($parsedCitation->getRawCitation());
+					$referenceList->appendChild($referenceItem);
+				}
+			} else {
+				$resultArray = explode("\n", $citations);
+				$referenceList = $htmlDocument->createElement('p');
+				$htmlDocument->appendChild($referenceList);
+				foreach ($resultArray as $result) {
+					$textNode = $htmlDocument->createTextNode($templateMgr->smartyEscape($result));
+					$referenceList->appendChild($textNode);
+					$referenceList->appendChild($htmlDocument->createElement("br"));
+					$htmlDocument->appendChild($referenceList);
+				}
 			}
 
 		}
 	}
+
 }
