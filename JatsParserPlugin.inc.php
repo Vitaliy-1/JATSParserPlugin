@@ -27,20 +27,20 @@ class JatsParserPlugin extends GenericPlugin {
 
 			// Return false if Lens is enabled
 			$pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
-			$context = PKPApplication::getRequest()->getContext();
+			$context = $this->getRequest()->getContext();
 			$contextId = $context ? $context->getId() : 0;
 			$lensSettings = $pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin');
 
 			if ($this->getEnabled() && !$lensSettings['enabled']) {
-				$this->import('classes.JatsParserGalleyDAO');
-				DAORegistry::registerDAO('JatsParserGalleyDAO', new JatsParserGalleyDAO());
+				$this->import('classes.JatsParserPublicationDAO');
+				DAORegistry::registerDAO('JatsParserPublicationDAO', new JatsParserPublicationDAO());
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
 				HookRegistry::register('Templates::Article::Main', array($this, 'embeddedXmlGalley'), HOOK_SEQUENCE_CORE);
 
 				// Add an option to set default XML galley to display in the ArticleGalley form (only when editing galley)
 				HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
-				HookRegistry::register('articlegalleydao::getAdditionalFieldNames', array($this, 'addArticleGalleyDAOFieldNames'));
+				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
 				HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
 			}
 			return true;
@@ -312,11 +312,14 @@ class JatsParserPlugin extends GenericPlugin {
 		if ($template == 'controllers/grid/gridRow.tpl') {
 			$row = $templateMgr->getTemplateVars('row');
 			$data = $row->getData();
-			if (!is_array($data) &&
+			if (is_object($data) &&
 				(get_class($data) == "ArticleGalley") &&
 				in_array($data->getFileType(), array("application/xml", "text/xml"))) {
 
-				/* @var $data ArticleGalley */
+				/**
+				 * @var $data ArticleGalley
+				 * @var $row ArticleGalleyGridRow
+				 */
 				import('lib.pkp.classes.linkAction.request.AjaxModal');
 				$row->addAction(new LinkAction(
 					'jatsParser',
@@ -324,7 +327,7 @@ class JatsParserPlugin extends GenericPlugin {
 						$dispatcher->url($request, ROUTE_PAGE, null, 'jatsParser', 'settings', null,
 							array(
 								'galleyId' => $data->getId(),
-								'submissionId' => $data->getSubmissionId()
+								'submissionId' => $row->getSubmission()->getId()
 							)
 						),
 						__("plugins.generic.jatsParser.workflow.settings")
@@ -338,12 +341,25 @@ class JatsParserPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @param $hookName string
-	 * @param $args array
+	 * Add a property to the publication schema
+	 *
+	 * @param $hookName string `Schema::get::publication`
+	 * @param $args [[
+	 * 	@option object Publication schema
+	 * ]]
 	 */
-	function addArticleGalleyDAOFieldNames($hookName, $args) {
-		$fields =& $args[1];
-		$fields[] = 'jatsParserDisplayDefaultXml';
+	public function addToSchema($hookName, $args) {
+		$schema = $args[0];
+		$prop = '{
+			"type": "integer",
+			"multilingual": true,
+			"apiSummary": true,
+			"validation": [
+				"nullable"
+			]
+		}';
+
+		$schema->properties->{'jatsparser::defaultGalley'} = json_decode($prop);
 	}
 
 	function callbackLoadHandler($hookName, $args) {
