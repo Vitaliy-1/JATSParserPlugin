@@ -8,26 +8,13 @@
  * Display settings of the JATS Parser plugin for XML galleys
  *}
 
+<div id="settings">
+	<pkp-form
+		v-bind="components.{$smarty.const.FORM_JATSPARSER_GALLEY}"
+		@set="set"
+	/>
+</div>
 <script type="text/javascript">
-	$(function() {ldelim}
-		$('#jatsParserGalleyForm').pkpHandler(
-			'$.pkp.controllers.form.AjaxFormHandler',
-			{ldelim}
-				baseUrl: {$baseUrl|json_encode}
-				{rdelim}
-		);
-		{rdelim});
+	pkp.registry.init('settings', 'SettingsContainer', {$containerData|json_encode});
 </script>
 
-<form class="pkp_form" id="jatsParserGalleyForm" action="{url op="updateGalleySettings" galleyId=$galleyId submissionId=$submissionId}" method="post">
-	{csrf}
-	{fbvFormArea id="jatsParserGalleyDisplayArea" title="plugins.generic.jatsParser.galley.settings.display"}
-		{fbvFormSection list=true}
-			<div class="instruct">{translate key="plugins.generic.jatsParser.galley.settings.display.description"}</div>
-			<p class="pkp_help">{translate key="plugins.generic.jatsParser.galley.settings.displayDefault.description"}</p>
-			{fbvElement type="checkbox" id="jatsParserDisplayDefaultXml" name="jatsParserDisplayDefaultXml" checked=$jatsParserDisplayDefaultXml label="plugins.generic.jatsParser.galley.settings.displayDefault" value="1"}
-		{/fbvFormSection}
-	{/fbvFormArea}
-
-	{fbvFormButtons submitText="common.save"}
-</form>

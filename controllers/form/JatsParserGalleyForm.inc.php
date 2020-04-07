@@ -12,73 +12,36 @@
  * @brief JATS Parser plugin galley editing form.
  */
 
-import('lib.pkp.classes.form.Form');
+namespace Plugins\generic\jatsParser\form;
+use \PKP\components\forms\FormComponent;
+use \PKP\components\forms\FieldOptions;
 
-class JatsParserGalleyForm extends Form {
+define('FORM_JATSPARSER_GALLEY', 'jatsParser');
 
-	/* @var $_request Request */
-	protected $_request;
+class JatsParserGalleyForm extends FormComponent {
 
-	/* @var $_articleGalley ArticleGalley */
-	protected $_articleGalley;
+	public $id = FORM_JATSPARSER_GALLEY;
+	public $method = 'PUT';
 
-	/* @var $_submissionId int */
-	protected $_submissionId;
-
-	/* @var $_publication Publication */
-	protected $_publication;
-
-	public function __construct($request, $plugin) {
-		parent::__construct($plugin->getTemplateResource('controllers/jatsParserGalleySettings/jatsParserGalleySettings.tpl'));
-
-		$this->_request = $request;
-
-		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
-		$galleyId = $this->_request->getUserVar('galleyId');
-		$this->_submissionId = $this->_request->getUserVar('submissionId');
-		$this->_articleGalley = $articleGalleyDao->getById($galleyId);
-
-		$jatsParserPublicationDao = DAORegistry::getDAO('JatsParserPublicationDAO'); /* @var $jatsParserPublicationDao JatsParserPublicationDAO */
-		$this->_publication = $jatsParserPublicationDao->getByGalleyId($this->_articleGalley->getId());
-
-		$this->addCheck(new FormValidatorPost($this));
-		$this->addCheck(new FormValidatorCSRF($this));
-	}
-
-	function initData() {
-		$galleyLocale = $this->_articleGalley->getLocale();
-
-		$defaultGalleyId = $this->_publication->getLocalizedData("jatsparser::defaultGalley", $galleyLocale);
-
-		if ($defaultGalleyId == $this->_articleGalley->getId()) {
-			$this->setData('jatsParserDisplayDefaultXml', 1);
-		} else {
-			$this->setData('jatsParserDisplayDefaultXml', 0);
+	public function __construct($action, $successMessage, $locales, $publication, $galley) {
+		$this->action = $action;
+		$this->successMessage = $successMessage;
+		$this->locales = $locales;
+		$isDefault = false;
+		$defaultGalleyId = (int) $publication->getData("jatsparser::defaultGalleyId", $galley->getLocale());
+		if ($defaultGalleyId == $galley->getId()) {
+			$isDefault = true;
 		}
 
-		//$this->setData('jatsParserDisplayDefaultXml', $this->_articleGalley->getData('jatsParserDisplayDefaultXml', $galleyLocale));
-
-		parent::initData();
-	}
-
-	function readInputData() {
-		parent::readInputData();
-		$this->readUserVars(array('jatsParserDisplayDefaultXml'));
-	}
-
-	function execute() {
-		$jatsParserPublicationDao = DAORegistry::getDAO('JatsParserPublicationDAO'); /* @var $jatsParserPublicationDao JatsParserPublicationDAO */
-		$currentGalley = $this->_articleGalley;
-		$defaultGalleyId = (int) $this->_publication->getLocalizedData("jatsparser::defaultGalley", $currentGalley->getLocale());
-
-		$displayDefaultXml = $this->getData('jatsParserDisplayDefaultXml');
-
-		if ($displayDefaultXml) {
-			$jatsParserPublicationDao->changeJatsParserSetting($this->_publication->getId(), "defaultGalley", (int) $this->_articleGalley->getId(), $currentGalley->getLocale());
-		} else if ($defaultGalleyId == $this->_articleGalley->getId()) {
-			$jatsParserPublicationDao->deleteJatsParserSetting($this->_publication->getId(), "defaultGalley", $currentGalley->getLocale());
-		}
-
-		return parent::execute();
+		$this->addField(new FieldOptions('defaultGalleyId', [
+			'label' => __('plugins.generic.jatsParser.galley.settings.display'),
+			'description' => __('plugins.generic.jatsParser.galley.settings.display.description'),
+			'type' => 'radio',
+			'options' => [
+				['value' => true, 'label' => __('common.enable')],
+				['value' => false, 'label' => __('common.disable')],
+			],
+			'value' => $isDefault
+		]));
 	}
 }

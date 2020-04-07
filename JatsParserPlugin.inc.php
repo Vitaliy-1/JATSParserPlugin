@@ -327,7 +327,8 @@ class JatsParserPlugin extends GenericPlugin {
 						$dispatcher->url($request, ROUTE_PAGE, null, 'jatsParser', 'settings', null,
 							array(
 								'galleyId' => $data->getId(),
-								'submissionId' => $row->getSubmission()->getId()
+								'submissionId' => $row->getSubmission()->getId(),
+								'publicationId' => $request->getUserVar('publicationId')
 							)
 						),
 						__("plugins.generic.jatsParser.workflow.settings")
@@ -359,7 +360,7 @@ class JatsParserPlugin extends GenericPlugin {
 			]
 		}';
 
-		$schema->properties->{'jatsparser::defaultGalley'} = json_decode($prop);
+		$schema->properties->{'jatsparser::defaultGalleyId'} = json_decode($prop);
 	}
 
 	function callbackLoadHandler($hookName, $args) {

@@ -60,38 +60,51 @@ class JatsParserHandler extends Handler {
 		$this->setupTemplate($request);
 		$galleyId = $request->getUserVar('galleyId');
 		$submissionId = $request->getUserVar('submissionId');
+		$publicationId = $request->getUserVar('publicationId');
+		$context = $request->getContext();
+
+		$dispatcher = $request->getDispatcher();
+		$apiUrl = $dispatcher->url($request, ROUTE_PAGE, $context->getPath(), 'jatsParser', 'updateGalleySettings', null, array(
+			'galleyId' => $galleyId,
+			'submissionId' => $submissionId,
+			'publicationId' => $publicationId
+		));
+		$successMessage = __('admin.contexts.form.edit.success');
+		$supportedLocales = $context->getSupportedFormLocales();
+		$localeNames = AppLocale::getAllLocales();
+		$locales = array_map(function($localeKey) use ($localeNames) {
+			return ['key' => $localeKey, 'label' => $localeNames[$localeKey]];
+		}, $supportedLocales);
+
+		$galley = Services::get('galley')->get($galleyId);
+		$publication = Services::get('publication')->get($publicationId);
+
+		import('plugins.generic.jatsParser.controllers.form.JatsParserGalleyForm');
+		$jatsParserGalleyForm = new \Plugins\generic\jatsParser\form\JatsParserGalleyForm($apiUrl, $successMessage, $locales, $publication, $galley);
+		$jatsParserGalleyFormConfig = $jatsParserGalleyForm->getConfig();
+
+		$containerData = [
+			'components' => [
+				FORM_JATSPARSER_GALLEY => $jatsParserGalleyFormConfig,
+			],
+		];
 
 		$templateMgr = TemplateManager::getManager($request);
 
 		$templateMgr->assign(array(
-			'galleyId' => $galleyId,
-			'submissionId' => $submissionId,
+			'containerData' => $containerData
 		));
 
-		import('plugins.generic.jatsParser.controllers.form.JatsParserGalleyForm');
-		$galleyForm = new JatsParserGalleyForm($request, $this->_plugin);
-		$galleyForm->initData();
-		return new JSONMessage(true, $galleyForm->fetch($request));
+		$plugin = PluginRegistry::getPlugin('generic', 'jatsparserplugin');
+
+		return new JSONMessage(true, $templateMgr->fetch($plugin->getTemplateResource('controllers/jatsParserGalleySettings/jatsParserGalleySettings.tpl')));
 	}
 
 	/**
 	 * @param $args array
 	 * @param $request Request
-	 * @return JSONMessage
 	 */
 	function updateGalleySettings($args, $request) {
-
-		import('plugins.generic.jatsParser.controllers.form.JatsParserGalleyForm');
-
-		$galleyForm = new JatsParserGalleyForm($request, $this->_plugin);
-		$galleyForm->readInputData();
-
-		if ($galleyForm->validate()) {
-			$galleyForm->execute();
-			$notificationMgr = new NotificationManager();
-			$notificationMgr->createTrivialNotification($request->getUser()->getId());
-			return DAO::getDataChangedEvent();
-		}
-		return new JSONMessage(true, $galleyForm->fetch($request));
+		// Something here?
 	}
 }
