@@ -64,11 +64,7 @@ class JatsParserHandler extends Handler {
 		$context = $request->getContext();
 
 		$dispatcher = $request->getDispatcher();
-		$apiUrl = $dispatcher->url($request, ROUTE_PAGE, $context->getPath(), 'jatsParser', 'updateGalleySettings', null, array(
-			'galleyId' => $galleyId,
-			'submissionId' => $submissionId,
-			'publicationId' => $publicationId
-		));
+		$apiUrl = $dispatcher->url($request, ROUTE_API, $context->getPath(), 'submissions/'. $submissionId . "/publications/" . $publicationId);
 		$successMessage = __('admin.contexts.form.edit.success');
 		$supportedLocales = $context->getSupportedFormLocales();
 		$localeNames = AppLocale::getAllLocales();
@@ -100,11 +96,4 @@ class JatsParserHandler extends Handler {
 		return new JSONMessage(true, $templateMgr->fetch($plugin->getTemplateResource('controllers/jatsParserGalleySettings/jatsParserGalleySettings.tpl')));
 	}
 
-	/**
-	 * @param $args array
-	 * @param $request Request
-	 */
-	function updateGalleySettings($args, $request) {
-		// Something here?
-	}
 }
