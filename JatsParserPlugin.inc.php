@@ -32,16 +32,8 @@ class JatsParserPlugin extends GenericPlugin {
 			$lensSettings = $pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin');
 
 			if ($this->getEnabled() && !$lensSettings['enabled']) {
-				$this->import('classes.JatsParserPublicationDAO');
-				DAORegistry::registerDAO('JatsParserPublicationDAO', new JatsParserPublicationDAO());
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
-				HookRegistry::register('Templates::Article::Main', array($this, 'embeddedXmlGalley'), HOOK_SEQUENCE_CORE);
-
-				// Add an option to set default XML galley to display in the ArticleGalley form (only when editing galley)
-				HookRegistry::register('TemplateManager::fetch', array($this, 'templateFetchCallback'));
-				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
-				HookRegistry::register('LoadHandler', array($this, 'callbackLoadHandler'));
 			}
 			return true;
 		}
@@ -221,126 +213,6 @@ class JatsParserPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @param $hookName string
-	 * @param $args array (PublishedArticle, SubmissionFile, submission file id)
-	 * @return boolean
-	 * @brief display parsed XML on article landing page
-	 */
-	function embeddedXmlGalley($hookName, $args) {
-		$templateMgr =& $args[1];
-		$output =& $args[2];
-		$request = $this->getRequest();
-		$context = $request->getContext();
-
-		if (!$this->getSetting($context->getId(), "displayOnArticlePage")) return false;
-
-		$article = $templateMgr->getTemplateVars('article');
-		$galleys = $templateMgr->getTemplateVars('primaryGalleys');
-
-		$locale = AppLocale::getLocale();
-		$primaryLocale = AppLocale::getPrimaryLocale();
-
-		// Determine what galley to display depending on galley's and request locale
-		$xmlGalleys = array();
-		$defaultGalley = null;
-		$localizedDefaultGalley = null;
-
-		foreach ($galleys as $galley) {
-			$defaultGalleySetting = $galley->getData("jatsParserDisplayDefaultXml", $primaryLocale);
-			$localizedDefaultGalleySetting = $galley->getData("jatsParserDisplayDefaultXml", $locale);
-			if (($galley->getFileType() === "application/xml" || $galley->getFileType() === "text/xml")) {
-				$xmlGalleys[$galley->getLocale()] = $galley;
-			}
-
-			if ($defaultGalleySetting) {
-				$defaultGalley = $galley;
-			}
-
-			if ($localizedDefaultGalleySetting) {
-				$localizedDefaultGalley = $galley;
-			}
-		}
-
-		if (empty($xmlGalleys)) return false;
-
-		if ($localizedDefaultGalley) {
-			$xmlGalley = $localizedDefaultGalley;
-		} else if ($defaultGalley) {
-			/* @var $defaultGalley ArticleGalley */
-			$xmlGalley = $defaultGalley;
-		} else if ($xmlGalleys[$locale]) {
-			// Last localized galley fetched
-			$xmlGalley = $xmlGalleys[$locale];
-		} else if ($xmlGalleys[$primaryLocale]) {
-			// Last galley fetched in primary locale
-			$xmlGalley = $xmlGalleys[$primaryLocale];
-		} else {
-			// Finally give up
-			$xmlGalley = $xmlGalleys[0];
-		}
-
-		// Convert JATS and assign HTML
-		$request = Application::getRequest();
-		$contextId = $request->getContext()->getId();
-
-		$jatsDocument = new Document($xmlGalley->getFile()->getFilePath());
-		$htmlDocument = $this->htmlCreation($article, $templateMgr, $jatsDocument, $xmlGalley, $request);
-		$templateMgr->assign('htmlDocument', $htmlDocument->saveHTML());
-		if ($this->getSetting($contextId, 'convertToPdf')) {
-			$convertedPdfUrl = $request->getCompleteUrl() . DIRECTORY_SEPARATOR . $xmlGalley->getId() . '?' . CREATE_PDF_QUERY;
-			$templateMgr->assign('convertedPdfUrl', $convertedPdfUrl);
-		}
-		$output .= $templateMgr->fetch($this->getTemplateResource('articleMain.tpl'));
-
-		return false;
-	}
-
-	/**
-	 * @param $hookName string
-	 * @param $args array (PKPTemplateManager, template, cache id, compile id, result)
-	 * @return boolean
-	 * @brief galley-level settings for the plugin
-	 */
-	function templateFetchCallback($hookName, $args) {
-
-		$templateMgr = $args[0];
-		$template = $args[1];
-		$request = $this->getRequest();
-		$router = $request->getRouter();
-		$dispatcher = $router->getDispatcher();
-
-		if ($template == 'controllers/grid/gridRow.tpl') {
-			$row = $templateMgr->getTemplateVars('row');
-			$data = $row->getData();
-			if (is_object($data) &&
-				(get_class($data) == "ArticleGalley") &&
-				in_array($data->getFileType(), array("application/xml", "text/xml"))) {
-
-				/**
-				 * @var $data ArticleGalley
-				 * @var $row ArticleGalleyGridRow
-				 */
-				import('lib.pkp.classes.linkAction.request.AjaxModal');
-				$row->addAction(new LinkAction(
-					'jatsParser',
-					new AjaxModal(
-						$dispatcher->url($request, ROUTE_PAGE, null, 'jatsParser', 'settings', null,
-							array(
-								'galleyId' => $data->getId(),
-								'submissionId' => $row->getSubmission()->getId()
-							)
-						),
-						__("plugins.generic.jatsParser.workflow.settings")
-					),
-					__('plugins.generic.jatsParser.workflow.settings'),
-					null
-				));
-
-			}
-		}
-	}
-
-	/**
 	 * Add a property to the publication schema
 	 *
 	 * @param $hookName string `Schema::get::publication`
@@ -360,22 +232,6 @@ class JatsParserPlugin extends GenericPlugin {
 		}';
 
 		$schema->properties->{'jatsparser::defaultGalley'} = json_decode($prop);
-	}
-
-	function callbackLoadHandler($hookName, $args) {
-		$page = $args[0];
-		$op = $args[1];
-
-		switch ("$page/$op") {
-			case 'jatsParser/settings':
-			case 'jatsParser/updateGalleySettings':
-				define('HANDLER_CLASS', 'JatsParserHandler');
-				define('JATSPARSER_PLUGIN_NAME', $this->getName());
-				$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR . 'JatsParserHandler.inc.php';
-				break;
-		}
-
-		return false;
 	}
 
 	/**
