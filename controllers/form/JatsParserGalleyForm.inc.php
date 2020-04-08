@@ -33,15 +33,19 @@ class JatsParserGalleyForm extends FormComponent {
 			$isDefault = true;
 		}
 
-		$this->addField(new FieldOptions('defaultGalleyId', [
-			'label' => __('plugins.generic.jatsParser.galley.settings.display'),
-			'description' => __('plugins.generic.jatsParser.galley.settings.display.description'),
-			'type' => 'radio',
-			'options' => [
-				['value' => true, 'label' => __('common.enable')],
-				['value' => false, 'label' => __('common.disable')],
-			],
-			'value' => $isDefault
-		]));
+		$fieldOptions = new FieldOptions('jatsparser::defaultGalleyId', array());
+		$fieldOptions->label = __('plugins.generic.jatsParser.galley.settings.display');
+		$fieldOptions->description = __('plugins.generic.jatsParser.galley.settings.display.description');
+		$fieldOptions->options[] = array(
+			'value' => $galley->getId(),
+			'label' => __('common.enable')
+		);
+		$fieldOptions->value[] = array(
+			'en_US' => $publication->getData("jatsparser::defaultGalleyId"),
+			'uk_UA' => $publication->getData("jatsparser::defaultGalleyId")
+		);
+
+		$this->addField($fieldOptions);
+
 	}
 }
