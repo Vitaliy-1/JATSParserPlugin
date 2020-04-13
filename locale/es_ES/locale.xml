@@ -11,8 +11,8 @@
   -->
 
 <locale name="es_ES" full_name="Español (España)">
-    <message key="plugins.generic.jatsParser.displayName">Complemento JATSParser</message>
-    <message key="plugins.generic.jatsParser.description">Convierte JATS XML a formato HTML a través de modelos Smarty y los muestra en las páginas de resumen del artículo</message>
+    <message key="plugins.generic.jatsParser.displayName">Módulo JATSParser</message>
+    <message key="plugins.generic.jatsParser.description">El complemento transforma JATS XML en HTML y PDF para ser visualizados en el frontal de la revista.</message>
     <message key="jatsParser.galleys.info">Ver el artículo en otros formatos</message>
     <message key="jatsParser.navigation.article">Artículo</message>
     <message key="jatsParser.navigation.details">Detalles</message>
