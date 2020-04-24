@@ -11,6 +11,10 @@ OJS3 Plugin for parsing JATS XML and displaying it on article detail page.
 2. Upload the plugin from the admin dashboard `Website Settings -> Plugins -> Upload a New Plugin` (make sure php.ini variables `upload_max_filesize` and `post_max_size` a set to equal or more than 16M) or unpack the archive into the `plugins/generic/` folder.
 3. Activate the plugin from the dashboard.
 4. To change image logo in resulted PDF just replace `JATSParser/logo/logo.jpg` file by yours. 
+## Installation for development
+1. Navigate to `plugins/generic` folder starting from OJS webroot.
+2. `git clone --recursive https://github.com/Vitaliy-1/JATSParserPlugin.git jatsParser`.
+3. To install support for JATS to PDF conversion: `cd jatsParser/JATSParser` and `composer install`.  
 ## Requirements
 * PHP 7.2 or higher
 * OJS theme with Bootstrap 4. If the theme doesn't utilize this library, it must be added alongside with jQuery from the plugin main class (it is [quite straightforward](https://github.com/Vitaliy-1/JATSParserPlugin/blob/0bfbe3acba6841cbfbec01e220d8ae507cde02af/JatsParserPlugin.inc.php#L145-L148)). JATS Parser Plugin is tested with [HealthSciences](https://github.com/pkp/healthSciences), [Classic](https://github.com/Vitaliy-1/classic), and [oldGregg](https://github.com/Vitaliy-1/oldGregg) themes
