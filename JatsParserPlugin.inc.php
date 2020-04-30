@@ -14,6 +14,7 @@ require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.jatsParser.classes.JATSParserDocument');
+import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
 
 use JATSParser\Body\Document as Document;
 use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
@@ -34,6 +35,10 @@ class JatsParserPlugin extends GenericPlugin {
 			if ($this->getEnabled() && !$lensSettings['enabled']) {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
+
+				// Add data to the publication
+				HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
+				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
 			}
 			return true;
 		}
@@ -215,28 +220,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
 
 		return false;
-	}
-
-	/**
-	 * Add a property to the publication schema
-	 *
-	 * @param $hookName string `Schema::get::publication`
-	 * @param $args [[
-	 * 	@option object Publication schema
-	 * ]]
-	 */
-	public function addToSchema($hookName, $args) {
-		$schema = $args[0];
-		$prop = '{
-			"type": "integer",
-			"multilingual": true,
-			"apiSummary": true,
-			"validation": [
-				"nullable"
-			]
-		}';
-
-		$schema->properties->{'jatsparser::defaultGalley'} = json_decode($prop);
 	}
 
 	/**
@@ -475,6 +458,72 @@ class JatsParserPlugin extends GenericPlugin {
 			}
 
 		}
+	}
+
+	/**
+	 * Add a property to the publication schema
+	 *
+	 * @param $hookName string `Schema::get::publication`
+	 * @param $args [[
+	 * 	@option object Publication schema
+	 * ]]
+	 */
+	public function addToSchema($hookName, $args) {
+		$schema = $args[0];
+		$prop = '{
+			"type": "integer",
+			"multilingual": true,
+			"apiSummary": true,
+			"validation": [
+				"nullable"
+			]
+		}';
+
+		$schema->properties->{'jatsparser::fulltext'} = json_decode($prop);
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args [string, TemplateManager]
+	 */
+	function publicationTemplateData(string $hookname, array $args): void {
+		/**
+		 * @var $templateMgr TemplateManager
+		 * @var $submission Submission
+		 * @var $submissionFileDao SubmissionFileDAO
+		 * @var $submissionFile SubmissionFile
+		 */
+		$templateMgr = $args[1];
+		$request = $this->getRequest();
+		$context = $request->getContext();
+		$submission = $templateMgr->getTemplateVars('submission');
+		$latestPublication = $submission->getLatestPublication();
+		$latestPublicationApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $context->getData('urlPath'), 'submissions/' . $submission->getId() . '/publications/' . $latestPublication->getId());
+
+		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();
+		$localeNames = AppLocale::getAllLocales();
+		$locales = array_map(function($localeKey) use ($localeNames) {
+			return ['key' => $localeKey, 'label' => $localeNames[$localeKey]];
+		}, $supportedSubmissionLocales);
+
+		$temporaryFileApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $context->getPath(), 'temporaryFiles');
+
+		$submissionFileDao = DAORegistry::getDAO("SubmissionFileDAO");
+		$submissionFiles = $submissionFileDao->getLatestRevisions($submission->getId(), SUBMISSION_FILE_PRODUCTION_READY);
+		$submissionFilesXML = array();
+		foreach ($submissionFiles as $submissionFile) {
+			if (in_array($submissionFile->getFileType(), array("application/xml", "text/xml"))) {
+				$submissionFilesXML[] = $submissionFile;
+			}
+		}
+
+		$form = new PublicationJATSUploadForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionFilesXML);
+		$workflowData = $templateMgr->getTemplateVars('workflowData');
+		$workflowData['components'][FORM_PUBLICATION_JATS_FULLTEXT] = $form->getConfig();
+
+		$templateMgr->assign('workflowData', $workflowData);
+
+		$templateMgr->display($this->getTemplateResource("workflowJatsFulltext.tpl"));
 	}
 
 }
