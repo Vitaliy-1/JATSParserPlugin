@@ -21,7 +21,7 @@ OJS3 Plugin for parsing JATS XML and displaying it on article detail page.
 * OJS 3.1+
 * Lens Galley Plugin must be turned off
 ## Examples
-* Example of the JATS XML: https://github.com/Vitaliy-1/JATSParserPlugin/blob/master/example.xml
+* Example of the JATS XML: https://github.com/Vitaliy-1/JATSParser/blob/master/example.xml
 * HTML example: http://ojsdemo.e-medjournal.com/index.php/jatsparser/article/view/8/8
 * PDF example: http://ojsdemo.e-medjournal.com/index.php/jatsparser/article/view/8/8?download=pdf
 
