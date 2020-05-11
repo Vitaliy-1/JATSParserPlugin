@@ -145,11 +145,15 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr->addJavaScript('jatsParserJavascript', $baseUrl . '/resources/javascript/jatsParser.js');
 
 		// Theme-specific styling for the galley page
-		switch ($context->getSetting("themePluginPath")) {
-			case "default":
-				$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
-				$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
-				break;
+		$themePlugins = PluginRegistry::getPlugins('themes');
+		foreach ($themePlugins as $themePlugin) {
+			if ($themePlugin->isActive()) {
+				// Chances are that child theme of a Default also need this styling
+				if ($themePlugin->getName() == "defaultthemeplugin" || $themePlugin->parent->getName() == "defaultthemeplugin") {
+					$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
+					$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
+				}
+			}
 		}
 
 		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';
