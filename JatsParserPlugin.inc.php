@@ -18,6 +18,7 @@ import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploa
 
 use JATSParser\Body\Document as Document;
 use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
+use JATSParser\HTML\Document as HTMLDocument;
 
 define("CREATE_PDF_QUERY", "download=pdf");
 
@@ -35,11 +36,17 @@ class JatsParserPlugin extends GenericPlugin {
 			if ($this->getEnabled() && !$lensSettings['enabled']) {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
-
-				// Add data to the publication
-				HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
-				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
 			}
+
+
+			// Add data to the publication
+			HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
+			HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
+			HookRegistry::register ('TemplateManager::display', array($this, 'previewFullTextCall'));
+			HookRegistry::register ('TemplateManager::display', array($this, 'previewFullText'));
+			HookRegistry::register('Publication::edit', array($this, 'editPublication'));
+			HookRegistry::register('Publication::add', array($this, 'addPublication'));
+
 			return true;
 		}
 		return false;
@@ -470,7 +477,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 */
 	public function addToSchema($hookName, $args) {
 		$schema = $args[0];
-		$prop = '{
+		$propId = '{
 			"type": "integer",
 			"multilingual": true,
 			"apiSummary": true,
@@ -478,8 +485,16 @@ class JatsParserPlugin extends GenericPlugin {
 				"nullable"
 			]
 		}';
-
-		$schema->properties->{'jatsparser::fulltext'} = json_decode($prop);
+		$propText = '{
+			"type": "string",
+			"multilingual": true,
+			"apiSummary": true,
+			"validation": [
+				"nullable"
+			]
+		}';
+		$schema->properties->{'jatsParser::fullTextFileId'} = json_decode($propId);
+		$schema->properties->{'jatsParser::fullText'} = json_decode($propText);
 	}
 
 	/**
@@ -506,8 +521,6 @@ class JatsParserPlugin extends GenericPlugin {
 			return ['key' => $localeKey, 'label' => $localeNames[$localeKey]];
 		}, $supportedSubmissionLocales);
 
-		$temporaryFileApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $context->getPath(), 'temporaryFiles');
-
 		$submissionFileDao = DAORegistry::getDAO("SubmissionFileDAO");
 		$submissionFiles = $submissionFileDao->getLatestRevisions($submission->getId(), SUBMISSION_FILE_PRODUCTION_READY);
 		$submissionFilesXML = array();
@@ -517,7 +530,21 @@ class JatsParserPlugin extends GenericPlugin {
 			}
 		}
 
-		$form = new PublicationJATSUploadForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionFilesXML);
+		$dispatcher = $request->getDispatcher();
+		$currentPath = $dispatcher->url($request, ROUTE_PAGE, null, 'article', 'view', array($submission->getId()));
+
+		if (!empty($submissionFiles)) {
+			$msg = $templateMgr->smartyTranslate(array(
+				'key' => 'plugins.generic.jatsParser.publication.jats.description',
+				'params' => array("previewPath" => $currentPath)
+			), $templateMgr);
+		} else {
+			$msg = $templateMgr->smartyTranslate(array(
+				'key' => 'plugins.generic.jatsParser.publication.jats.descriptionEmpty'
+			), $templateMgr);
+		}
+
+		$form = new PublicationJATSUploadForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionFilesXML, $msg);
 		$workflowData = $templateMgr->getTemplateVars('workflowData');
 		$workflowData['components'][FORM_PUBLICATION_JATS_FULLTEXT] = $form->getConfig();
 
@@ -526,4 +553,74 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr->display($this->getTemplateResource("workflowJatsFulltext.tpl"));
 	}
 
+	function previewFullTextCall(string $hookname, array $args) {
+		/**
+		 * @var $templateMgr TemplateManager
+		 */
+		$templateMgr = $args[0];
+		$template = $args[1];
+		$request = $this->getRequest();
+
+		if ($template != 'workflow/workflow.tpl') {
+			return false;
+		}
+
+		$templateMgr->addJavaScript('fulltextPreview', $request->getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'preview.js', array('contexts' => 'backend'));
+	}
+
+	function previewFullText(string $hookname, array $args) {
+		$templateMgr = $args[0];
+		$template = $args[1];
+
+		if ($template != 'frontend/page/article.tpl') {
+			return false;
+		}
+
+		$request = $this->getRequest();
+		$userVars = $request->getUserVars();
+
+		if (!array_key_exists('_full-text-preview', $userVars)) return false;
+
+		$submissionFileId = $userVars['_full-text-preview'];
+
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args [
+	 *   Publication -> new publication
+	 *   Publication
+	 *   array parameters/publication properties to be saved
+	 *   Request
+	 * ]
+	 */
+	function editPublication(string $hookname, array $args) {
+		$newPublication = $args[0];
+		$params = $args[2];
+		if (!array_key_exists('jatsParser::fullTextFileId', $params)) return false;
+
+		$localePare = $params['jatsParser::fullTextFileId'];
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		foreach ($localePare as $localeKey => $fileId) {
+			if (empty($fileId)) {
+				$newPublication->setData('jatsParser::fullText', null, $localeKey);
+				continue;
+			}
+			$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY);
+			$htmlDocument = new HTMLDocument(new Document($submissionFile->getFilePath()), false);
+			$newPublication->setData('jatsParser::fullText', $htmlDocument->saveHTML(), $localeKey);
+		}
+
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args [
+	 *   Publication
+	 *   Request
+	 * ]
+	 */
+	function addPublication(string $hookname, array $args) {
+
+	}
 }

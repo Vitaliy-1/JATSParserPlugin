@@ -2,7 +2,7 @@
 
 use PKP\components\forms\FieldHTML;
 use \PKP\components\forms\FormComponent;
-use \PKP\components\forms\FieldRadioInput;
+use \PKP\components\forms\FieldOptions;
 use JATSParser\Body\Document as JATSDocument;
 use JATSParser\HTML\Document as HTMLDocument;
 
@@ -22,9 +22,8 @@ class PublicationJATSUploadForm extends FormComponent {
 	 * @param $locales array Supported locales
 	 * @param $publication \Publication publication to change settings for
 	 * @param $submissionFiles array of SubmissionFile with xml type
-	 * @param $jatsUploadUrl string URL to upload files to
 	 */
-	public function __construct($action, $locales, $publication, $submissionFiles) {
+	public function __construct($action, $locales, $publication, $submissionFiles, $msg) {
 		/**
 		 * @var $submissionFile SubmissionFile
 		 */
@@ -33,26 +32,43 @@ class PublicationJATSUploadForm extends FormComponent {
 		$this->locales = $locales;
 
 		$options = array();
-		foreach ($submissionFiles as $submissionFile) {
-			$htmlDocument = new HTMLDocument(new JATSDocument($submissionFile->getFilePath()), false);
-			$options[] = array(
-				'value' => $htmlDocument,
-				'label' => $submissionFile->getLocalizedName()
+		foreach ($locales as $value) {
+			$locale = $value['key'];
+			$lang = array();
+			if (empty($submissionFiles)) break;
+			foreach ($submissionFiles as $submissionFile) {
+				$subName = $submissionFile->getName($locale);
+				if (empty($subName)) {
+					$subName = $submissionFile->getLocalizedName();
+				}
+				$lang[] = array(
+					'value' => $submissionFile->getId(),
+					'label' => $subName
+				);
+
+			}
+
+			$lang[] = array(
+				'value' => null,
+				'label' => __('common.default')
 			);
+
+			$options[$locale] = $lang;
 		}
 
-		$this->addField(new FieldRadioInput('jatsFulltext', [
-			'label' => __('plugins.generic.jatsParser.publication.jats.label'),
-			'isMultilingual' => true,
-			'type' => 'radio',
-			'options' => $options,
-			'value' => $publication->getData('jatsParser::fulltext')
-		]))
-		->addField(new FieldHTML("preview", array(
-			'description' => "<div>Just a test</div>",
-			'isMultilingual' => true
-		)));
-
+		if (!empty($options)) {
+			$this->addField(new FieldOptions('jatsParser::fullTextFileId', [
+				'label' => __('plugins.generic.jatsParser.publication.jats.label'),
+				'description' => $msg,
+				'isMultilingual' => true,
+				'type' => 'radio',
+				'options' => $options,
+				'value' => $publication->getData('jatsParser::fullTextFileId'),
+			]));
+		} else {
+			$this->addField(new FieldHTML("preview", array(
+				'description' => $msg
+			)));
+		}
 	}
-
 }

@@ -41,4 +41,6 @@
 	<message key="plugins.generic.jatsParser.publication.jats.fulltext">Full-text upload</message>
 	<message key="plugins.generic.jatsParser.publication.jats.fulltext.success">Full-text upload successful</message>
 	<message key="plugins.generic.jatsParser.publication.jats.label">Generate article's fulltext from submission file in JATS XML format</message>
+	<message key="plugins.generic.jatsParser.publication.jats.description"><![CDATA[The file can be uploaded as a <a href="#workflow" id="jatsParser__linkToProduction">production ready</a> to be listed below. To see the preview, please, follow the <a id="jatsParser__linkPreview" href="{$previewPath}" target="_blank">link</a> after choosing an item from the list.]]></message>
+	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty"><![CDATA[The list of JATS XML files is empty. Please, upload the file to the <a href="#workflow" id="jatsParser__linkToProduction">production stage</a> and it will appear below for full-text generation.]]></message>
 </locale>

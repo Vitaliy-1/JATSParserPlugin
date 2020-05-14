@@ -31,4 +31,6 @@
 	</message>
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">За замовчуванням</message>
 
+	<message key="plugins.generic.jatsParser.publication.jats.label">Створити повний текст для статті із файлу формату JATS XML</message>
+
 </locale>
