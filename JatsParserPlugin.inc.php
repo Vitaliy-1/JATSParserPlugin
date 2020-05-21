@@ -148,8 +148,9 @@ class JatsParserPlugin extends GenericPlugin {
 		$themePlugins = PluginRegistry::getPlugins('themes');
 		foreach ($themePlugins as $themePlugin) {
 			if ($themePlugin->isActive()) {
+				$parentTheme = $themePlugin->parent;
 				// Chances are that child theme of a Default also need this styling
-				if ($themePlugin->getName() == "defaultthemeplugin" || $themePlugin->parent->getName() == "defaultthemeplugin") {
+				if ($themePlugin->getName() == "defaultthemeplugin" || ($parentTheme && $parentTheme->getName() == "defaultthemeplugin")) {
 					$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
 					$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
 				}
