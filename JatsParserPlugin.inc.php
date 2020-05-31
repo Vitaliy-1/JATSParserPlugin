@@ -44,6 +44,7 @@ class JatsParserPlugin extends GenericPlugin {
 			HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
 			HookRegistry::register ('TemplateManager::display', array($this, 'previewFullTextCall'));
 			HookRegistry::register ('TemplateManager::display', array($this, 'previewFullText'));
+			HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
 			HookRegistry::register('Publication::edit', array($this, 'editPublication'));
 			HookRegistry::register('Publication::add', array($this, 'addPublication'));
 
@@ -531,8 +532,8 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		$dispatcher = $request->getDispatcher();
-		$currentPath = $dispatcher->url($request, ROUTE_PAGE, null, 'article', 'view', array($submission->getId()));
-
+		$submissionProps = Services::get('submission')->getProperties($submission, array('stageId'), array('request' => $request));
+		$currentPath = $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'fullTextPreview', $submission->getId(), $submissionProps);
 		if (!empty($submissionFiles)) {
 			$msg = $templateMgr->smartyTranslate(array(
 				'key' => 'plugins.generic.jatsParser.publication.jats.description',
@@ -568,21 +569,17 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr->addJavaScript('fulltextPreview', $request->getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'preview.js', array('contexts' => 'backend'));
 	}
 
-	function previewFullText(string $hookname, array $args) {
-		$templateMgr = $args[0];
-		$template = $args[1];
-
-		if ($template != 'frontend/page/article.tpl') {
-			return false;
-		}
-
+	function loadPreviewHandler($hookName, $args) {
+		$page = $args[0];
+		$op = $args[1];
 		$request = $this->getRequest();
 		$userVars = $request->getUserVars();
 
-		if (!array_key_exists('_full-text-preview', $userVars)) return false;
-
-		$submissionFileId = $userVars['_full-text-preview'];
-
+		if ($page == "workflow" && $op == "fullTextPreview" && array_key_exists('_full-text-preview', $userVars)) {
+			define('HANDLER_CLASS', 'FullTextPreviewHandler');
+			define('JATSPARSER_PLUGIN_NAME', $this->getName());
+			$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'FullTextPreviewHandler.inc.php';
+		}
 	}
 
 	/**
