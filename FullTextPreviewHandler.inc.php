@@ -14,6 +14,9 @@ import('classes.handler.Handler');
 import('pages.workflow.WorkflowHandler');
 
 class FullTextPreviewHandler extends WorkflowHandler {
+
+	var $_plugin;
+
 	/**
 	 * Constructor
 	 */
@@ -26,12 +29,28 @@ class FullTextPreviewHandler extends WorkflowHandler {
 		);
 	}
 
-	/**
-	 * @copydoc PKPHandler::authorize()
-	 */
-
-
 	public function fullTextPreview($args, $request) {
-		/** @var $request Request */
+		$submissionId = $args[0];
+		$fileId = $request->getUserVar('_full-text-preview');
+		$submission = Services::get('submission')->get($submissionId);
+		$publication = $submission->getLatestPublication();
+		$templateMgr = TemplateManager::getManager($request);
+		$this->setupTemplate($request);
+
+		$templateMgr->assign(array(
+			'article' => $submission,
+			'publication' => $publication,
+			'currentPublication' => $publication
+		));
+		$templateMgr->display('frontend/pages/article.tpl');
+	}
+
+	/**
+	 * Set up the template. (Load required locale components.)
+	 * @param $request PKPRequest
+	 */
+	function setupTemplate($request) {
+		parent::setupTemplate($request);
+		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_READER, LOCALE_COMPONENT_PKP_SUBMISSION);
 	}
 }
