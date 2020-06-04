@@ -42,10 +42,11 @@ class JatsParserPlugin extends GenericPlugin {
 			// Add data to the publication
 			HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
 			HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
-			HookRegistry::register ('TemplateManager::display', array($this, 'previewFullTextCall'));
-			HookRegistry::register ('TemplateManager::display', array($this, 'previewFullText'));
+			HookRegistry::register('TemplateManager::display', array($this, 'previewFullTextCall'));
+			HookRegistry::register('TemplateManager::display', array($this, 'previewFullText'));
 			HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
 			HookRegistry::register('Publication::edit', array($this, 'editPublication'));
+			HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
 			HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
 
 			return true;
@@ -173,7 +174,7 @@ class JatsParserPlugin extends GenericPlugin {
 			$templateMgr->assign('generatePdfUrl', $generatePdfUrl);
 		}
 
-		$templateMgr->display($this->getTemplateResource('articleView.tpl'));
+		$templateMgr->display($this->getTemplateResource('articleGalleyView.tpl'));
 
 		return false;
 	}
@@ -595,6 +596,55 @@ class JatsParserPlugin extends GenericPlugin {
 			$newPublication->setData('jatsParser::fullText', $htmlDocument->saveHTML(), $localeKey);
 		}
 
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args
+	 * @return bool
+	 * @brief Displays full-text on article landing page and preview page
+	 */
+	function displayFullText(string $hookname, array $args) {
+		$templateMgr =& $args[1];
+		$output =& $args[2];
+		$publication = $templateMgr->getTemplateVars('publication');
+		$fullTexts = $publication->getData('jatsParser::fullText');
+
+		$request = $this->getRequest();
+		$requestedOp = $request->getRequestedOp();
+		$html = null;
+
+		if ($requestedOp === 'view') {
+			if (empty($fullTexts)) return false;
+			$currentLocale = AppLocale::getLocale();
+			if (array_key_exists($currentLocale, $fullTexts)) {
+				$html = $fullTexts[$currentLocale];
+			} else {
+				$locales = AppLocale::getAllLocales();
+				$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocale');
+				if (count($fullTexts) > 1) {
+					$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocales');
+				}
+
+				$html = $msg;
+				foreach ($fullTexts as $localeKey => $fullText) {
+					$html .= ' <a href="' . $request->url(null, 'user', 'setLocale', $localeKey) . '">' . $locales[$localeKey] . '</a>';
+					if ($fullText !== end($fullTexts)) {
+						$html .= ', ';
+					} else {
+						$html .= '.';
+					}
+				}
+			}
+
+		} else if ($requestedOp === 'fullTextPreview') {
+
+		}
+
+		if (is_null($html)) return false;
+
+		$templateMgr->assign('fullText', $html);
+		$output .= $templateMgr->fetch($this->getTemplateResource('articleMainView.tpl'));
 	}
 
 	/**

@@ -23,6 +23,9 @@
 	<message key="plugins.generic.jatsParser.pdf.read.symbol-text">PDF</message>
 	<message key="plugins.generic.jatsParser.article.authorBio">Bio</message>
 
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocale">Full-text of the article is available for this locale:</message>
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocales">Full-text of the article is available for these locales:</message>
+
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Settings</message>
 	<message key="plugins.generic.jatsParser.settings.description">JATSParser plugin settings menu</message>
