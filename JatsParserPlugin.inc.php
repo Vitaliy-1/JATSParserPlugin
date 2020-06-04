@@ -46,7 +46,7 @@ class JatsParserPlugin extends GenericPlugin {
 			HookRegistry::register ('TemplateManager::display', array($this, 'previewFullText'));
 			HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
 			HookRegistry::register('Publication::edit', array($this, 'editPublication'));
-			HookRegistry::register('Publication::add', array($this, 'addPublication'));
+			HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
 
 			return true;
 		}
@@ -156,19 +156,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr->addStyleSheet('jatsParserStyles', $baseUrl . '/resources/styles/jatsParser.css');
 		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
 		$templateMgr->addJavaScript('jatsParserJavascript', $baseUrl . '/resources/javascript/jatsParser.js');
-
-		// Theme-specific styling for the galley page
-		$themePlugins = PluginRegistry::getPlugins('themes');
-		foreach ($themePlugins as $themePlugin) {
-			if ($themePlugin->isActive()) {
-				$parentTheme = $themePlugin->parent;
-				// Chances are that child theme of a Default also need this styling
-				if ($themePlugin->getName() == "defaultthemeplugin" || ($parentTheme && $parentTheme->getName() == "defaultthemeplugin")) {
-					$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
-					$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
-				}
-			}
-		}
 
 		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';
 
@@ -612,12 +599,33 @@ class JatsParserPlugin extends GenericPlugin {
 
 	/**
 	 * @param string $hookname
-	 * @param array $args [
-	 *   Publication
-	 *   Request
-	 * ]
+	 * @param array $args
+	 * @return bool
+	 * @brief theme-specific styles for galley and article landing page
 	 */
-	function addPublication(string $hookname, array $args) {
+	function themeSpecificStyles(string $hookname, array $args) {
+		$templateMgr = $args[0];
+		$template = $args[1];
 
+		if ($template !== "frontend/pages/article.tpl" && $template !== "plugins-plugins-generic-jatsParser-generic-jatsParser:articleGalleyView.tpl") return false;
+
+		$request = $this->getRequest();
+		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
+
+		$themePlugins = PluginRegistry::getPlugins('themes');
+		foreach ($themePlugins as $themePlugin) {
+			if ($themePlugin->isActive()) {
+				$parentTheme = $themePlugin->parent;
+				// Chances are that child theme of a Default also need this styling
+				if ($themePlugin->getName() == "defaultthemeplugin" || ($parentTheme && $parentTheme->getName() == "defaultthemeplugin")) {
+					if ($template === "plugins-plugins-generic-jatsParser-generic-jatsParser:articleGalleyView.tpl") {
+						$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
+						$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
+					} else if ($template === "frontend/pages/article.tpl") {
+						$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/article.css');
+					}
+				}
+			}
+		}
 	}
 }
