@@ -704,7 +704,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$imageFiles = [];
 
 		foreach ($dependentFiles as $dependentFile) {
-			if (get_class($dependentFile !== 'SubmissionArtworkFile')) continue;
+			if (get_class($dependentFile) !== 'SubmissionArtworkFile') continue;
 			if (!in_array($dependentFile->getFileType(), self::getSupportedSupplFileTypes())) continue;
 			$filePath = $request->url(null, 'article', 'downloadFullTextAssoc', array($submissionFile->getSubmissionId(), $dependentFile->getAssocId(), $dependentFile->getFileId()));
 			$imageFiles[$dependentFile->getOriginalFileName()] = $filePath;
