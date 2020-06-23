@@ -14,9 +14,11 @@ require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.jatsParser.classes.JATSParserDocument');
+import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
 
 use JATSParser\Body\Document as Document;
 use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
+use JATSParser\HTML\Document as HTMLDocument;
 
 define("CREATE_PDF_QUERY", "download=pdf");
 
@@ -35,6 +37,17 @@ class JatsParserPlugin extends GenericPlugin {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
 			}
+
+
+			// Add data to the publication
+			HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
+			HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
+			HookRegistry::register('TemplateManager::display', array($this, 'previewFullTextCall'));
+			HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
+			HookRegistry::register('Publication::edit', array($this, 'editPublication'));
+			HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
+			HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
+
 			return true;
 		}
 		return false;
@@ -106,6 +119,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param $hookName string
 	 * @param $args array
 	 * @return bool
+	 * @deprecated
 	 */
 	function articleViewCallback($hookName, $args) {
 		$request =& $args[0];
@@ -144,19 +158,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
 		$templateMgr->addJavaScript('jatsParserJavascript', $baseUrl . '/resources/javascript/jatsParser.js');
 
-		// Theme-specific styling for the galley page
-		$themePlugins = PluginRegistry::getPlugins('themes');
-		foreach ($themePlugins as $themePlugin) {
-			if ($themePlugin->isActive()) {
-				$parentTheme = $themePlugin->parent;
-				// Chances are that child theme of a Default also need this styling
-				if ($themePlugin->getName() == "defaultthemeplugin" || ($parentTheme && $parentTheme->getName() == "defaultthemeplugin")) {
-					$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
-					$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
-				}
-			}
-		}
-
 		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';
 
 		$templateMgr->assign(array(
@@ -173,7 +174,7 @@ class JatsParserPlugin extends GenericPlugin {
 			$templateMgr->assign('generatePdfUrl', $generatePdfUrl);
 		}
 
-		$templateMgr->display($this->getTemplateResource('articleView.tpl'));
+		$templateMgr->display($this->getTemplateResource('articleGalleyView.tpl'));
 
 		return false;
 	}
@@ -215,28 +216,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
 
 		return false;
-	}
-
-	/**
-	 * Add a property to the publication schema
-	 *
-	 * @param $hookName string `Schema::get::publication`
-	 * @param $args [[
-	 * 	@option object Publication schema
-	 * ]]
-	 */
-	public function addToSchema($hookName, $args) {
-		$schema = $args[0];
-		$prop = '{
-			"type": "integer",
-			"multilingual": true,
-			"apiSummary": true,
-			"validation": [
-				"nullable"
-			]
-		}';
-
-		$schema->properties->{'jatsparser::defaultGalley'} = json_decode($prop);
 	}
 
 	/**
@@ -362,6 +341,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param $request Request
 	 * @return $htmlDocument JATSParserDocument
 	 * @brief preparation of HTML file
+	 * @deprecated
 	 */
 	private function htmlCreation($article, $templateMgr, $jatsDocument, $embeddedXml, $request): JATSParserDocument
 	{
@@ -398,6 +378,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param $embeddedXml
 	 * @param $xpath
 	 * @brief replacement for url to figures with actuall path
+	 * @deprecated
 	 */
 	private function imageUrlReplacement($embeddedXml, $xpath): void
 	{
@@ -477,4 +458,316 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 	}
 
+	/**
+	 * Add a property to the publication schema
+	 *
+	 * @param $hookName string `Schema::get::publication`
+	 * @param $args [[
+	 * 	@option object Publication schema
+	 * ]]
+	 */
+	public function addToSchema($hookName, $args) {
+		$schema = $args[0];
+		$propId = '{
+			"type": "integer",
+			"multilingual": true,
+			"apiSummary": true,
+			"validation": [
+				"nullable"
+			]
+		}';
+		$propText = '{
+			"type": "string",
+			"multilingual": true,
+			"apiSummary": true,
+			"validation": [
+				"nullable"
+			]
+		}';
+		$schema->properties->{'jatsParser::fullTextFileId'} = json_decode($propId);
+		$schema->properties->{'jatsParser::fullText'} = json_decode($propText);
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args [string, TemplateManager]
+	 */
+	function publicationTemplateData(string $hookname, array $args): void {
+		/**
+		 * @var $templateMgr TemplateManager
+		 * @var $submission Submission
+		 * @var $submissionFileDao SubmissionFileDAO
+		 * @var $submissionFile SubmissionFile
+		 */
+		$templateMgr = $args[1];
+		$request = $this->getRequest();
+		$context = $request->getContext();
+		$submission = $templateMgr->getTemplateVars('submission');
+		$latestPublication = $submission->getLatestPublication();
+		$latestPublicationApiUrl = $request->getDispatcher()->url($request, ROUTE_API, $context->getData('urlPath'), 'submissions/' . $submission->getId() . '/publications/' . $latestPublication->getId());
+
+		$supportedSubmissionLocales = $context->getSupportedSubmissionLocales();
+		$localeNames = AppLocale::getAllLocales();
+		$locales = array_map(function($localeKey) use ($localeNames) {
+			return ['key' => $localeKey, 'label' => $localeNames[$localeKey]];
+		}, $supportedSubmissionLocales);
+
+		$submissionFileDao = DAORegistry::getDAO("SubmissionFileDAO");
+		$submissionFiles = $submissionFileDao->getLatestRevisions($submission->getId(), SUBMISSION_FILE_PRODUCTION_READY);
+		$submissionFilesXML = array();
+		foreach ($submissionFiles as $submissionFile) {
+			if (in_array($submissionFile->getFileType(), array("application/xml", "text/xml"))) {
+				$submissionFilesXML[] = $submissionFile;
+			}
+		}
+
+		$dispatcher = $request->getDispatcher();
+		$submissionProps = Services::get('submission')->getProperties($submission, array('stageId'), array('request' => $request));
+		$currentPath = $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'fullTextPreview', $submission->getId(), $submissionProps);
+		if (!empty($submissionFiles)) {
+			$msg = $templateMgr->smartyTranslate(array(
+				'key' => 'plugins.generic.jatsParser.publication.jats.description',
+				'params' => array("previewPath" => $currentPath)
+			), $templateMgr);
+		} else {
+			$msg = $templateMgr->smartyTranslate(array(
+				'key' => 'plugins.generic.jatsParser.publication.jats.descriptionEmpty'
+			), $templateMgr);
+		}
+
+		$form = new PublicationJATSUploadForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionFilesXML, $msg);
+		$workflowData = $templateMgr->getTemplateVars('workflowData');
+		$workflowData['components'][FORM_PUBLICATION_JATS_FULLTEXT] = $form->getConfig();
+
+		$templateMgr->assign('workflowData', $workflowData);
+
+		$templateMgr->display($this->getTemplateResource("workflowJatsFulltext.tpl"));
+	}
+
+	function previewFullTextCall(string $hookname, array $args) {
+		/**
+		 * @var $templateMgr TemplateManager
+		 */
+		$templateMgr = $args[0];
+		$template = $args[1];
+		$request = $this->getRequest();
+
+		if ($template != 'workflow/workflow.tpl') {
+			return false;
+		}
+
+		$templateMgr->addJavaScript('fulltextPreview', $request->getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'preview.js', array('contexts' => 'backend'));
+
+		return false;
+	}
+
+	/**
+	 * @param $hookName string
+	 * @param $args array
+	 * @brief Controller for the preview page
+	 */
+	function loadPreviewHandler($hookName, $args) {
+		$page = $args[0];
+		$op = $args[1];
+		$request = $this->getRequest();
+		$userVars = $request->getUserVars();
+
+		if ($page == 'workflow' && $op == 'fullTextPreview' && array_key_exists('_full-text-preview', $userVars)) {
+			define('HANDLER_CLASS', 'FullTextPreviewHandler');
+			define('JATSPARSER_PLUGIN_NAME', $this->getName());
+			$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'FullTextPreviewHandler.inc.php';
+
+		} else if ($page == 'article' && $op == 'downloadFullTextAssoc') {
+			define('HANDLER_CLASS', 'FullTextArticleHandler');
+			define('JATSPARSER_PLUGIN_NAME', $this->getName());
+			$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'FullTextArticleHandler.inc.php';
+		}
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args [
+	 *   Publication -> new publication
+	 *   Publication
+	 *   array parameters/publication properties to be saved
+	 *   Request
+	 * ]
+	 * @return bool
+	 */
+	function editPublication(string $hookname, array $args) {
+		$newPublication = $args[0];
+		$params = $args[2];
+		if (!array_key_exists('jatsParser::fullTextFileId', $params)) return false;
+
+		$localePare = $params['jatsParser::fullTextFileId'];
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		foreach ($localePare as $localeKey => $fileId) {
+			if (empty($fileId)) {
+				$newPublication->setData('jatsParser::fullText', null, $localeKey);
+				continue;
+			}
+			$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY);
+			$htmlDocument = $this->getFullTextFromJats($submissionFile);
+			$newPublication->setData('jatsParser::fullText', $htmlDocument->saveHTML(), $localeKey);
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param SubmissionFile $submissionFile
+	 * @return HTMLDocument
+	 * @brief retrieves PHP DOM representation of the article's full-text
+	 */
+	public function getFullTextFromJats (SubmissionFile $submissionFile): HTMLDocument {
+		$htmlDocument = new HTMLDocument(new Document($submissionFile->getFilePath()), false);
+		return $htmlDocument;
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args
+	 * @return bool
+	 * @brief Displays full-text on article landing page and preview page
+	 */
+	function displayFullText(string $hookname, array $args) {
+		$templateMgr =& $args[1];
+		$output =& $args[2];
+		$publication = $templateMgr->getTemplateVars('publication');
+		$submission = $templateMgr->getTemplateVars('article');
+		$submissionId = $submission->getId();
+		$fullTexts = $publication->getData('jatsParser::fullText');
+
+		$submissionFileId = 0;
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$submissionFile = null;
+
+		$request = $this->getRequest();
+		$requestedOp = $request->getRequestedOp();
+		$html = null;
+
+		if ($requestedOp === 'view') {
+			if (empty($fullTexts)) return false;
+			$currentLocale = AppLocale::getLocale();
+			if (array_key_exists($currentLocale, $fullTexts)) {
+				$html = $fullTexts[$currentLocale];
+
+				$submissionFileId = $publication->getData('jatsParser::fullTextFileId', $currentLocale);
+				$submissionFile = $submissionFileDao->getLatestRevision($submissionFileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
+			} else {
+				$locales = AppLocale::getAllLocales();
+				$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocale');
+				if (count($fullTexts) > 1) {
+					$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocales');
+				}
+
+				$html = $msg;
+				foreach ($fullTexts as $localeKey => $fullText) {
+					$html .= ' <a href="' . $request->url(null, 'user', 'setLocale', $localeKey) . '">' . $locales[$localeKey] . '</a>';
+					if ($fullText !== end($fullTexts)) {
+						$html .= ', ';
+					} else {
+						$html .= '.';
+					}
+				}
+			}
+
+		} else if ($requestedOp === 'fullTextPreview') {
+			$submissionFileId = $request->getUserVar('_full-text-preview');
+			$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+			$submissionFile = $submissionFileDao->getLatestRevision($submissionFileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
+			$html = $this->getFullTextFromJats($submissionFile)->saveHTML();
+		}
+
+		if (is_null($html)) return false;
+
+		if ($submissionFileId && $submissionFile) {
+			$html = $this->_setSupplImgPath($submissionFile, $html);
+		}
+
+		$templateMgr->assign('fullText', $html);
+		$output .= $templateMgr->fetch($this->getTemplateResource('articleMainView.tpl'));
+
+		return false;
+	}
+
+	/**
+	 * @param SubmissionFile $submissionFile
+	 * @param string $htmlString
+	 * @return string
+	 * @brief Substitute path to attached images for full-text HTML
+	 */
+	function _setSupplImgPath(SubmissionFile $submissionFile, string $htmlString): string {
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$dependentFiles = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getFileId(), $submissionFile->getSubmissionId());
+		$request = $this->getRequest();
+		$imageFiles = [];
+
+		foreach ($dependentFiles as $dependentFile) {
+			if (get_class($dependentFile !== 'SubmissionArtworkFile')) continue;
+			if (!in_array($dependentFile->getFileType(), self::getSupportedSupplFileTypes())) continue;
+			$filePath = $request->url(null, 'article', 'downloadFullTextAssoc', array($submissionFile->getSubmissionId(), $dependentFile->getAssocId(), $dependentFile->getFileId()));
+			$imageFiles[$dependentFile->getOriginalFileName()] = $filePath;
+		}
+
+		if (empty($imageFiles)) return  $htmlString;
+
+		// Solution from HtmlArticleGalleyPlugin::_getHTMLContents
+		foreach ($imageFiles as $originalFileName => $filePath) {
+			$pattern = preg_quote(rawurlencode($originalFileName));
+
+			$htmlString = preg_replace(
+				'/([Ss][Rr][Cc]|[Hh][Rr][Ee][Ff]|[Dd][Aa][Tt][Aa])\s*=\s*"([^"]*' . $pattern . ')"/',
+				'\1="' . $filePath . '"',
+				$htmlString
+			);
+		}
+
+		return $htmlString;
+	}
+
+	/**
+	 * @return array
+	 * @brief get the list of types of files that are dependent from an original JATS XML (from which full-text was generated) and are accessible to public
+	 */
+	public static function getSupportedSupplFileTypes() {
+		return array(
+			'image/png',
+			'image/jpeg'
+		);
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args
+	 * @return bool
+	 * @brief theme-specific styles for galley and article landing page
+	 */
+	function themeSpecificStyles(string $hookname, array $args) {
+		$templateMgr = $args[0];
+		$template = $args[1];
+
+		if ($template !== "frontend/pages/article.tpl" && $template !== "plugins-plugins-generic-jatsParser-generic-jatsParser:articleGalleyView.tpl") return false;
+
+		$request = $this->getRequest();
+		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
+
+		$themePlugins = PluginRegistry::getPlugins('themes');
+		foreach ($themePlugins as $themePlugin) {
+			if ($themePlugin->isActive()) {
+				$parentTheme = $themePlugin->parent;
+				// Chances are that child theme of a Default also need this styling
+				if ($themePlugin->getName() == "defaultthemeplugin" || ($parentTheme && $parentTheme->getName() == "defaultthemeplugin")) {
+					if ($template === "plugins-plugins-generic-jatsParser-generic-jatsParser:articleGalleyView.tpl") {
+						$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
+						$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
+					} else if ($template === "frontend/pages/article.tpl") {
+						$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/article.css');
+					}
+				}
+			}
+		}
+
+		return false;
+	}
 }

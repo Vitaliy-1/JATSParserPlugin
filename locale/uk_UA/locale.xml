@@ -23,6 +23,9 @@
 	<message key="plugins.generic.jatsParser.pdf.read.symbol-text">PDF</message>
 	<message key="plugins.generic.jatsParser.article.authorBio">Біографія</message>
 
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocale">Повний текст статті доступний для такої мови:</message>
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocale">Повний текст статті доступний для таких мов:</message>
+
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.settings.description">Форма налаштувань для плагіна JATSParser</message>
 	<message key="plugins.generic.jatsParser.settings.jatsReferences">Примусово відображати перелік посилань з JATS XML
@@ -30,5 +33,7 @@
 	<message key="plugins.generic.jatsParser.settings.ojsReferences">Примусово відображати перелік посилань з OJS
 	</message>
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">За замовчуванням</message>
+
+	<message key="plugins.generic.jatsParser.publication.jats.label">Створити повний текст для статті із файлу формату JATS XML</message>
 
 </locale>

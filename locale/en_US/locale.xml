@@ -23,6 +23,9 @@
 	<message key="plugins.generic.jatsParser.pdf.read.symbol-text">PDF</message>
 	<message key="plugins.generic.jatsParser.article.authorBio">Bio</message>
 
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocale">Full-text of the article is available for this locale:</message>
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocales">Full-text of the article is available for these locales:</message>
+
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Settings</message>
 	<message key="plugins.generic.jatsParser.settings.description">JATSParser plugin settings menu</message>
@@ -38,4 +41,9 @@
 	<message key="plugins.generic.jatsParser.galley.settings.display.description">These settings are applied to XML galleys on individual basis.</message>
 	<message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">This option allows to choose JATS XML galley that will be displayed on article landing page. Note that for this option to work, "Display galleys on article landing page" should be enabled via plugin's settings. By default the plugin will pick up the first uploaded XML galley.</message>
 	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">Display as a default</message>
+	<message key="plugins.generic.jatsParser.publication.jats.fulltext">Full-text upload</message>
+	<message key="plugins.generic.jatsParser.publication.jats.fulltext.success">Full-text upload successful</message>
+	<message key="plugins.generic.jatsParser.publication.jats.label">Generate article's fulltext from submission file in JATS XML format</message>
+	<message key="plugins.generic.jatsParser.publication.jats.description"><![CDATA[The file can be uploaded as a <a href="#workflow" id="jatsParser__linkToProduction">production ready</a> to be listed below. To see the preview, please, follow the <a id="jatsParser__linkPreview" href="{$previewPath}" target="_blank">link</a> after choosing an item from the list.]]></message>
+	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty"><![CDATA[The list of JATS XML files is empty. Please, upload the file to the <a href="#workflow" id="jatsParser__linkToProduction">production stage</a> and it will appear below for full-text generation.]]></message>
 </locale>
