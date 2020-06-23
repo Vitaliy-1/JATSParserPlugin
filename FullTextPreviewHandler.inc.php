@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @file plugins/generic/docxConverter/DOCXConverterHandler.inc.php
+ * @file plugins/generic/jatsParser/FullTextPreviewHandler.inc.php
  *
- * Copyright (c) 2014-2019 Simon Fraser University Library
- * Copyright (c) 2003-2019 John Willinsky
+ * Copyright (c) 2014-2020 Simon Fraser University Library
+ * Copyright (c) 2003-2020 John Willinsky
  * Distributed under the GNU GPL v2.
  *
- * @brief handler for the grid's conversion
+ * @brief handler for the full-text preview page
  */
 
 import('classes.handler.Handler');
@@ -37,10 +37,17 @@ class FullTextPreviewHandler extends WorkflowHandler {
 		$templateMgr = TemplateManager::getManager($request);
 		$this->setupTemplate($request);
 
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
+
+		$dispatcher = $request->getDispatcher();
+		if (!$submissionFile) $dispatcher->handle404();
+
 		$templateMgr->assign(array(
 			'article' => $submission,
 			'publication' => $publication,
-			'currentPublication' => $publication
+			'currentPublication' => $publication,
+			'firstPublication' => reset($submission->getData('publications')),
 		));
 		$templateMgr->display('frontend/pages/article.tpl');
 	}
