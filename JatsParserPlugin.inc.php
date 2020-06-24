@@ -38,7 +38,6 @@ class JatsParserPlugin extends GenericPlugin {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
 			}
 
-
 			// Add data to the publication
 			HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
 			HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
