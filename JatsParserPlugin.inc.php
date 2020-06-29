@@ -571,7 +571,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$request = $this->getRequest();
 		$userVars = $request->getUserVars();
 
-		if ($page == 'workflow' && $op == 'fullTextPreview' && array_key_exists('_full-text-preview', $userVars)) {
+		if ($page == 'workflow' && (($op == 'fullTextPreview' && array_key_exists('_full-text-preview', $userVars)) || $op = 'downloadPreviewAssoc')) {
 			define('HANDLER_CLASS', 'FullTextPreviewHandler');
 			define('JATSPARSER_PLUGIN_NAME', $this->getName());
 			$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'FullTextPreviewHandler.inc.php';
@@ -705,7 +705,22 @@ class JatsParserPlugin extends GenericPlugin {
 		foreach ($dependentFiles as $dependentFile) {
 			if (get_class($dependentFile) !== 'SubmissionArtworkFile') continue;
 			if (!in_array($dependentFile->getFileType(), self::getSupportedSupplFileTypes())) continue;
-			$filePath = $request->url(null, 'article', 'downloadFullTextAssoc', array($submissionFile->getSubmissionId(), $dependentFile->getAssocId(), $dependentFile->getFileId()));
+			$submissionId = $submissionFile->getSubmissionId();
+			switch ($request->getRequestedOp()) {
+				case 'view':
+					$filePath = $request->url(null, 'article', 'downloadFullTextAssoc', array($submissionId, $dependentFile->getAssocId(), $dependentFile->getFileId()));
+					break;
+				case 'fullTextPreview':
+					$submission = Services::get('submission')->get($submissionId);
+					$submissionProps = Services::get('submission')->getProperties($submission, array('stageId'), array('request' => $request));
+					$filePath = $request->url(null, 'workflow', 'downloadPreviewAssoc', array_merge(
+						[$submissionId],
+						$submissionProps,
+						[$dependentFile->getAssocId(), $dependentFile->getFileId()]
+					));
+					break;
+			}
+
 			$imageFiles[$dependentFile->getOriginalFileName()] = $filePath;
 		}
 

@@ -25,10 +25,15 @@ class FullTextPreviewHandler extends WorkflowHandler {
 		$this->_plugin = PluginRegistry::getPlugin('generic', JATSPARSER_PLUGIN_NAME);
 		$this->addRoleAssignment(
 			array(ROLE_ID_SUB_EDITOR, ROLE_ID_MANAGER, ROLE_ID_ASSISTANT),
-			array('fullTextPreview')
+			array('fullTextPreview', 'downloadPreviewAssoc')
 		);
 	}
 
+	/**
+	 * @param $args array
+	 * @param $request Request;
+	 * @brief handle request for full-text preview
+	 */
 	public function fullTextPreview($args, $request) {
 		$submissionId = $args[0];
 		$fileId = $request->getUserVar('_full-text-preview');
@@ -50,6 +55,47 @@ class FullTextPreviewHandler extends WorkflowHandler {
 			'firstPublication' => reset($submission->getData('publications')),
 		));
 		$templateMgr->display('frontend/pages/article.tpl');
+	}
+
+	/**
+	 * @param $args
+	 * @param $request
+	 * @brief download supplementary files for article's preview
+	 */
+	function downloadPreviewAssoc($args, $request) {
+		$submissionId = $args[0];
+		$dependentFileAssocId = $args[2];
+		$dependentFileId = $args[3];
+		$dispatcher = $request->getDispatcher();
+
+		if (!$dependentFileId) $dispatcher->handle404();
+
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$submissionFile = $submissionFileDao->getLatestRevision($dependentFileAssocId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
+		$submissionFileDependent = $submissionFileDao->getLatestRevision($dependentFileId, SUBMISSION_FILE_DEPENDENT, $submissionId);
+
+		if (!is_a($submissionFile, 'SubmissionFile') || !is_a($submissionFileDependent, 'SubmissionFile')) $dispatcher->handle404();
+
+		// Verify that the file is dependant from the one specified
+		$dependentFiles = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $dependentFileAssocId, $submissionId, SUBMISSION_FILE_DEPENDENT);
+
+		if (empty($dependentFiles)) $dispatcher->handle404();
+		$currentDependentFile = null;
+		foreach ($dependentFiles as $dependentFile) {
+			if ($dependentFileId == $dependentFile->getFileId()) {
+				$currentDependentFile = $dependentFile;
+				break;
+			}
+		}
+		if (!$currentDependentFile) $dispatcher->handle404();
+
+		if (!in_array($currentDependentFile->getFileType(), $this->_plugin::getSupportedSupplFileTypes())) $dispatcher->handler404();
+
+		// Download file
+		import('lib.pkp.classes.file.SubmissionFileManager');
+		$submissionFileManager = new SubmissionFileManager($request->getContext()->getId(), $submissionId);
+		$submissionFileManager->downloadById($dependentFileId);
+
 	}
 
 	/**
