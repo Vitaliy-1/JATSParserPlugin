@@ -619,7 +619,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @brief retrieves PHP DOM representation of the article's full-text
 	 */
 	public function getFullTextFromJats (SubmissionFile $submissionFile): HTMLDocument {
-		$htmlDocument = new HTMLDocument(new Document($submissionFile->getFilePath()), false);
+		$htmlDocument = new HTMLDocument(new Document($submissionFile->getFilePath()));
 		return $htmlDocument;
 	}
 
