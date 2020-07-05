@@ -604,7 +604,7 @@ class JatsParserPlugin extends GenericPlugin {
 			}
 			$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY);
 			$htmlDocument = $this->getFullTextFromJats($submissionFile);
-			$newPublication->setData('jatsParser::fullText', $htmlDocument->saveHTML(), $localeKey);
+			$newPublication->setData('jatsParser::fullText', $htmlDocument->saveAsHTML(), $localeKey);
 		}
 
 		return false;
@@ -672,7 +672,7 @@ class JatsParserPlugin extends GenericPlugin {
 			$submissionFileId = $request->getUserVar('_full-text-preview');
 			$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
 			$submissionFile = $submissionFileDao->getLatestRevision($submissionFileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
-			$html = $this->getFullTextFromJats($submissionFile)->saveHTML();
+			$html = $this->getFullTextFromJats($submissionFile)->saveAsHTML();
 		}
 
 		if (is_null($html)) return false;
