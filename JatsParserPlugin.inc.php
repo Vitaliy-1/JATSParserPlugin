@@ -205,11 +205,9 @@ class JatsParserPlugin extends GenericPlugin {
 		$jatsDocument = new Document($submissionFile->getFilePath());
 
 		$parseReferences = $this->getSetting($request->getContext()->getId(), 'references');
-
-		if ($parseReferences === "ojsReferences") {
-			$htmlDocument = new JATSParserDocument($jatsDocument, false);
-		} else {
-			$htmlDocument = new JATSParserDocument($jatsDocument);
+		$htmlDocument = new JATSParserDocument($jatsDocument);
+		if ($parseReferences !== "ojsReferences") {
+			$htmlDocument->setReferences('vancouver', 'en-US', false);
 		}
 
 		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
@@ -347,10 +345,9 @@ class JatsParserPlugin extends GenericPlugin {
 		$context = $request->getContext();
 
 		$parseReferences = $this->getSetting($context->getId(), 'references');
-		if ($parseReferences === "ojsReferences") {
-			$htmlDocument = new JATSParserDocument($jatsDocument, false);
-		} else {
-			$htmlDocument = new JATSParserDocument($jatsDocument, true);
+		$htmlDocument = new JATSParserDocument($jatsDocument);
+		if ($parseReferences !== "ojsReferences") {
+			$htmlDocument->setReferences('vancouver', 'en-US', false);
 		}
 
 		// HTML DOM
