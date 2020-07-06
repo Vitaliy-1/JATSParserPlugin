@@ -126,18 +126,16 @@
 
 		{/if}
 
-		{* Keywords *}
-		{if !empty($keywords[$currentLocale])}
+        {* Keywords *}
+        {if !empty($keywords[$currentLocale])}
 			<div class="jatsParser__keywords-wrapper">
 				<div class="jatsParser__keywords-row">
-					{foreach from=$keywords item=keywordArray}
-						{foreach from=$keywordArray item=keyword key=k}
-								<span class="jatsParser__keyword">{$keyword|escape}</span>
-						{/foreach}
-					{/foreach}
+                    {foreach name="keywords" from=$publication->getLocalizedData('keywords') item="keyword"}
+						<span class="jatsParser__keyword">{$keyword|escape}</span>
+                    {/foreach}
 				</div>
 			</div>
-		{/if}
+        {/if}
 	</div>
 	<div class="jatsParser__articleView">
 		<div class="jatsParser__left-article-block">
