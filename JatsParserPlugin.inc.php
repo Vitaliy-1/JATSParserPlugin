@@ -245,9 +245,14 @@ class JatsParserPlugin extends GenericPlugin {
 		$pdfDocument->setTitle($article->getLocalizedFullTitle());
 
 		// get the logo
-
 		$journal = $request->getContext();
-		$pdfHeaderLogo = __DIR__ . "/JATSParser/logo/logo.jpg";
+		$thumb = $journal->getLocalizedData('journalThumbnail');
+		if (!empty($thumb)) {
+			$journalFilesPath = __DIR__ . '/../../../' . Config::getVar('files', 'public_files_dir') . '/journals/' . $journal->getId() . '/'; // TCPDF accepts only relative path
+			$pdfHeaderLogo = $journalFilesPath . $thumb['uploadName'];
+		} else {
+			$pdfHeaderLogo = __DIR__ . "/JATSParser/logo/logo.jpg";
+		}
 
 		$pdfDocument->SetCreator(PDF_CREATOR);
 		$pdfDocument->SetAuthor($article->getAuthorString());
@@ -262,6 +267,8 @@ class JatsParserPlugin extends GenericPlugin {
 		if ($article->getSectionTitle()) {
 			$articleDataString .= "\n" . $article->getSectionTitle();
 		}
+
+		error_log(PDF_HEADER_LOGO_WIDTH);
 
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getLocalizedName(), $articleDataString);
 
