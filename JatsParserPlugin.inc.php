@@ -15,6 +15,7 @@ require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.jatsParser.classes.JATSParserDocument');
 import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
+import('lib.pkp.classes.file.SubmissionFileManager');
 
 use JATSParser\Body\Document as Document;
 use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
@@ -787,5 +788,61 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		return false;
+	}
+
+	public function importGalleys() {
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$request = $this->getRequest();
+		$context = $request->getContext();
+		$user = $request->getUser();
+		$publicationDao = DAORegistry::getDAO('PublicationDAO');
+
+		$submissions = Services::get('submission')->getMany([
+			'contextId' => $context->getId(),
+			'stageIds' => [
+				WORKFLOW_STAGE_ID_PRODUCTION
+			]
+		]);
+
+		foreach ($submissions as $submission) {
+			$publication = $submission->getCurrentPublication();
+			$galleys = $publication->getData('galleys');
+
+			if (empty($galleys)) continue;
+
+			foreach ($galleys as $galley) {
+				if (!in_array($galley->getFileType(), array("application/xml", "text/xml"))) continue;
+
+				$galleyLocale = $galley->getLocale();
+				$localizedFullTextFileSetting = $publication->getData('jatsParser::fullTextFileId', $galleyLocale);
+				if ($localizedFullTextFileSetting) continue;
+
+				$submissionFile = $galley->getFile();
+				/** @var $submissionFile SubmissionFile */
+				$document = new Document($submissionFile->getFilePath());
+				if (empty($document->getArticleSections())) continue;
+
+				$submissionFileManager = new SubmissionFileManager($context->getId(), $submissionFile->getSubmissionId());
+				$newSubmissionFile = $submissionFileManager->copySubmissionFile($submissionFile->getFilePath(), SUBMISSION_FILE_PRODUCTION_READY, $user->getId(), null, $submissionFile->getGenreId());
+
+				// copy and attach dependent files, only images are supported
+				$assocFiles = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getId());
+				foreach ($assocFiles as $assocFile) {
+					/** @var $assocFile SubmissionFile */
+					if (in_array($assocFile->getFileType(), $this->getSupportedSupplFileTypes())) {
+						$newAssocFile = $submissionFileManager->copySubmissionFile($assocFile->getFilePath(), SUBMISSION_FILE_DEPENDENT, $user->getId(), null, $assocFile->getGenreId(), $assocFile->getAssocType(), $newSubmissionFile->getId());
+						$newAssocFile->setOriginalFileName($assocFile->getOriginalFileName()); // should have preserved original file name to be retrieved for front-end correctly
+						$submissionFileDao->updateObject($newAssocFile);
+					}
+				}
+
+				// Convert and save as a Publication property
+				$htmlDocument = new HTMLDocument($document);
+				$htmlString = $htmlDocument->saveAsHTML();
+				$publication->setData('jatsParser::fullTextFileId', $newSubmissionFile->getId(), $galleyLocale);
+				$publication->setData('jatsParser::fullText', $htmlString, $galleyLocale);
+				$publicationDao->updateObject($publication);
+			}
+		}
 	}
 }

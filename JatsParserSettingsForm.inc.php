@@ -54,7 +54,7 @@ class JatsParserSettingsForm extends Form {
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('references', 'convertToPdf'));
+		$this->readUserVars(array('references', 'convertToPdf', 'galleysImport'));
 	}
 
 	/**
@@ -83,6 +83,10 @@ class JatsParserSettingsForm extends Form {
 			$convertToPdf = true;
 		}
 		$plugin->updateSetting($contextId, 'convertToPdf', $convertToPdf);
+
+		if ($importGalleys = $this->getData('galleysImport')) {
+			$plugin->importGalleys();
+		}
 
 		parent::execute(...$functionArgs);
 	}

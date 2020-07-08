@@ -35,5 +35,7 @@
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">За замовчуванням</message>
 
 	<message key="plugins.generic.jatsParser.publication.jats.label">Створити повний текст для статті із файлу формату JATS XML</message>
-
+	<message key="plugins.generic.jatsParser.galley.import">Завантаження гранок JATS XML</message>
+	<message key="plugins.generic.jatsParser.galley.import.description">Ця опція дозволяє завантажити повний текст для всіх публікацій із гранок у форматі JATS XML. Завантаження не відбудеться якщо публікація вже має повний текст. Імпорт почнеться одразу після збереження цієї форми</message>
+	<message key="plugins.generic.jatsParser.galley.import.title">Завантаження повного тексту із гранок</message>
 </locale>

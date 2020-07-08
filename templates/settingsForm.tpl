@@ -18,9 +18,7 @@
 	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="jatsParserSettingsFormNotification"}
 
-	<div id="description">{translate key="plugins.generic.jatsParser.settings.description"}</div>
-
-	{fbvFormArea id="jatsParserSettingsFormArea"}
+	{fbvFormArea id="jatsParserSettingsFormArea" title="plugins.generic.jatsParser.settings.description"}
 		{fbvFormSection list=true}
 			{fbvElement type="radio" id="jatsReferences" name="references" value="jatsReferences" checked=$references|compare:"jatsReferences" label="plugins.generic.jatsParser.settings.jatsReferences"}
 			{fbvElement type="radio" id="ojsReferences" name="references" value="ojsReferences" checked=$references|compare:"ojsReferences" label="plugins.generic.jatsParser.settings.ojsReferences"}
@@ -30,6 +28,12 @@
 			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.display.pdf"}
 		{/fbvFormSection}
 	{/fbvFormArea}
+
+    {fbvFormArea id="jatsParserGalleyImport" title="plugins.generic.jatsParser.galley.import"}
+		{fbvFormSection for="galleysImport" list=true description="plugins.generic.jatsParser.galley.import.description"}
+			{fbvElement type="checkbox" id="galleysImport" name="galleysImport" label="plugins.generic.jatsParser.galley.import.title"}
+		{/fbvFormSection}
+    {/fbvFormArea}
 
 	{fbvFormButtons}
 	<p><span class="formRequired">{translate key="common.requiredField"}</span></p>

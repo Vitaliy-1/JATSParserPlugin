@@ -35,7 +35,9 @@
 	<message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">Allow plugin to display converted JATS XML galleys on article landing page. By default the first XML galley fetched will be displayed. This can be changed individually via JATS Parser galley settings under each uploaded galley.</message>
 	<message key="plugins.generic.jatsParser.settings.display.articlePage">Display JATS XML on article landing page</message>
 	<message key="plugins.generic.jatsParser.settings.display.pdf">Convert JATS XML to PDF</message>
-
+	<message key="plugins.generic.jatsParser.galley.import">Import of JATS XML galleys</message>
+	<message key="plugins.generic.jatsParser.galley.import.description">This options allows to save JATS XML galleys as a full-text across all publications in the journal. Import is omitted if a publication already has full-text for a given galley. Import starts immediately after saving the form</message>
+	<message key="plugins.generic.jatsParser.galley.import.title">Import full-text from galleys</message>
 	<!-- Plugin galley settings -->
 	<message key="plugins.generic.jatsParser.galley.settings.display">Display Settings</message>
 	<message key="plugins.generic.jatsParser.galley.settings.display.description">These settings are applied to XML galleys on individual basis.</message>
