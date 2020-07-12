@@ -665,7 +665,7 @@ class JatsParserPlugin extends GenericPlugin {
 					$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocales');
 				}
 
-				$html = $msg;
+				$html = '<p>' . $msg;
 				foreach ($fullTexts as $localeKey => $fullText) {
 					$html .= ' <a href="' . $request->url(null, 'user', 'setLocale', $localeKey) . '">' . $locales[$localeKey] . '</a>';
 					if ($fullText !== end($fullTexts)) {
@@ -674,6 +674,7 @@ class JatsParserPlugin extends GenericPlugin {
 						$html .= '.';
 					}
 				}
+				$html .= '</p>';
 			}
 
 		} else if ($requestedOp === 'fullTextPreview') {
