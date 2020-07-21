@@ -31,10 +31,10 @@ class PublicationJATSUploadForm extends FormComponent {
 		$this->successMessage = __('plugins.generic.jatsParser.publication.jats.fulltext.success');
 		$this->locales = $locales;
 
-		$options = array();
+		$options = [];
 		foreach ($locales as $value) {
 			$locale = $value['key'];
-			$lang = array();
+			$lang = [];
 			if (empty($submissionFiles)) break;
 			foreach ($submissionFiles as $submissionFile) {
 				$subName = $submissionFile->getName($locale);
@@ -64,9 +64,19 @@ class PublicationJATSUploadForm extends FormComponent {
 				'type' => 'radio',
 				'options' => $options,
 				'value' => $publication->getData('jatsParser::fullTextFileId'),
+			]))->addField(new FieldOptions('jatsParser::linksToRefs', [
+				'label' => __('plugins.generic.jatsParser.publication.jats.links.label'),
+				'type' => 'checkbox',
+				'showWhen' => 'jatsParser::references',
+				'options' => [
+					[
+						'value' => true,
+						'label' => __('common.yes')
+					]
+				],
 			]));
 		} else {
-			$this->addField(new FieldHTML("preview", array(
+			$this->addField(new FieldHTML("addProductionReadyFiles", array(
 				'description' => $msg
 			)));
 		}

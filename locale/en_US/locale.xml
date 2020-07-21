@@ -38,6 +38,7 @@
 	<message key="plugins.generic.jatsParser.galley.import">Import of JATS XML galleys</message>
 	<message key="plugins.generic.jatsParser.galley.import.description">This options allows to save JATS XML galleys as a full-text across all publications in the journal. Import is omitted if a publication already has full-text for a given galley. Import starts immediately after saving the form</message>
 	<message key="plugins.generic.jatsParser.galley.import.title">Import full-text from galleys</message>
+
 	<!-- Plugin galley settings -->
 	<message key="plugins.generic.jatsParser.galley.settings.display">Display Settings</message>
 	<message key="plugins.generic.jatsParser.galley.settings.display.description">These settings are applied to XML galleys on individual basis.</message>
@@ -48,4 +49,23 @@
 	<message key="plugins.generic.jatsParser.publication.jats.label">Generate article's fulltext from submission file in JATS XML format</message>
 	<message key="plugins.generic.jatsParser.publication.jats.description"><![CDATA[The file can be uploaded as a <a href="#workflow" id="jatsParser__linkToProduction">production ready</a> to be listed below. To see the preview, please, follow the <a id="jatsParser__linkPreview" href="{$previewPath}" target="_blank">link</a> after choosing an item from the list.]]></message>
 	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty"><![CDATA[The list of JATS XML files is empty. Please, upload the file to the <a href="#workflow" id="jatsParser__linkToProduction">production stage</a> and it will appear below for full-text generation.]]></message>
+	<message key="plugins.generic.jatsParser.publication.jats.references.label">Retrieve references from JATS XML?</message>
+	<message key="plugins.generic.jatsParser.publication.jats.references.description">Reference list will be retrieved from JATS XML and saved as a part of the publication. If references are already included into the publication, they are going to be rewritten.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.links.label">Format in-text links to references?</message>
+
+	<!-- Citation Style Formats -->
+	<message key="plugins.generic.jatsParser.style.acm-sig-proceedings">ACM</message>
+	<message key="plugins.generic.jatsParser.style.acs-nano">ACS</message>
+	<message key="plugins.generic.jatsParser.style.apa">APA</message>
+	<message key="plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas">ABNT</message>
+	<message key="plugins.generic.jatsParser.style.chicago-author-date">Chicago</message>
+	<message key="plugins.generic.jatsParser.style.harvard-cite-them-right">Harvard</message>
+	<message key="plugins.generic.jatsParser.style.ieee">IEEE</message>
+	<message key="plugins.generic.jatsParser.style.modern-language-association">MLA</message>
+	<message key="plugins.generic.jatsParser.style.turabian-fullnote-bibliography">Turabian</message>
+	<message key="plugins.generic.jatsParser.style.vancouver">Vancouver</message>
+	<message key="plugins.generic.jatsParser.style.custom">Other citation style formats</message>
+	<message key="plugins.generic.jatsParser.style.description"><![CDATA[The style format for references parsed by the plugin. For other styles, visit <a target="_blank" href="https://github.com/citation-style-language/styles">CSL repository</a> to see if it's supported.]]></message>
+	<message key="plugins.generic.jatsParser.style.label">e.g.: american-medical-association</message>
+
 </locale>

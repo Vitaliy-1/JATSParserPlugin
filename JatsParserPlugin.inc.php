@@ -5,7 +5,7 @@
  * Copyright (c) 2017-2018 Vitalii Bezsheiko
  * Distributed under the GNU GPL v3.
  *
- * @class JatsParserSettingsForm
+ * @class JatsParserPlugin
  * @ingroup plugins_generic_jatsParser
  *
  */
@@ -17,9 +17,10 @@ import('plugins.generic.jatsParser.classes.JATSParserDocument');
 import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
 import('lib.pkp.classes.file.SubmissionFileManager');
 
-use JATSParser\Body\Document as Document;
-use JATSParser\PDF\TCPDFDocument as TCPDFDocument;
+use JATSParser\Body\Document;
+use JATSParser\PDF\TCPDFDocument;
 use JATSParser\HTML\Document as HTMLDocument;
+use \PKP\components\forms\FormComponent;
 
 define("CREATE_PDF_QUERY", "download=pdf");
 
@@ -47,6 +48,7 @@ class JatsParserPlugin extends GenericPlugin {
 			HookRegistry::register('Publication::edit', array($this, 'editPublication'));
 			HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
 			HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
+			HookRegistry::register('Form::config::before', array($this, 'addCitationsFormFields'));
 
 			return true;
 		}
@@ -488,8 +490,17 @@ class JatsParserPlugin extends GenericPlugin {
 				"nullable"
 			]
 		}';
+		$propRef = '{
+			"type": "boolean",
+			"multilingual": true,
+			"apiSummary": true,
+			"validation": [
+				"nullable"
+			]
+		}';
 		$schema->properties->{'jatsParser::fullTextFileId'} = json_decode($propId);
 		$schema->properties->{'jatsParser::fullText'} = json_decode($propText);
+		$schema->properties->{'jatsParser::references'} = json_decode($propRef);
 	}
 
 	/**
@@ -751,10 +762,55 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @brief get the list of types of files that are dependent from an original JATS XML (from which full-text was generated) and are accessible to public
 	 */
 	public static function getSupportedSupplFileTypes() {
-		return array(
+		return [
 			'image/png',
 			'image/jpeg'
-		);
+		];
+	}
+
+	public static function getSupportedCitationStyles() {
+		return [
+			[
+				'id' => 'acm-sig-proceedings',
+				'title' => 'plugins.generic.jatsParser.style.acm-sig-proceedings',
+			],
+			[
+				'id' => 'acs-nano',
+				'title' => 'plugins.generic.jatsParser.style.acs-nano',
+			],
+			[
+				'id' => 'apa',
+				'title' => 'plugins.generic.jatsParser.style.apa',
+			],
+			[
+				'id' => 'associacao-brasileira-de-normas-tecnicas',
+				'title' => 'plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas',
+			],
+			[
+				'id' => 'chicago-author-date',
+				'title' => 'plugins.generic.jatsParser.style.chicago-author-date',
+			],
+			[
+				'id' => 'harvard-cite-them-right',
+				'title' => 'plugins.generic.jatsParser.style.harvard-cite-them-right',
+			],
+			[
+				'id' => 'ieee',
+				'title' => 'plugins.generic.jatsParser.style.ieee',
+			],
+			[
+				'id' => 'modern-language-association',
+				'title' => 'plugins.generic.jatsParser.style.modern-language-association',
+			],
+			[
+				'id' => 'turabian-fullnote-bibliography',
+				'title' => 'plugins.generic.jatsParser.style.turabian-fullnote-bibliography',
+			],
+			[
+				'id' => 'vancouver',
+				'title' => 'plugins.generic.jatsParser.style.vancouver',
+			],
+		];
 	}
 
 	/**
@@ -791,6 +847,10 @@ class JatsParserPlugin extends GenericPlugin {
 		return false;
 	}
 
+	/**
+	 * @return void
+	 * @brief iterate through all submissions and add full-text from  galleys
+	 */
 	public function importGalleys() {
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
 		$request = $this->getRequest();
@@ -845,5 +905,78 @@ class JatsParserPlugin extends GenericPlugin {
 				$publicationDao->updateObject($publication);
 			}
 		}
+	}
+
+	/**
+	 * @param $hookName string Form::config::before
+	 * @param $form FormComponent The form object
+	 */
+	public function addCitationsFormFields(string $hookName, FormComponent $form): void {
+		if ($form->id !== 'citations' || !empty($form->errors)) return;
+
+		$path = parse_url($form->action)['path'];
+		if (!$path) return;
+
+		$args = explode('/', $path);
+		$publicationId = 0;
+		if ($key = array_search('publications', $args)) {
+			if (array_key_exists($key+1, $args)) {
+				$publicationId = intval($args[$key+1]);
+			}
+		}
+
+		if (!$publicationId) return;
+
+		$publication = Services::get('publication')->get($publicationId);
+		if (!$publication) return;
+
+		$submissionFileIds = array_unique($publication->getData('jatsParser::fullTextFileId'));
+		if (empty($submissionFileIds)) return;
+
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+
+		$submissionFiles = [];
+		foreach ($submissionFileIds as $submissionFileId) {
+			$submissionFiles[] = $submissionFileDao->getLatestRevision($submissionFileId);
+		}
+
+		if (empty($submissionFiles)) return;
+
+		if (count($submissionFiles) > 1) {
+			$options = [];
+			foreach ($submissionFiles as $submissionFile) {
+				$options[] = [
+					'value' => $submissionFile->getId(),
+					'label' => $submissionFile->getLocalizedName(),
+				];
+			}
+
+			$options[] = [
+				'value' => null,
+				'label' => __('common.default'),
+			];
+
+			$form->addField(new \PKP\components\forms\FieldOptions('jatsParser::references', [
+				'label' => __('plugins.generic.jatsParser.publication.jats.references.label'),
+				'description' => __('plugins.generic.jatsParser.publication.jats.references.description'),
+				'type' => 'radio',
+				'options' => $options,
+			]));
+		} else {
+			$submissionFile = array_shift($submissionFiles);
+			$form->addField(new \PKP\components\forms\FieldOptions('jatsParser::references', [
+				'label' => __('plugins.generic.jatsParser.publication.jats.references.label'),
+				'description' => __('plugins.generic.jatsParser.publication.jats.references.description'),
+				'type' => 'checkbox',
+				'options' => [
+					[
+						'value' => $submissionFile->getId(),
+						'label' => $submissionFile->getLocalizedName(),
+					],
+				],
+
+			]));
+		}
+
 	}
 }
