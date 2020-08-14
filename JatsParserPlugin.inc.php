@@ -16,6 +16,7 @@ import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.jatsParser.classes.JATSParserDocument');
 import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
 import('lib.pkp.classes.file.SubmissionFileManager');
+import('lib.pkp.classes.citation.Citation');
 
 use JATSParser\Body\Document;
 use JATSParser\PDF\TCPDFDocument;
@@ -45,10 +46,12 @@ class JatsParserPlugin extends GenericPlugin {
 			HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
 			HookRegistry::register('TemplateManager::display', array($this, 'previewFullTextCall'));
 			HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
-			HookRegistry::register('Publication::edit', array($this, 'editPublication'));
+			HookRegistry::register('Publication::edit', array($this, 'editPublicationFullText'));
 			HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
 			HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
 			HookRegistry::register('Form::config::before', array($this, 'addCitationsFormFields'));
+			HookRegistry::register('Publication::edit', array($this, 'editPublicationReferences'));
+			HookRegistry::register('citationdao::getAdditionalFieldNames', array($this, 'citationFieldNames'));
 
 			return true;
 		}
@@ -490,17 +493,8 @@ class JatsParserPlugin extends GenericPlugin {
 				"nullable"
 			]
 		}';
-		$propRef = '{
-			"type": "boolean",
-			"multilingual": true,
-			"apiSummary": true,
-			"validation": [
-				"nullable"
-			]
-		}';
 		$schema->properties->{'jatsParser::fullTextFileId'} = json_decode($propId);
 		$schema->properties->{'jatsParser::fullText'} = json_decode($propText);
-		$schema->properties->{'jatsParser::references'} = json_decode($propRef);
 	}
 
 	/**
@@ -609,7 +603,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * ]
 	 * @return bool
 	 */
-	function editPublication(string $hookname, array $args) {
+	function editPublicationFullText(string $hookname, array $args) {
 		$newPublication = $args[0];
 		$params = $args[2];
 		if (!array_key_exists('jatsParser::fullTextFileId', $params)) return false;
@@ -625,6 +619,77 @@ class JatsParserPlugin extends GenericPlugin {
 			$htmlDocument = $this->getFullTextFromJats($submissionFile);
 			$newPublication->setData('jatsParser::fullText', $htmlDocument->saveAsHTML(), $localeKey);
 		}
+
+		return false;
+	}
+
+	/**
+	 * @param string $hookname
+	 * @param array $args
+	 * @return bool
+	 * @brief modify citationsRaw property based on parsed citations from JATS XML
+	 */
+	function editPublicationReferences(string $hookname, array $args) {
+		$newPublication = $args[0];
+		$params = $args[2];
+		if (!array_key_exists('jatsParser::references', $params)) return false;
+
+		$fileId = $params['jatsParser::references'];
+		if (!$fileId) return false;
+
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY);
+		$htmlDocument = $this->getFullTextFromJats($submissionFile);
+
+		$request = $this->getRequest();
+		$context = $request->getContext();
+		$citationStyle = $this->getSetting($context->getId(), 'citationStyle');
+		$lang = str_replace('_', '-', $submissionFile->getSubmissionLocale());
+		$htmlDocument->setReferences($citationStyle, $lang, false);
+
+		$this->_importCitations($htmlDocument, $newPublication);
+
+		return false;
+	}
+
+	/**
+	 * @param HTMLDocument $htmlDocument
+	 * @param Publication $newPublication
+	 * @return void
+	 * @brief used instead of CitationDAO::importCitations
+	 */
+	private function _importCitations(HTMLDocument $htmlDocument, Publication $newPublication): void {
+		$refs = $htmlDocument->getRawReferences();
+		$publicationId = $newPublication->getId();
+		$citationDao = DAORegistry::getDAO('CitationDAO'); /** @var $citationDao CitationDAO */
+
+		$citationDao->deleteByPublicationId($publicationId);
+		$cslRefs = $htmlDocument->citeProcReferences;
+		$idColumn = array_column($cslRefs, 'id');
+		$seq = 0;
+
+		foreach ($refs as $key => $ref) {
+			$citation = new Citation($ref);
+			$citation->setData('publicationId', $publicationId);
+			$citation->setSequence(++$seq);
+
+			$cslKey = array_search($key, $idColumn);
+			if ($cslKey !== false) {
+				$citation->setData('jatsParser::csl', $cslRefs[$cslKey]);
+			}
+
+			$citationDao->insertObject($citation);
+		}
+	}
+
+	/**
+	 * @param $hookname string
+	 * @param $args array
+	 * @return bool
+	 */
+	function citationFieldNames($hookname, $args) {
+		$fields =& $args[1];
+		$fields[] = 'jatsParser::csl';
 
 		return false;
 	}
@@ -942,41 +1007,26 @@ class JatsParserPlugin extends GenericPlugin {
 
 		if (empty($submissionFiles)) return;
 
-		if (count($submissionFiles) > 1) {
-			$options = [];
-			foreach ($submissionFiles as $submissionFile) {
-				$options[] = [
-					'value' => $submissionFile->getId(),
-					'label' => $submissionFile->getLocalizedName(),
-				];
-			}
-
+		$options = [];
+		foreach ($submissionFiles as $submissionFile) {
 			$options[] = [
-				'value' => null,
-				'label' => __('common.default'),
+				'value' => $submissionFile->getId(),
+				'label' => $submissionFile->getLocalizedName(),
 			];
-
-			$form->addField(new \PKP\components\forms\FieldOptions('jatsParser::references', [
-				'label' => __('plugins.generic.jatsParser.publication.jats.references.label'),
-				'description' => __('plugins.generic.jatsParser.publication.jats.references.description'),
-				'type' => 'radio',
-				'options' => $options,
-			]));
-		} else {
-			$submissionFile = array_shift($submissionFiles);
-			$form->addField(new \PKP\components\forms\FieldOptions('jatsParser::references', [
-				'label' => __('plugins.generic.jatsParser.publication.jats.references.label'),
-				'description' => __('plugins.generic.jatsParser.publication.jats.references.description'),
-				'type' => 'checkbox',
-				'options' => [
-					[
-						'value' => $submissionFile->getId(),
-						'label' => $submissionFile->getLocalizedName(),
-					],
-				],
-
-			]));
 		}
+
+		$options[] = [
+			'value' => null,
+			'label' => __('common.default'),
+		];
+
+		$form->addField(new \PKP\components\forms\FieldOptions('jatsParser::references', [
+			'label' => __('plugins.generic.jatsParser.publication.jats.references.label'),
+			'description' => __('plugins.generic.jatsParser.publication.jats.references.description'),
+			'type' => 'radio',
+			'options' => $options,
+			'value' => null
+		]));
 
 	}
 }
