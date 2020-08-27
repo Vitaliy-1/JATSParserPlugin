@@ -51,7 +51,6 @@ class JatsParserPlugin extends GenericPlugin {
 			HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
 			HookRegistry::register('Form::config::before', array($this, 'addCitationsFormFields'));
 			HookRegistry::register('Publication::edit', array($this, 'editPublicationReferences'));
-			HookRegistry::register('citationdao::getAdditionalFieldNames', array($this, 'citationFieldNames'));
 
 			return true;
 		}
@@ -656,7 +655,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param HTMLDocument $htmlDocument
 	 * @param Publication $newPublication
 	 * @return void
-	 * @brief used instead of CitationDAO::importCitations
+	 * @brief saves parsed citeproc references as raw citations
 	 */
 	private function _importCitations(HTMLDocument $htmlDocument, Publication $newPublication): void {
 		$refs = $htmlDocument->getRawReferences();
@@ -664,34 +663,13 @@ class JatsParserPlugin extends GenericPlugin {
 		$citationDao = DAORegistry::getDAO('CitationDAO'); /** @var $citationDao CitationDAO */
 
 		$citationDao->deleteByPublicationId($publicationId);
-		$cslRefs = $htmlDocument->citeProcReferences;
-		$idColumn = array_column($cslRefs, 'id');
-		$seq = 0;
+		$rawCitations = '';
 
 		foreach ($refs as $key => $ref) {
-			$citation = new Citation($ref);
-			$citation->setData('publicationId', $publicationId);
-			$citation->setSequence(++$seq);
-
-			$cslKey = array_search($key, $idColumn);
-			if ($cslKey !== false) {
-				$citation->setData('jatsParser::csl', $cslRefs[$cslKey]);
-			}
-
-			$citationDao->insertObject($citation);
+			$rawCitations .= $ref . "\n";
 		}
-	}
 
-	/**
-	 * @param $hookname string
-	 * @param $args array
-	 * @return bool
-	 */
-	function citationFieldNames($hookname, $args) {
-		$fields =& $args[1];
-		$fields[] = 'jatsParser::csl';
-
-		return false;
+		$newPublication->setData('citationsRaw', $rawCitations);
 	}
 
 	/**
