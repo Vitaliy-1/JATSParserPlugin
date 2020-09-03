@@ -13,8 +13,8 @@
 require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 
 import('lib.pkp.classes.plugins.GenericPlugin');
-import('plugins.generic.jatsParser.classes.JATSParserDocument');
-import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
+import('plugins.generic.JATSParserPlugin.classes.JATSParserDocument');
+import('plugins.generic.JATSParserPlugin.classes.components.forms.PublicationJATSUploadForm');
 import('lib.pkp.classes.file.SubmissionFileManager');
 import('lib.pkp.classes.citation.Citation');
 
