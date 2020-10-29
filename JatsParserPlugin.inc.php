@@ -980,7 +980,10 @@ class JatsParserPlugin extends GenericPlugin {
 
 		$submissionFiles = [];
 		foreach ($submissionFileIds as $submissionFileId) {
-			$submissionFiles[] = $submissionFileDao->getLatestRevision($submissionFileId);
+			// Check if file ID is valid and object can be returned
+			if ($submissionFile = $submissionFileDao->getLatestRevision($submissionFileId)) {
+				$submissionFiles[] = $submissionFile;
+			}
 		}
 
 		if (empty($submissionFiles)) return;
