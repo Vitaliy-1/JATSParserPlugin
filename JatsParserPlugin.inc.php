@@ -668,6 +668,9 @@ class JatsParserPlugin extends GenericPlugin {
 				$fullText = $this->_setSupplImgPath($jatsSubmissionFile, $fullText);
 			}
 
+			// Set references
+			$fullText = $this->_setReferences($newPublication, $localeKey, $fullText);
+
 			// Finally, convert and receive TCPDF output as a binary string
 			$pdf = $this->pdfCreation($fullText, $newPublication, $request, $localeKey);
 
@@ -742,6 +745,30 @@ class JatsParserPlugin extends GenericPlugin {
 		$submissionFile = $submissionFileDao->insertObject($submissionFile, $tmpFile);
 		unlink($tmpFile);
 		return $submissionFile;
+	}
+
+	private function _setReferences(Publication $publication, string $locale, string $htmlString): string {
+		$rawCitations = $publication->getData('citationsRaw');
+		if (empty($rawCitations)) return $htmlString;
+
+		// Use OJS raw citations tokenizer
+		import('lib.pkp.classes.citation.CitationListTokenizerFilter');
+		$citationTokenizer = new CitationListTokenizerFilter();
+		$citationStrings = $citationTokenizer->execute($rawCitations);
+
+		if (!is_array($citationStrings) || empty($citationStrings)) return $htmlString;
+		$htmlString .= '<h2 class="article-section-title" id="reference-title">' . __('submission.citations', null, $locale) . '</h2>';
+		$htmlString .= "\n";
+		$htmlString .= '<ol id="references">';
+		$htmlString .= "\n";
+		foreach ($citationStrings as $citationString) {
+			$htmlString .= "\t";
+			$htmlString .= '<li>' . $citationString . '</li>';
+			$htmlString .= "\n";
+		}
+		$htmlString .= '</ol>';
+
+		return $htmlString;
 	}
 
 	/**
