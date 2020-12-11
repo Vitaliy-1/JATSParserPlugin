@@ -52,6 +52,8 @@
 	<message key="plugins.generic.jatsParser.publication.jats.references.label">Retrieve references from JATS XML?</message>
 	<message key="plugins.generic.jatsParser.publication.jats.references.description">Reference list will be retrieved from JATS XML and saved as a part of the publication. If references are already included into the publication, they are going to be rewritten.</message>
 	<message key="plugins.generic.jatsParser.publication.jats.links.label">Format in-text links to references?</message>
+	<message key="plugins.generic.jatsParser.publication.jats.pdf.label">Create PDF Galley?</message>
+	<message key="plugins.generic.jatsParser.publication.galley.pdf.label">PDF</message>
 
 	<!-- Citation Style Formats -->
 	<message key="plugins.generic.jatsParser.style.acm-sig-proceedings">ACM</message>
