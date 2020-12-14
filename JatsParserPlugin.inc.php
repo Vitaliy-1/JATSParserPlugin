@@ -259,8 +259,8 @@ class JatsParserPlugin extends GenericPlugin {
 			$articleDataString .= ", ". $pages;
 		}
 
-		if ($sectionTitle = $submission->getSectionTitle()) {
-			$articleDataString .= "\n" . $sectionTitle;
+		if ($doi = $publication->getData('pub-id::doi')) {
+			$articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
 		}
 
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getLocalizedName(), $articleDataString);
@@ -324,7 +324,6 @@ class JatsParserPlugin extends GenericPlugin {
 
 		$htmlString .= "\n" . '<style>' . "\n" . file_get_contents($this->getPluginPath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
 		$htmlString = $this->_prepareForPdfGalley($htmlString);
-		error_log($htmlString);
 		$pdfDocument->writeHTML($htmlString, true, false, true, false, '');
 
 		return $pdfDocument->Output('article.pdf', 'S');
