@@ -31,9 +31,6 @@ class JatsParserPlugin extends GenericPlugin {
 		if (parent::register($category, $path, $mainContextId)) {
 
 			if ($this->getEnabled()) {
-				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
-				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
-
 				// Add data to the publication
 				HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
 				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
@@ -111,108 +108,6 @@ class JatsParserPlugin extends GenericPlugin {
 				return new JSONMessage(true, $form->fetch($request));
 		}
 		return parent::manage($args, $request);
-	}
-
-	/**
-	 * Present the article wrapper page.
-	 * @param $hookName string
-	 * @param $args array
-	 * @return bool
-	 * @deprecated
-	 */
-	function articleViewCallback($hookName, $args) {
-		$request =& $args[0];
-		$issue =& $args[1];
-		$galley =& $args[2];
-		$article =& $args[3];
-
-		$context = $request->getContext();
-		$contextId = $context->getId();
-
-		if (($request->getQueryString() === CREATE_PDF_QUERY) && ($this->getSetting($contextId, 'convertToPdf'))) return false;
-
-		$xmlGalley = null;
-		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
-			$xmlGalley = $galley;
-		}
-
-		if (!$xmlGalley) return false;
-
-		$submissionFile = $xmlGalley->getFile();
-		$jatsDocument = new Document($submissionFile->getFilePath());
-
-		$templateMgr = TemplateManager::getManager($request);
-
-		//creating HTML Document
-		$htmlDocument = $this->htmlCreation($article, $templateMgr, $jatsDocument, $xmlGalley, $request);
-
-		// Recording a view
-		import('lib.pkp.classes.file.SubmissionFileManager');
-		$submissionFileManager = new SubmissionFileManager($article->getContextId(), $article->getId());
-		$submissionFileManager->recordView($xmlGalley->getFile());
-
-		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
-
-		$templateMgr->addStyleSheet('jatsParserStyles', $baseUrl . '/resources/styles/jatsParser.css');
-		$templateMgr->addStyleSheet('googleFonts', 'https://fonts.googleapis.com/css?family=PT+Serif:400,700&amp;subset=cyrillic');
-		$templateMgr->addJavaScript('jatsParserJavascript', $baseUrl . '/resources/javascript/jatsParser.js');
-
-		$orcidImage = $this->getPluginPath() . '/templates/images/orcid.png';
-
-		$templateMgr->assign(array(
-			'issue' => $issue,
-			'article' => $article,
-			'galley' => $galley,
-			'htmlDocument' => $htmlDocument->saveHTML(),
-			'pluginUrl' => $baseUrl,
-			'jatsParserOrcidImage' => $orcidImage,
-		));
-
-		if ($this->getSetting($contextId, 'convertToPdf')) {
-			$generatePdfUrl = $request->getCompleteUrl() . "?" . CREATE_PDF_QUERY;
-			$templateMgr->assign('generatePdfUrl', $generatePdfUrl);
-		}
-
-		$templateMgr->display($this->getTemplateResource('articleGalleyView.tpl'));
-
-		return false;
-	}
-
-	/**
-	 * Hadnling request to PDF download page.
-	 * @param $hookName string
-	 * @param $args array
-	 * @return bool
-	 *
-	 */
-	function pdfViewCallback($hookName, $args) {
-		/* @var $request Request */
-		$request =& $args[0];
-		$issue =& $args[1];
-		$galley =& $args[2];
-		$article =& $args[3];
-
-		if (($request->getQueryString() !== CREATE_PDF_QUERY) || (!$this->getSetting($request->getContext()->getId(), 'convertToPdf'))) return false;
-
-		$xmlGalley = null;
-		if ($galley && ($galley->getFileType() === "application/xml" || $galley->getFileType() == 'text/xml')) {
-			$xmlGalley = $galley;
-		}
-
-		if (!$xmlGalley) return false;
-
-		$submissionFile = $xmlGalley->getFile();
-		$jatsDocument = new Document($submissionFile->getFilePath());
-
-		$parseReferences = $this->getSetting($request->getContext()->getId(), 'references');
-		$htmlDocument = new JATSParserDocument($jatsDocument);
-		if ($parseReferences !== "ojsReferences") {
-			$htmlDocument->setReferences('vancouver', 'en-US', false);
-		}
-
-		$this->pdfCreation($article, $request, $htmlDocument, $issue, $xmlGalley);
-
-		return false;
 	}
 
 	/**
@@ -381,129 +276,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$modifiedHtmlString = preg_replace('/<p class="caption">\s*/', '<p class="caption">', $modifiedHtmlString);
 
 		return $modifiedHtmlString;
-	}
-
-	/**
-	 * @param $article Submission
-	 * @param $jatsDocument Document
-	 * @param $templateMgr TemplateManager
-	 * @param $request Request
-	 * @return $htmlDocument JATSParserDocument
-	 * @brief preparation of HTML file
-	 * @deprecated
-	 */
-	private function htmlCreation($article, $templateMgr, $jatsDocument, $embeddedXml, $request): JATSParserDocument
-	{
-		$context = $request->getContext();
-
-		$parseReferences = $this->getSetting($context->getId(), 'references');
-		$htmlDocument = new JATSParserDocument($jatsDocument);
-		if ($parseReferences !== "ojsReferences") {
-			$htmlDocument->setReferences('vancouver', 'en-US', false);
-		}
-
-		// HTML DOM
-		$xpath = new \DOMXPath($htmlDocument);
-
-		$this->imageUrlReplacement($embeddedXml, $xpath);
-
-		$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
-
-		// Localization of reference list title
-		$referenceTitles = $xpath->evaluate("//h2[@id='reference-title']");
-		$translateReference = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
-		if ($referenceTitles->length > 0) {
-			foreach ($referenceTitles as $referenceTitle) {
-				$referenceTitle->nodeValue = $translateReference;
-			}
-		}
-
-
-		return $htmlDocument;
-	}
-
-	/**
-	 * @param $embeddedXml
-	 * @param $xpath
-	 * @brief replacement for url to figures with actuall path
-	 * @deprecated
-	 */
-	private function imageUrlReplacement($embeddedXml, $xpath): void
-	{
-		$submissionFile = $embeddedXml->getFile();
-		$submissionId = $submissionFile->getSubmissionId();
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-		import('lib.pkp.classes.submission.SubmissionFile'); // Constants
-		$embeddableFiles = array_merge(
-			$submissionFileDao->getLatestRevisions($submissionFile->getSubmissionId(), SUBMISSION_FILE_PROOF),
-			$submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getFileId(), $submissionFile->getSubmissionId(), SUBMISSION_FILE_DEPENDENT)
-		);
-		$referredArticle = null;
-		$submissionDao = DAORegistry::getDAO('SubmissionDAO');
-		$imageUrlArray = array();
-		foreach ($embeddableFiles as $embeddableFile) {
-			$params = array();
-			if ($embeddableFile->getFileType() == 'image/png' || $embeddableFile->getFileType() == 'image/jpeg') {
-				// Ensure that the $referredArticle object refers to the article we want
-				if (!$referredArticle || $referredArticle->getId() != $submissionId) {
-					$referredArticle = $submissionDao->getById($submissionId);
-				}
-				$fileUrl = $this->getRequest()->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $embeddedXml->getBestGalleyId(), $embeddableFile->getFileId()), $params);
-				$imageUrlArray[$embeddableFile->getOriginalFileName()] = $fileUrl;
-			}
-		}
-
-		// Replace link with actual path
-		$imageLinks = $xpath->evaluate("//img");
-		foreach ($imageLinks as $imageLink) {
-			if ($imageLink->hasAttribute("src")) {
-				array_key_exists($imageLink->getAttribute("src"), $imageUrlArray);
-				$imageLink->setAttribute("src", $imageUrlArray[$imageLink->getAttribute("src")]);
-			}
-		}
-	}
-
-	/**
-	 * @param $article
-	 * @param $templateMgr
-	 * @param $htmlDocument
-	 * @param $request Request
-	 */
-	private function ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request): void
-	{
-		$citations = $article->getCurrentPublication()->getData("citationsRaw");
-		$parseReferences = $this->getSetting($request->getContext()->getId(), 'references');
-
-		if (($htmlDocument->useOjsReferences() && $citations && $parseReferences !== 'jatsReferences') || ($parseReferences === 'ojsReferences' && $citations)) {
-			$referenceTitle = $htmlDocument->createElement('h2');
-			$referenceTitle->setAttribute('id', 'reference-title');
-			$referenceTitle->setAttribute('class', 'article-section-title');
-			$referenceTitle->nodeValue = $templateMgr->smartyTranslate(array('key' =>'submission.citations'), $templateMgr);
-
-			$htmlDocument->appendChild($referenceTitle);
-
-			$parsedCitations = DAORegistry::getDAO('CitationDAO')->getByPublicationId($article->getId())->toArray();
-			if (!empty($parsedCitations)) {
-				foreach ($parsedCitations as $parsedCitation) {
-					$referenceList = $htmlDocument->createElement('ol');
-					$htmlDocument->appendChild($referenceList);
-					$referenceItem = $htmlDocument->createElement('li');
-					$referenceItem->nodeValue = $templateMgr->smartyEscape($parsedCitation->getRawCitation());
-					$referenceList->appendChild($referenceItem);
-				}
-			} else {
-				$resultArray = explode("\n", $citations);
-				$referenceList = $htmlDocument->createElement('p');
-				$htmlDocument->appendChild($referenceList);
-				foreach ($resultArray as $result) {
-					$textNode = $htmlDocument->createTextNode($templateMgr->smartyEscape($result));
-					$referenceList->appendChild($textNode);
-					$referenceList->appendChild($htmlDocument->createElement("br"));
-					$htmlDocument->appendChild($referenceList);
-				}
-			}
-
-		}
 	}
 
 	/**
@@ -802,6 +574,13 @@ class JatsParserPlugin extends GenericPlugin {
 		return $submissionFile;
 	}
 
+	/**
+	 * @param Publication $publication
+	 * @param string $locale
+	 * @param string $htmlString
+	 * @return string
+	 * @brief set references for PDF galley
+	 */
 	private function _setReferences(Publication $publication, string $locale, string $htmlString): string {
 		$rawCitations = $publication->getData('citationsRaw');
 		if (empty($rawCitations)) return $htmlString;
