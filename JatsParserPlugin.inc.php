@@ -30,27 +30,22 @@ class JatsParserPlugin extends GenericPlugin {
 	function register($category, $path, $mainContextId = null) {
 		if (parent::register($category, $path, $mainContextId)) {
 
-			// Return false if Lens is enabled
-			$pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
-			$context = $this->getRequest()->getContext();
-			$contextId = $context ? $context->getId() : 0;
-			$lensSettings = $pluginSettingsDAO->getPluginSettings($contextId, 'LensGalleyPlugin');
-
-			if ($this->getEnabled() && !$lensSettings['enabled']) {
+			if ($this->getEnabled()) {
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'));
 				HookRegistry::register('ArticleHandler::view::galley', array($this, 'pdfViewCallback'));
-			}
 
-			// Add data to the publication
-			HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
-			HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
-			HookRegistry::register('TemplateManager::display', array($this, 'previewFullTextCall'));
-			HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
-			HookRegistry::register('Publication::edit', array($this, 'editPublicationFullText'));
-			HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
-			HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
-			HookRegistry::register('Form::config::before', array($this, 'addCitationsFormFields'));
-			HookRegistry::register('Publication::edit', array($this, 'editPublicationReferences'));
+				// Add data to the publication
+				HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
+				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
+				HookRegistry::register('TemplateManager::display', array($this, 'previewFullTextCall'));
+				HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
+				HookRegistry::register('Publication::edit', array($this, 'editPublicationFullText'));
+				HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
+				HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
+				HookRegistry::register('Form::config::before', array($this, 'addCitationsFormFields'));
+				HookRegistry::register('Publication::edit', array($this, 'editPublicationReferences'));
+				HookRegistry::register('Publication::edit', array($this, 'createPdfGalley'), HOOK_SEQUENCE_LAST);
+			}
 
 			return true;
 		}
@@ -227,27 +222,21 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param $issue Issue
 	 * @param
 	 */
-	private function pdfCreation(Submission $article, Request $request, JATSParserDocument $htmlDocument, Issue $issue, ArticleGalley $xmlGalley): void
+	private function pdfCreation(string $htmlString, Publication $publication, Request $request, string $localeKey): string
 	{
 		// HTML preparation
-		$xpath = new \DOMXPath($htmlDocument);
-		$templateMgr = TemplateManager::getManager($request);
+		$context = $request->getContext(); /* @var $context Journal */
+		$submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
+		$issueDao = DAORegistry::getDAO('IssueDAO');
+		$issue = $issueDao->getBySubmissionId($submission->getId(), $context->getId());
 
-		$this->imageUrlReplacement($xmlGalley, $xpath);
-		$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
-
-		// Special treatment for table head
-		$tableHeadRows = $xpath->evaluate("//thead/tr");
-		foreach ($tableHeadRows as $tableHeadRow) {
-			$tableHeadRow->setAttribute("align", "center");
-			$tableHeadRow->setAttribute("style", "background-color:#f2e6ff;");
-		}
-
+		//$this->imageUrlReplacement($xmlGalley, $xpath);
+		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
 
 		// extends TCPDF object
 		$pdfDocument = new TCPDFDocument();
 
-		$pdfDocument->setTitle($article->getLocalizedFullTitle());
+		$pdfDocument->setTitle($publication->getLocalizedFullTitle());
 
 		// get the logo
 		$journal = $request->getContext();
@@ -260,20 +249,19 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		$pdfDocument->SetCreator(PDF_CREATOR);
-		$pdfDocument->SetAuthor($article->getAuthorString());
-		$pdfDocument->SetSubject($article->getLocalizedSubject());
-
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
+		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
+		$pdfDocument->SetSubject($publication->getLocalizedData('subject'));
 
 		$articleDataString = $issue->getIssueIdentification();
-		if ($article->getPages()) {
-			$articleDataString .= ", ". $article->getPages();
+		if ($pages = $publication->getLocalizedData('subject')) {
+			$articleDataString .= ", ". $pages;
 		}
 
-		if ($article->getSectionTitle()) {
-			$articleDataString .= "\n" . $article->getSectionTitle();
+		if ($doi = $publication->getData('pub-id::doi')) {
+			$articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
 		}
-
-		error_log(PDF_HEADER_LOGO_WIDTH);
 
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getLocalizedName(), $articleDataString);
 
@@ -288,20 +276,18 @@ class JatsParserPlugin extends GenericPlugin {
 
 		$pdfDocument->AddPage();
 
-		/* An example of using translations inside PHP */
-		//$translate = $templateMgr->smartyTranslate(array('key' =>'common.abstract'), $templateMgr);
-
 		// Article title
 
 		$pdfDocument->SetFillColor(255, 255, 255);
 		$pdfDocument->SetFont('dejavuserif', 'B', 20);
-		$pdfDocument->MultiCell('', '', $article->getLocalizedFullTitle(), 0, 'L', 1, 1, '' ,'', true);
+		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle(), 0, 'L', 1, 1, '' ,'', true);
 		$pdfDocument->Ln(6);
 
 		// Article's authors
-		if (count($article->getAuthors()) > 0) {
+		$authors = $publication->getData('authors');
+		if (count($authors) > 0) {
 			/* @var $author Author */
-			foreach ($article->getAuthors() as $author) {
+			foreach ($authors as $author) {
 				$pdfDocument->SetFont('dejavuserif', 'I', 10);
 
 				// Calculating the line height for author name and affiliation
@@ -323,12 +309,12 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		// Abstract
-		if ($article->getLocalizedAbstract()) {
+		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
 			$pdfDocument->setCellPaddings(5, 5, 5, 5);
 			$pdfDocument->SetFillColor(248, 248, 255);
 			$pdfDocument->SetFont('dejavuserif', '', 10);
 			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 140, 0)));
-			$pdfDocument->writeHTMLCell('', '', '', '', $article->getLocalizedAbstract(), 'B', 1, 1, true, 'J', true);
+			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
 			$pdfDocument->Ln(4);
 		}
 
@@ -336,11 +322,65 @@ class JatsParserPlugin extends GenericPlugin {
 		$pdfDocument->setCellPaddings(0, 0, 0, 0);
 		$pdfDocument->SetFont('dejavuserif', '', 10);
 
-		$htmlString = $htmlDocument->getHtmlForTCPDF();
-
+		$htmlString .= "\n" . '<style>' . "\n" . file_get_contents($this->getPluginPath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
+		$htmlString = $this->_prepareForPdfGalley($htmlString);
 		$pdfDocument->writeHTML($htmlString, true, false, true, false, '');
 
-		$pdfDocument->Output('article.pdf', 'I');
+		return $pdfDocument->Output('article.pdf', 'S');
+	}
+
+	/**
+	 * @param string $htmlString
+	 * @return string Preprocessed HTML string for TCPDF
+	 */
+	private function _prepareForPdfGalley(string $htmlString): string {
+
+		$dom = new DOMDocument('1.0', 'utf-8');
+		$htmlHead = "\n";
+		$htmlHead .= '<head>';
+		$htmlHead .= "\t" . '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+		$htmlHead .= "\n";
+		$htmlHead .= '</head>';
+		$dom->loadHTML($htmlHead . $htmlString);
+
+		// set style for figures and table
+		$xpath = new \DOMXPath($dom);
+
+		$tableNodes = $xpath->evaluate('//table');
+		foreach ($tableNodes as $tableNode) {
+			$tableNode->setAttribute('border', '1');
+			$tableNode->setAttribute('cellpadding', '2');
+		}
+
+		$captionNodes = $xpath->evaluate('//figure/p[@class="caption"]|//table/caption');
+		foreach ($captionNodes as $captionNode) {
+			$captionParts = $xpath->evaluate('span[@class="label"]|span[@class="title"]', $captionNode);
+			foreach ($captionParts as $captionPart) {
+				$emptyTextNode = $dom->createTextNode(' ');
+				$captionPart->appendChild($emptyTextNode);
+			}
+		}
+
+		// TCPDF doesn't recognize display property, insert div
+		$tableCaptions = $xpath->evaluate('//table/caption');
+		foreach ($tableCaptions as $tableCaption) {
+			/* @var $tableNode \DOMNode */
+			$tableNode = $tableCaption->parentNode;
+			$divNode = $dom->createElement('div');
+			$divNode->setAttribute('class', 'caption');
+			$nextToTableNode = $tableNode->nextSibling;
+			if ($nextToTableNode) {
+				$tableNode->parentNode->insertBefore($divNode, $nextToTableNode);
+			}
+			$divNode->appendChild($tableCaption);
+		}
+
+		// Remove redundant whitespaces before caption label
+		$modifiedHtmlString = $dom->saveHTML();
+		$modifiedHtmlString = preg_replace('/<caption>\s*/', '<br>' . '<caption>', $modifiedHtmlString);
+		$modifiedHtmlString = preg_replace('/<p class="caption">\s*/', '<p class="caption">', $modifiedHtmlString);
+
+		return $modifiedHtmlString;
 	}
 
 	/**
@@ -408,7 +448,7 @@ class JatsParserPlugin extends GenericPlugin {
 				if (!$referredArticle || $referredArticle->getId() != $submissionId) {
 					$referredArticle = $submissionDao->getById($submissionId);
 				}
-				$fileUrl = Application::getRequest()->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $embeddedXml->getBestGalleyId(), $embeddableFile->getFileId()), $params);
+				$fileUrl = $this->getRequest()->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $embeddedXml->getBestGalleyId(), $embeddableFile->getFileId()), $params);
 				$imageUrlArray[$embeddableFile->getOriginalFileName()] = $fileUrl;
 			}
 		}
@@ -655,6 +695,138 @@ class JatsParserPlugin extends GenericPlugin {
 	}
 
 	/**
+	 * @param string $hookname
+	 * @param array $args
+	 * @return false
+	 * @brief creates a PDF file and saves as a galley
+	 */
+	function createPdfGalley(string $hookname, array $args) {
+		$newPublication = $args[0]; /* @var $newPublication Publication */
+		$params = $args[2];
+		$request = $args[3];
+
+		if (!array_key_exists('jatsParser::pdfGalley', $params)) return false;
+		$submission = Services::get('submission')->get($newPublication->getData('submissionId')); /* @var $submission Submission */
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
+		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
+
+		$localePare = $params['jatsParser::pdfGalley'];
+		foreach ($localePare as $localeKey => $createPdf) {
+			$fullText = $newPublication->getData('jatsParser::fullText', $localeKey);
+			if (empty($fullText)) continue;
+			if (!$createPdf) continue;
+
+			// Set real path to images, attached to the original JATS XML file
+			$jatsFileId = $newPublication->getData('jatsParser::fullTextFileId', $localeKey);
+			$jatsSubmissionFile = $submissionFileDao->getLatestRevision($jatsFileId, null, $submission->getId());
+			if ($jatsSubmissionFile) {
+				$fullText = $this->_setSupplImgPath($jatsSubmissionFile, $fullText);
+			}
+
+			// Set references
+			$fullText = $this->_setReferences($newPublication, $localeKey, $fullText);
+
+			// Finally, convert and receive TCPDF output as a binary string
+			$pdf = $this->pdfCreation($fullText, $newPublication, $request, $localeKey);
+
+			// Create a PDF Galley
+			$galleyId = $this->createGalley($localeKey, $newPublication);
+			$galley = $articleGalleyDao->getByBestGalleyId($galleyId, $newPublication->getId());
+
+			// Create associated submission file and update the galley
+			$submissionFile = $this->_setPdfSubmissionFile($pdf, $newPublication, $galley);
+			if ($submissionFile) {
+				$galley->setFileId($submissionFile->getFileId());
+				$articleGalleyDao->updateObject($galley);
+			}
+			// remove galley if submission file is missing
+			else {
+				$articleGalleyDao->deleteObject($galley);
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param string $galleyLocale
+	 * @param Publication $publication
+	 * @return int
+	 * @brief create an empty galley
+	 */
+	function createGalley(string $galleyLocale, Publication $publication): int {
+		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
+		$articleGalley = $articleGalleyDao->newDataObject();
+		$articleGalley->setLocale($galleyLocale);
+		$articleGalley->setData('publicationId', $publication->getId());
+		$articleGalley->setLabel(__('plugins.generic.jatsParser.publication.galley.pdf.label'));
+		return $articleGalleyDao->insertObject($articleGalley);
+	}
+
+	/**
+	 * @param string $pdfBinaryString output of the TCPDF, binary string
+	 * @param Publication $publication publication associated with a submission file
+	 * @brief creates a new PDF submission file
+	 */
+	private function _setPdfSubmissionFile(string $pdfBinaryString, Publication $publication, ArticleGalley $galley) {
+		$submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
+
+		// Create a temporary file
+		$tmpFile = tempnam(sys_get_temp_dir(), 'jatsParser');
+		file_put_contents($tmpFile, $pdfBinaryString);
+
+		// Set main Submission File data
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
+		$submissionFile = $submissionFileDao->newDataObjectByGenreId(GENRE_CATEGORY_DOCUMENT); /* @var $submissionFile SubmissionFile */
+		$submissionFile->setAssocType(ASSOC_TYPE_GALLEY);
+		$submissionFile->setAssocId($galley->getId());
+		$submissionFile->setFileStage(SUBMISSION_FILE_PROOF);
+		$submissionFile->setSubmissionId($submission->getId());
+		$submissionFile->setFileType('application/pdf');
+		$submissionFile->setFileSize(filesize($tmpFile));
+		$submissionFile->setRevision(1);
+		$submissionFile->setDateUploaded(Core::getCurrentDate());
+		$submissionFile->setDateModified(Core::getCurrentDate());
+		$submissionFile->setUploaderUserId($this->getRequest()->getUser()->getId());
+		$submissionFile->setSubmissionLocale($galley->getLocale());
+
+		// Set original filename, get it from the JATS XML file
+		$jatsFileId = $publication->getData('jatsParser::fullTextFileId', $galley->getLocale());
+		$jatsFile = $submissionFileDao->getLatestRevision($jatsFileId, null, $submission->getId());
+		$filename = $jatsFile->getOriginalFileName() ?
+			pathinfo($jatsFile->getOriginalFileName())['filename'] . '.pdf' :
+			'document.pdf';
+		$submissionFile->setOriginalFileName($filename);
+		$submissionFile = $submissionFileDao->insertObject($submissionFile, $tmpFile);
+		unlink($tmpFile);
+		return $submissionFile;
+	}
+
+	private function _setReferences(Publication $publication, string $locale, string $htmlString): string {
+		$rawCitations = $publication->getData('citationsRaw');
+		if (empty($rawCitations)) return $htmlString;
+
+		// Use OJS raw citations tokenizer
+		import('lib.pkp.classes.citation.CitationListTokenizerFilter');
+		$citationTokenizer = new CitationListTokenizerFilter();
+		$citationStrings = $citationTokenizer->execute($rawCitations);
+
+		if (!is_array($citationStrings) || empty($citationStrings)) return $htmlString;
+		$htmlString .= '<h2 class="article-section-title" id="reference-title">' . __('submission.citations', null, $locale) . '</h2>';
+		$htmlString .= "\n";
+		$htmlString .= '<ol id="references">';
+		$htmlString .= "\n";
+		foreach ($citationStrings as $citationString) {
+			$htmlString .= "\t";
+			$htmlString .= '<li>' . $citationString . '</li>';
+			$htmlString .= "\n";
+		}
+		$htmlString .= '</ol>';
+
+		return $htmlString;
+	}
+
+	/**
 	 * @param Journal $context Journal
 	 * @return string
 	 * @brief Retrieve citation style format that should be supported by citeproc-php
@@ -813,6 +985,12 @@ class JatsParserPlugin extends GenericPlugin {
 						$submissionProps,
 						[$dependentFile->getAssocId(), $dependentFile->getFileId()]
 					));
+					break;
+				case 'editPublication':
+					// API Handler cannot process $op, $path or $anchor in url()
+					$image = file_get_contents($dependentFile->getFilePath());
+					$imageBase64 = base64_encode($image);
+					$filePath = '@' . $imageBase64; // Format, supported by TCPDF
 					break;
 			}
 

@@ -33,6 +33,7 @@
 	<message key="plugins.generic.jatsParser.settings.ojsReferences">Примусово відображати перелік посилань з OJS
 	</message>
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">За замовчуванням</message>
+	<message key="plugins.generic.jatsParser.publication.galley.pdf.label">PDF</message>
 
 	<message key="plugins.generic.jatsParser.publication.jats.label">Створити повний текст для статті із файлу формату JATS XML</message>
 	<message key="plugins.generic.jatsParser.galley.import">Завантаження гранок JATS XML</message>

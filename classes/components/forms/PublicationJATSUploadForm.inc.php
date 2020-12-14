@@ -32,6 +32,7 @@ class PublicationJATSUploadForm extends FormComponent {
 		$this->locales = $locales;
 
 		$options = [];
+		$pdfOptions = [];
 		foreach ($locales as $value) {
 			$locale = $value['key'];
 			$lang = [];
@@ -54,6 +55,11 @@ class PublicationJATSUploadForm extends FormComponent {
 			);
 
 			$options[$locale] = $lang;
+
+			$pdfOptions[$locale][] = array(
+				'value' => true,
+				'label' => __('common.yes')
+			);
 		}
 
 		if (!empty($options)) {
@@ -64,16 +70,11 @@ class PublicationJATSUploadForm extends FormComponent {
 				'type' => 'radio',
 				'options' => $options,
 				'value' => $publication->getData('jatsParser::fullTextFileId'),
-			]))->addField(new FieldOptions('jatsParser::linksToRefs', [
-				'label' => __('plugins.generic.jatsParser.publication.jats.links.label'),
+			]))->addField(new FieldOptions('jatsParser::pdfGalley', [
+				'label' => __('plugins.generic.jatsParser.publication.jats.pdf.label'),
 				'type' => 'checkbox',
-				'showWhen' => 'jatsParser::references',
-				'options' => [
-					[
-						'value' => true,
-						'label' => __('common.yes')
-					]
-				],
+				'isMultilingual' => true,
+				'options' => $pdfOptions,
 			]));
 		} else {
 			$this->addField(new FieldHTML("addProductionReadyFiles", array(
