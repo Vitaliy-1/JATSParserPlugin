@@ -12,7 +12,7 @@ span.notes, p.caption, table {
 	font-size: 10px;
 }
 
-.caption {
+div.caption {
 	line-height: 90%;
 }
 
