@@ -44,10 +44,10 @@
 	<message key="plugins.generic.jatsParser.galley.settings.display.description">These settings are applied to XML galleys on individual basis.</message>
 	<message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">This option allows to choose JATS XML galley that will be displayed on article landing page. Note that for this option to work, "Display galleys on article landing page" should be enabled via plugin's settings. By default the plugin will pick up the first uploaded XML galley.</message>
 	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">Display as a default</message>
-	<message key="plugins.generic.jatsParser.publication.jats.fulltext">Full-text upload</message>
+	<message key="plugins.generic.jatsParser.publication.jats.fulltext">Full Text</message>
 	<message key="plugins.generic.jatsParser.publication.jats.fulltext.success">Full-text upload successful</message>
-	<message key="plugins.generic.jatsParser.publication.jats.label">Generate article's fulltext from submission file in JATS XML format</message>
-	<message key="plugins.generic.jatsParser.publication.jats.description">The file can be uploaded as a production ready to be listed below.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.label">Create full text</message>
+	<message key="plugins.generic.jatsParser.publication.jats.description">Select a production ready file in JATS XML format to create the full text.</message>
 	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty">The list of JATS XML files is empty. Please, upload the file to the production stage and it will appear below for full-text generation.</message>
 	<message key="plugins.generic.jatsParser.publication.jats.references.label">Retrieve references from JATS XML?</message>
 	<message key="plugins.generic.jatsParser.publication.jats.references.description">Reference list will be retrieved from JATS XML and saved as a part of the publication. If references are already included into the publication, they are going to be rewritten.</message>
