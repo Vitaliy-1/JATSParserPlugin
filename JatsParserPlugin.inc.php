@@ -34,8 +34,7 @@ class JatsParserPlugin extends GenericPlugin {
 				// Add data to the publication
 				HookRegistry::register('Template::Workflow::Publication', array($this, 'publicationTemplateData'));
 				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
-				HookRegistry::register('TemplateManager::display', array($this, 'previewFullTextCall'));
-				HookRegistry::register('LoadHandler', array($this, 'loadPreviewHandler'));
+				HookRegistry::register('LoadHandler', array($this, 'loadFullTextAssocHandler'));
 				HookRegistry::register('Publication::edit', array($this, 'editPublicationFullText'));
 				HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
 				HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
@@ -364,40 +363,17 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr->display($this->getTemplateResource("workflowJatsFulltext.tpl"));
 	}
 
-	function previewFullTextCall(string $hookname, array $args) {
-		/**
-		 * @var $templateMgr TemplateManager
-		 */
-		$templateMgr = $args[0];
-		$template = $args[1];
-		$request = $this->getRequest();
-
-		if ($template != 'workflow/workflow.tpl') {
-			return false;
-		}
-
-		$templateMgr->addJavaScript('fulltextPreview', $request->getBaseUrl() . DIRECTORY_SEPARATOR . $this->getPluginPath() . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'preview.js', array('contexts' => 'backend'));
-
-		return false;
-	}
-
 	/**
 	 * @param $hookName string
 	 * @param $args array
-	 * @brief Controller for the preview page
+	 * @brief Handle associated files of the full-text, only images are supported
 	 */
-	function loadPreviewHandler($hookName, $args) {
+	function loadFullTextAssocHandler($hookName, $args) {
 		$page = $args[0];
 		$op = $args[1];
 		$request = $this->getRequest();
-		$userVars = $request->getUserVars();
 
-		if ($page == 'workflow' && (($op == 'fullTextPreview' && array_key_exists('_full-text-preview', $userVars)) || $op = 'downloadPreviewAssoc')) {
-			define('HANDLER_CLASS', 'FullTextPreviewHandler');
-			define('JATSPARSER_PLUGIN_NAME', $this->getName());
-			$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'FullTextPreviewHandler.inc.php';
-
-		} else if ($page == 'article' && $op == 'downloadFullTextAssoc') {
+		if ($page == 'article' && $op == 'downloadFullTextAssoc') {
 			define('HANDLER_CLASS', 'FullTextArticleHandler');
 			define('JATSPARSER_PLUGIN_NAME', $this->getName());
 			$args[2] = $this->getPluginPath() . DIRECTORY_SEPARATOR . 'FullTextArticleHandler.inc.php';
@@ -673,7 +649,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @param string $hookname
 	 * @param array $args
 	 * @return bool
-	 * @brief Displays full-text on article landing page and preview page
+	 * @brief Displays full-text on article landing page
 	 */
 	function displayFullText(string $hookname, array $args) {
 		$templateMgr =& $args[1];
@@ -688,41 +664,32 @@ class JatsParserPlugin extends GenericPlugin {
 		$submissionFile = null;
 
 		$request = $this->getRequest();
-		$requestedOp = $request->getRequestedOp();
 		$html = null;
 
-		if ($requestedOp === 'view') {
-			if (empty($fullTexts)) return false;
-			$currentLocale = AppLocale::getLocale();
-			if (array_key_exists($currentLocale, $fullTexts)) {
-				$html = $fullTexts[$currentLocale];
+		if (empty($fullTexts)) return false;
+		$currentLocale = AppLocale::getLocale();
+		if (array_key_exists($currentLocale, $fullTexts)) {
+			$html = $fullTexts[$currentLocale];
 
-				$submissionFileId = $publication->getData('jatsParser::fullTextFileId', $currentLocale);
-				$submissionFile = $submissionFileDao->getLatestRevision($submissionFileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
-			} else {
-				$locales = AppLocale::getAllLocales();
-				$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocale');
-				if (count($fullTexts) > 1) {
-					$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocales');
-				}
-
-				$html = '<p>' . $msg;
-				foreach ($fullTexts as $localeKey => $fullText) {
-					$html .= ' <a href="' . $request->url(null, 'user', 'setLocale', $localeKey) . '">' . $locales[$localeKey] . '</a>';
-					if ($fullText !== end($fullTexts)) {
-						$html .= ', ';
-					} else {
-						$html .= '.';
-					}
-				}
-				$html .= '</p>';
+			$submissionFileId = $publication->getData('jatsParser::fullTextFileId', $currentLocale);
+			$submissionFile = $submissionFileDao->getLatestRevision($submissionFileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
+		} else {
+			$locales = AppLocale::getAllLocales();
+			$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocale');
+			if (count($fullTexts) > 1) {
+				$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocales');
 			}
 
-		} else if ($requestedOp === 'fullTextPreview') {
-			$submissionFileId = $request->getUserVar('_full-text-preview');
-			$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-			$submissionFile = $submissionFileDao->getLatestRevision($submissionFileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
-			$html = $this->getFullTextFromJats($submissionFile)->saveAsHTML();
+			$html = '<p>' . $msg;
+			foreach ($fullTexts as $localeKey => $fullText) {
+				$html .= ' <a href="' . $request->url(null, 'user', 'setLocale', $localeKey) . '">' . $locales[$localeKey] . '</a>';
+				if ($fullText !== end($fullTexts)) {
+					$html .= ', ';
+				} else {
+					$html .= '.';
+				}
+			}
+			$html .= '</p>';
 		}
 
 		if (is_null($html)) return false;
@@ -756,15 +723,6 @@ class JatsParserPlugin extends GenericPlugin {
 			switch ($request->getRequestedOp()) {
 				case 'view':
 					$filePath = $request->url(null, 'article', 'downloadFullTextAssoc', array($submissionId, $dependentFile->getAssocId(), $dependentFile->getFileId()));
-					break;
-				case 'fullTextPreview':
-					$submission = Services::get('submission')->get($submissionId);
-					$submissionProps = Services::get('submission')->getProperties($submission, array('stageId'), array('request' => $request));
-					$filePath = $request->url(null, 'workflow', 'downloadPreviewAssoc', array_merge(
-						[$submissionId],
-						$submissionProps,
-						[$dependentFile->getAssocId(), $dependentFile->getFileId()]
-					));
 					break;
 				case 'editPublication':
 					// API Handler cannot process $op, $path or $anchor in url()
@@ -859,7 +817,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$templateMgr = $args[0];
 		$template = $args[1];
 
-		if ($template !== "frontend/pages/article.tpl" && $template !== "plugins-plugins-generic-jatsParser-generic-jatsParser:articleGalleyView.tpl") return false;
+		if ($template !== "frontend/pages/article.tpl") return false;
 
 		$request = $this->getRequest();
 		$baseUrl = $request->getBaseUrl() . '/' . $this->getPluginPath();
@@ -870,12 +828,7 @@ class JatsParserPlugin extends GenericPlugin {
 				$parentTheme = $themePlugin->parent;
 				// Chances are that child theme of a Default also need this styling
 				if ($themePlugin->getName() == "defaultthemeplugin" || ($parentTheme && $parentTheme->getName() == "defaultthemeplugin")) {
-					if ($template === "plugins-plugins-generic-jatsParser-generic-jatsParser:articleGalleyView.tpl") {
-						$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/galley.css');
-						$templateMgr->assign("isFullWidth", true); // remove sidebar for the Default theme
-					} else if ($template === "frontend/pages/article.tpl") {
-						$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/article.css');
-					}
+					$templateMgr->addStyleSheet('jatsParserThemeStyles', $baseUrl . '/resources/styles/default/article.css');
 				}
 			}
 		}

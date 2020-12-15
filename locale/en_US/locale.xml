@@ -47,8 +47,8 @@
 	<message key="plugins.generic.jatsParser.publication.jats.fulltext">Full-text upload</message>
 	<message key="plugins.generic.jatsParser.publication.jats.fulltext.success">Full-text upload successful</message>
 	<message key="plugins.generic.jatsParser.publication.jats.label">Generate article's fulltext from submission file in JATS XML format</message>
-	<message key="plugins.generic.jatsParser.publication.jats.description"><![CDATA[The file can be uploaded as a production ready to be listed below. To see the preview, please, follow the <a id="jatsParser__linkPreview" href="{$previewPath}" target="_blank">link</a> after choosing an item from the list.]]></message>
-	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty"><![CDATA[The list of JATS XML files is empty. Please, upload the file to the production stage and it will appear below for full-text generation.]]></message>
+	<message key="plugins.generic.jatsParser.publication.jats.description">The file can be uploaded as a production ready to be listed below.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty">The list of JATS XML files is empty. Please, upload the file to the production stage and it will appear below for full-text generation.</message>
 	<message key="plugins.generic.jatsParser.publication.jats.references.label">Retrieve references from JATS XML?</message>
 	<message key="plugins.generic.jatsParser.publication.jats.references.description">Reference list will be retrieved from JATS XML and saved as a part of the publication. If references are already included into the publication, they are going to be rewritten.</message>
 	<message key="plugins.generic.jatsParser.publication.jats.links.label">Format in-text links to references?</message>
