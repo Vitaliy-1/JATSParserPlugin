@@ -62,6 +62,11 @@ class PublicationJATSUploadForm extends FormComponent {
 			);
 		}
 
+		// Update the values so the proper option is selected on thr form initiation if full-text isn't selected for the specific locale
+		$values = $publication->getData('jatsParser::fullTextFileId');
+		$emptyValues = array_fill_keys(array_keys($options), null);
+		empty($values) ? $values = $emptyValues : $values = array_merge($emptyValues, $values);
+
 		if (!empty($options)) {
 			$this->addField(new FieldOptions('jatsParser::fullTextFileId', [
 				'label' => __('plugins.generic.jatsParser.publication.jats.label'),
@@ -69,7 +74,7 @@ class PublicationJATSUploadForm extends FormComponent {
 				'isMultilingual' => true,
 				'type' => 'radio',
 				'options' => $options,
-				'value' => $publication->getData('jatsParser::fullTextFileId'),
+				'value' => $values,
 			]))->addField(new FieldOptions('jatsParser::pdfGalley', [
 				'label' => __('plugins.generic.jatsParser.publication.jats.pdf.label'),
 				'type' => 'checkbox',

@@ -400,6 +400,7 @@ class JatsParserPlugin extends GenericPlugin {
 		foreach ($localePare as $localeKey => $fileId) {
 			if (empty($fileId)) {
 				$newPublication->setData('jatsParser::fullText', null, $localeKey);
+				$newPublication->setData('jatsParser::fullTextFileId', null, $localeKey);
 				continue;
 			}
 			$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY);
