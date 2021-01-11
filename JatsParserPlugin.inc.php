@@ -148,7 +148,12 @@ class JatsParserPlugin extends GenericPlugin {
 		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
 		$pdfDocument->SetSubject($publication->getLocalizedData('subject'));
 
-		$articleDataString = $issue->getIssueIdentification();
+		$articleDataString = '';
+
+		if ($issue && $issueIdentification = $issue->getIssueIdentification()) {
+			$articleDataString .= $issueIdentification;
+		}
+
 		if ($pages = $publication->getLocalizedData('subject')) {
 			$articleDataString .= ", ". $pages;
 		}
