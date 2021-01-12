@@ -538,7 +538,9 @@ class JatsParserPlugin extends GenericPlugin {
 		// Set main Submission File data
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
 		$submissionFile = $submissionFileDao->newDataObjectByGenreId(GENRE_CATEGORY_DOCUMENT); /* @var $submissionFile SubmissionFile */
-		$submissionFile->setGenreId(GENRE_CATEGORY_DOCUMENT);
+		$genreDAO = DAORegistry::getDAO('GenreDAO');
+		$genre = $genreDAO->getByKey('SUBMISSION', $submission->getData('contextId'));
+		$submissionFile->setGenreId($genre->getId());
 		$submissionFile->setAssocType(ASSOC_TYPE_GALLEY);
 		$submissionFile->setAssocId($galley->getId());
 		$submissionFile->setFileStage(SUBMISSION_FILE_PROOF);
