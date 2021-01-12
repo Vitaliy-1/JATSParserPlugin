@@ -39,4 +39,20 @@
 	<message key="plugins.generic.jatsParser.galley.import">Завантаження гранок JATS XML</message>
 	<message key="plugins.generic.jatsParser.galley.import.description">Ця опція дозволяє завантажити повний текст для всіх публікацій із гранок у форматі JATS XML. Завантаження не відбудеться якщо публікація вже має повний текст. Імпорт почнеться одразу після збереження цієї форми</message>
 	<message key="plugins.generic.jatsParser.galley.import.title">Завантаження повного тексту із гранок</message>
+
+	<!-- Plugin galley settings -->
+	<message key="plugins.generic.jatsParser.galley.settings.display">Показати налаштування</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.description">Ці налаштування застосовуються індивідуально для XML гранок.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">Відображати за замовчуванням</message>
+	<message key="plugins.generic.jatsParser.publication.jats.fulltext">Повний текст</message>
+	<message key="plugins.generic.jatsParser.publication.jats.fulltext.success">Повний текст успішно завантажився</message>
+	<message key="plugins.generic.jatsParser.publication.jats.label">Створити повний текст</message>
+	<message key="plugins.generic.jatsParser.publication.jats.description">Виберіть зверстаний файл у форматі JATS XML для створення повного тексту.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty">Список файлів у форматі JATS XML порожній. Будь ласка, завантажте файл на стадії верстки для того, щоб він став доступний для створення повного тексту.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.references.label">Взяти бібліографічний список з JATS XML файлу?</message>
+	<message key="plugins.generic.jatsParser.publication.jats.references.description">Бібліографічний список буде взятий із JATS XML та збережений як частина публікації. Всі посилання, вже включені у публікацію, будуть переписані.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.links.label">Відформатувати посилання на бібліографічний список в тексті статті?</message>
+	<message key="plugins.generic.jatsParser.publication.jats.pdf.label">Створити PDF гранку?</message>
+	<message key="plugins.generic.jatsParser.publication.galley.pdf.label">PDF</message>
+
 </locale>

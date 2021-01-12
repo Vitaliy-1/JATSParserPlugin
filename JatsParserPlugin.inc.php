@@ -130,7 +130,7 @@ class JatsParserPlugin extends GenericPlugin {
 		// extends TCPDF object
 		$pdfDocument = new TCPDFDocument();
 
-		$pdfDocument->setTitle($publication->getLocalizedFullTitle());
+		$pdfDocument->setTitle($publication->getLocalizedFullTitle($localeKey));
 
 		// get the logo
 		$journal = $request->getContext();
@@ -146,7 +146,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
 		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
 		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
-		$pdfDocument->SetSubject($publication->getLocalizedData('subject'));
+		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
 
 		$articleDataString = '';
 
@@ -154,7 +154,7 @@ class JatsParserPlugin extends GenericPlugin {
 			$articleDataString .= $issueIdentification;
 		}
 
-		if ($pages = $publication->getLocalizedData('subject')) {
+		if ($pages = $publication->getLocalizedData('subject', $localeKey)) {
 			$articleDataString .= ", ". $pages;
 		}
 
@@ -162,7 +162,7 @@ class JatsParserPlugin extends GenericPlugin {
 			$articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
 		}
 
-		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getLocalizedName(), $articleDataString);
+		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
 
 		$pdfDocument->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 		$pdfDocument->setFooterFont(Array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
@@ -179,7 +179,7 @@ class JatsParserPlugin extends GenericPlugin {
 
 		$pdfDocument->SetFillColor(255, 255, 255);
 		$pdfDocument->SetFont('dejavuserif', 'B', 20);
-		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle(), 0, 'L', 1, 1, '' ,'', true);
+		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'L', 1, 1, '' ,'', true);
 		$pdfDocument->Ln(6);
 
 		// Article's authors
@@ -190,19 +190,21 @@ class JatsParserPlugin extends GenericPlugin {
 				$pdfDocument->SetFont('dejavuserif', 'I', 10);
 
 				// Calculating the line height for author name and affiliation
+				$authorName = htmlspecialchars($author->getGivenName($localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($localeKey));
+				$affiliation = htmlspecialchars($author->getAffiliation($localeKey));
 
 				$authorLineWidth = 60;
-				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, htmlspecialchars($author->getFullName()));
+				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, $authorName);
 
 				$affiliationLineWidth = 110;
-				$afilliationStringHeight = $pdfDocument->getStringHeight(110, htmlspecialchars($author->getLocalizedAffiliation()));
+				$afilliationStringHeight = $pdfDocument->getStringHeight(110, $affiliation);
 
 				$authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
 
 				// Writing affiliations into cells
-				$pdfDocument->MultiCell($authorLineWidth, 0, htmlspecialchars($author->getFullName()), 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
+				$pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
 				$pdfDocument->SetFont('dejavuserif', '', 10);
-				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, htmlspecialchars($author->getLocalizedAffiliation()), 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
+				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
 			}
 			$pdfDocument->Ln(6);
 		}
@@ -476,6 +478,10 @@ class JatsParserPlugin extends GenericPlugin {
 			if ($jatsSubmissionFile) {
 				$fullText = $this->_setSupplImgPath($jatsSubmissionFile, $fullText);
 			}
+
+			// Add required locale components
+			AppLocale::requireComponents(LOCALE_COMPONENT_PKP_SUBMISSION, $localeKey);
+			AppLocale::registerLocaleFile($localeKey, 'plugins/pubIds/doi/locale/' . $localeKey . '/locale.po');
 
 			// Set references
 			$fullText = $this->_setReferences($newPublication, $localeKey, $fullText);
