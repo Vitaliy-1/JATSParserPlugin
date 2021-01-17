@@ -29,8 +29,8 @@
 	<!-- Plugin settings -->
 	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Einstellungen</message>
 	<message key="plugins.generic.jatsParser.settings.description">JATSParser Plugin Einstellungen Menü</message>
-	<message key="plugins.generic.jatsParser.settings.jatsReferences">Anzeiege der Literatur aus JATS XML erzwingen</message>
-	<message key="plugins.generic.jatsParser.settings.ojsReferences">Anzeiege der Literatur aus OJS erzwingen</message>
+	<message key="plugins.generic.jatsParser.settings.jatsReferences">Anzeige der Literatur aus JATS XML erzwingen</message>
+	<message key="plugins.generic.jatsParser.settings.ojsReferences">Anzeige der Literatur aus OJS erzwingen</message>
 	<message key="plugins.generic.jatsParser.settings.defaultReferences">Voreinstellung</message>
 	<message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">Dem Plugin erlauben, konvertierte JATS XML Fahnen auf der Landingpage anzuzeigen. Gem. Voreinstellung werden die ersten zwei generierten XML Fahnen angezeigt. Dies kann für jede Fahne individuell via JATS Parser Fahnen Einstellungen festgelegt werden.</message>
 	<message key="plugins.generic.jatsParser.settings.display.articlePage">JATS XML auf der Artikel Landingpage anzeigen</message>
