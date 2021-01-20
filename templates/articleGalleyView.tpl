@@ -1,5 +1,5 @@
 {**
- * plugins/generic/jatsParser/templates/articleView.tpl
+ * plugins/generic/jatsParser/templates/articleGalleyView.tpl
  *
  * Copyright (c) 2017-2018 Vitalii Bezsheiko
  * Distributed under the GNU GPL v3.
