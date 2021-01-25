@@ -1,0 +1,73 @@
+?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/jatsParser/locale/pt_PT/locale.xml
+  *
+  * Copyright (c) 2017 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
+  * Distributed under the GNU GPL v3.
+  *
+  * jatsParser plugin localization strings
+  -->
+
+<locale name="en_US" full_name="U.S. English">
+	<message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
+	<message key="plugins.generic.jatsParser.description">Este plugin transforma o JATS XML em HTML e PDF para visualização pública da revista</message>
+	<message key="plugins.generic.jatsParser.galleys.info">Ver trabalho noutros formatos</message>
+	<message key="plugins.generic.jatsParser.navigation.article">Trabalho</message>
+	<message key="plugins.generic.jatsParser.navigation.details">Detalhes</message>
+	<message key="plugins.generic.jatsParser.navigation.metrics">Métricas</message>
+	<message key="plugins.generic.jatsParser.openAccess.label">Acesso Aberto</message>
+	<message key="plugins.generic.jatsParser.references.link">Procurar no texto</message>
+	<message key="plugins.generic.jatsParser.pdf.read.label">Ler como PDF</message>
+	<message key="plugins.generic.jatsParser.pdf.read.symbol-text">PDF</message>
+	<message key="plugins.generic.jatsParser.article.authorBio">Biografia</message>
+
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocale">O texto integral deste trabalho está disponível neste idioma:</message>
+	<message key="plugins.generic.jatsParser.article.fulltext.availableLocales">O texto integral deste trabalho está disponível nestes idiomas:</message>
+
+	<!-- Plugin settings -->
+	<message key="plugins.generic.jatsParser.workflow.settings">Configurações do JATS Parser</message>
+	<message key="plugins.generic.jatsParser.settings.description">Menu de configurações do JATSParser plugin</message>
+	<message key="plugins.generic.jatsParser.settings.jatsReferences">Apresentar referências bibliográficas do JATS XML</message>
+	<message key="plugins.generic.jatsParser.settings.ojsReferences">Apresentar referências bibliográficas do OJS</message>
+	<message key="plugins.generic.jatsParser.settings.defaultReferences">Definições padrão</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">Permitir ao plugin apresentar o conteúdo do JATS XML na página de apresentação do trabalho. Será apresentado o primeiro ficheiro XML mas pode alterar esta configuração através dos formatos de publicação.</message>
+	<message key="plugins.generic.jatsParser.settings.display.articlePage">Apresentar conteúdo do JATS XML na página de apresentação do trabalho.</message>
+	<message key="plugins.generic.jatsParser.settings.display.pdf">Converter JATS XML para PDF</message>
+	<message key="plugins.generic.jatsParser.galley.import">Importar ficheiros JATS XML</message>
+	<message key="plugins.generic.jatsParser.galley.import.description">Esta opção permite guardar o JATS XML como texto integral em todas as publicações da revista. A importação será omissa caso já possua um texto integral para um determinado formato de publicação. O processamento será iniciado assim que guardar este formulário.</message>
+	<message key="plugins.generic.jatsParser.galley.import.title">Importar texto integral dos ficheiros de publicação</message>
+
+	<!-- Plugin galley settings -->
+	<message key="plugins.generic.jatsParser.galley.settings.display">Configurações de Apresentação</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.description">Estas configurações são aplicadas ao formato XML de forma individual.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">Esta opção permite escolher o formato JATS XML que será apresentado na página de apresentação do trabalho. Para que esta opção funcione dever ativar a opção "Apresentar conteúdo do JATS XML na página de apresentação do trabalho." nas configurações do plugin. Será apresentado o primeiro ficheiro XML disponível mas pode editar para cada trabalho.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">Apresentação padrão</message>
+	<message key="plugins.generic.jatsParser.publication.jats.fulltext">Texto Integral</message>
+	<message key="plugins.generic.jatsParser.publication.jats.fulltext.success">Texto Integral carregado com sucesso</message>
+	<message key="plugins.generic.jatsParser.publication.jats.label">Criar texto integral</message>
+	<message key="plugins.generic.jatsParser.publication.jats.description">Seleccionar um ficheiro de produção em JATS-XML para criar o texto integral.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.descriptionEmpty">Não existem ficheiros em JATS-XML. Carregue um no passo de produção e ficará disponível abaixo para que seja gerado o texto integral.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.references.label">Extrair referências bibliográficas do JATS XML?</message>
+	<message key="plugins.generic.jatsParser.publication.jats.references.description">A lista de referências bibliográficas será extraída do JATS XML e guardada como parte da publicação. Se as referências já existem na publicação serão substituídas após este processo.</message>
+	<message key="plugins.generic.jatsParser.publication.jats.links.label">Formatar ligações às referências bibliográficas no texto?</message>
+	<message key="plugins.generic.jatsParser.publication.jats.pdf.label">Criar formato PDF?</message>
+	<message key="plugins.generic.jatsParser.publication.galley.pdf.label">PDF</message>
+
+	<!-- Citation Style Formats -->
+	<message key="plugins.generic.jatsParser.style.acm-sig-proceedings">ACM</message>
+	<message key="plugins.generic.jatsParser.style.acs-nano">ACS</message>
+	<message key="plugins.generic.jatsParser.style.apa">APA</message>
+	<message key="plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas">ABNT</message>
+	<message key="plugins.generic.jatsParser.style.chicago-author-date">Chicago</message>
+	<message key="plugins.generic.jatsParser.style.harvard-cite-them-right">Harvard</message>
+	<message key="plugins.generic.jatsParser.style.ieee">IEEE</message>
+	<message key="plugins.generic.jatsParser.style.modern-language-association">MLA</message>
+	<message key="plugins.generic.jatsParser.style.turabian-fullnote-bibliography">Turabian</message>
+	<message key="plugins.generic.jatsParser.style.vancouver">Vancouver</message>
+	<message key="plugins.generic.jatsParser.style.custom">Outros estilos de citação</message>
+	<message key="plugins.generic.jatsParser.style.description"><![CDATA[Os formatos das referências bibliográficas suportados pelo plugin. Para outros formatos, visite o <a target="_blank" href="https://github.com/citation-style-language/styles">repositório CSL</a> para verificar se é suportado.]]></message>
+	<message key="plugins.generic.jatsParser.style.label">e.g.: american-medical-association</message>
+
+</locale>
