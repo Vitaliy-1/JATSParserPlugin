@@ -38,9 +38,9 @@ class PublicationJATSUploadForm extends FormComponent {
 			$lang = [];
 			if (empty($submissionFiles)) break;
 			foreach ($submissionFiles as $submissionFile) {
-				$subName = $submissionFile->getName($locale);
+				$subName = $submissionFile->getData('name', $locale);
 				if (empty($subName)) {
-					$subName = $submissionFile->getLocalizedName();
+					$subName = $submissionFile->getLocalizedData('name');
 				}
 				$lang[] = array(
 					'value' => $submissionFile->getId(),
