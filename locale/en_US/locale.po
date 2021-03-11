@@ -17,33 +17,6 @@ msgstr "JATSParser Plugin"
 msgid "plugins.generic.jatsParser.description"
 msgstr "The plugin transforms JATS XML into HTML and PDF for viewing on the journal's front-end"
 
-msgid "plugins.generic.jatsParser.galleys.info"
-msgstr "View article in other formats"
-
-msgid "plugins.generic.jatsParser.navigation.article"
-msgstr "Article"
-
-msgid "plugins.generic.jatsParser.navigation.details"
-msgstr "Details"
-
-msgid "plugins.generic.jatsParser.navigation.metrics"
-msgstr "Metrics"
-
-msgid "plugins.generic.jatsParser.openAccess.label"
-msgstr "open access"
-
-msgid "plugins.generic.jatsParser.references.link"
-msgstr "Find in text"
-
-msgid "plugins.generic.jatsParser.pdf.read.label"
-msgstr "Read as PDF"
-
-msgid "plugins.generic.jatsParser.pdf.read.symbol-text"
-msgstr "PDF"
-
-msgid "plugins.generic.jatsParser.article.authorBio"
-msgstr "Bio"
-
 msgid "plugins.generic.jatsParser.article.fulltext.availableLocale"
 msgstr "Full-text of the article is available for this locale:"
 
@@ -56,14 +29,8 @@ msgstr "JATS Parser Settings"
 msgid "plugins.generic.jatsParser.settings.description"
 msgstr "JATSParser plugin settings menu"
 
-msgid "plugins.generic.jatsParser.galley.settings.display.articlePage.description"
-msgstr "Allow plugin to display converted JATS XML galleys on article landing page. By default the first XML galley fetched will be displayed. This can be changed individually via JATS Parser galley settings under each uploaded galley."
-
-msgid "plugins.generic.jatsParser.settings.display.articlePage"
-msgstr "Display JATS XML on article landing page"
-
-msgid "plugins.generic.jatsParser.settings.display.pdf"
-msgstr "Convert JATS XML to PDF"
+msgid "plugins.generic.jatsParser.settings.covert.pdf"
+msgstr "Activate JATS XML to PDF conversion"
 
 msgid "plugins.generic.jatsParser.galley.import"
 msgstr "Import of JATS XML galleys"
@@ -73,18 +40,6 @@ msgstr "This options allows to save JATS XML galleys as a full-text across all p
 
 msgid "plugins.generic.jatsParser.galley.import.title"
 msgstr "Import full-text from galleys"
-
-msgid "plugins.generic.jatsParser.galley.settings.display"
-msgstr "Display Settings"
-
-msgid "plugins.generic.jatsParser.galley.settings.display.description"
-msgstr "These settings are applied to XML galleys on individual basis."
-
-msgid "plugins.generic.jatsParser.galley.settings.displayDefault.description"
-msgstr "This option allows to choose JATS XML galley that will be displayed on article landing page. Note that for this option to work, \"Display galleys on article landing page\" should be enabled via plugin's settings. By default the plugin will pick up the first uploaded XML galley."
-
-msgid "plugins.generic.jatsParser.galley.settings.displayDefault"
-msgstr "Display as a default"
 
 msgid "plugins.generic.jatsParser.publication.jats.fulltext"
 msgstr "Full Text"
@@ -106,9 +61,6 @@ msgstr "Retrieve references from JATS XML?"
 
 msgid "plugins.generic.jatsParser.publication.jats.references.description"
 msgstr "Reference list will be retrieved from JATS XML and saved as a part of the publication. If references are already included into the publication, they are going to be rewritten."
-
-msgid "plugins.generic.jatsParser.publication.jats.links.label"
-msgstr "Format in-text links to references?"
 
 msgid "plugins.generic.jatsParser.publication.jats.pdf.label"
 msgstr "Create PDF Galley?"
@@ -154,3 +106,6 @@ msgstr "The style format for references parsed by the plugin. For other styles, 
 
 msgid "plugins.generic.jatsParser.style.label"
 msgstr "e.g.: american-medical-association"
+
+msgid "plugins.generic.jatsParser.publication.jats.links.label"
+msgstr "Format in-text links to references?"

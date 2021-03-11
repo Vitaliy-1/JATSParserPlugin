@@ -461,6 +461,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$request = $args[3];
 
 		if (!array_key_exists('jatsParser::pdfGalley', $params)) return false;
+		if (!$this->getSetting($request->getContext()->getId(), 'convertToPdf')) return false;
 
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
 

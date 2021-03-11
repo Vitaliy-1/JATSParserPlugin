@@ -20,7 +20,7 @@
 
 	{fbvFormArea id="jatsParserSettingsFormArea" title="plugins.generic.jatsParser.settings.description"}
 		{fbvFormSection list=true}
-			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.display.pdf"}
+			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.convert.pdf"}
 		{/fbvFormSection}
 
 		{assign var='otherStyleValue' value=true}
