@@ -22,7 +22,6 @@ use JATSParser\Body\Document;
 use JATSParser\PDF\TCPDFDocument;
 use JATSParser\HTML\Document as HTMLDocument;
 use \PKP\components\forms\FormComponent;
-use APP\Services\SubmissionFileService;
 
 define("CREATE_PDF_QUERY", "download=pdf");
 
@@ -381,7 +380,6 @@ class JatsParserPlugin extends GenericPlugin {
 	function loadFullTextAssocHandler($hookName, $args) {
 		$page = $args[0];
 		$op = $args[1];
-		$request = $this->getRequest();
 
 		if ($page == 'article' && $op == 'downloadFullTextAssoc') {
 			define('HANDLER_CLASS', 'FullTextArticleHandler');
@@ -463,8 +461,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$request = $args[3];
 
 		if (!array_key_exists('jatsParser::pdfGalley', $params)) return false;
-		$submission = Services::get('submission')->get($newPublication->getData('submissionId')); /* @var $submission Submission */
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
+
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
 
 		$localePare = $params['jatsParser::pdfGalley'];
@@ -683,7 +680,6 @@ class JatsParserPlugin extends GenericPlugin {
 		$output =& $args[2];
 		$publication = $templateMgr->getTemplateVars('publication');
 		$submission = $templateMgr->getTemplateVars('article');
-		$submissionId = $submission->getId();
 		$fullTexts = $publication->getData('jatsParser::fullText');
 
 		$submissionFileId = 0;
