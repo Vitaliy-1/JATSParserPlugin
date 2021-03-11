@@ -46,7 +46,6 @@ class JatsParserSettingsForm extends Form {
 		$contextId = $this->_journalId ;
 		$plugin = $this->_plugin;
 
-		$this->setData('references', $plugin->getSetting($contextId, 'references'));
 		$this->setData('convertToPdf', $plugin->getSetting($contextId, 'convertToPdf'));
 		$this->setData('citationStyle', $plugin->getSetting($contextId, 'citationStyle'));
 	}
@@ -55,7 +54,7 @@ class JatsParserSettingsForm extends Form {
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('references', 'convertToPdf', 'citationStyle', 'customStyleInput', 'galleysImport'));
+		$this->readUserVars(array('convertToPdf', 'citationStyle', 'customStyleInput', 'galleysImport'));
 	}
 
 	/**
@@ -77,8 +76,6 @@ class JatsParserSettingsForm extends Form {
 	function execute(...$functionArgs) {
 		$plugin = $this->_plugin;
 		$contextId = $this->_journalId ;
-
-		$plugin->updateSetting($contextId, 'references', $this->getData('references'));
 
 		$convertToPdf = $this->getData('convertToPdf');
 		if (!$convertToPdf) {
