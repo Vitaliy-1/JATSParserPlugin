@@ -20,12 +20,7 @@
 
 	{fbvFormArea id="jatsParserSettingsFormArea" title="plugins.generic.jatsParser.settings.description"}
 		{fbvFormSection list=true}
-			{fbvElement type="radio" id="jatsReferences" name="references" value="jatsReferences" checked=$references|compare:"jatsReferences" label="plugins.generic.jatsParser.settings.jatsReferences"}
-			{fbvElement type="radio" id="ojsReferences" name="references" value="ojsReferences" checked=$references|compare:"ojsReferences" label="plugins.generic.jatsParser.settings.ojsReferences"}
-			{fbvElement type="radio" id="defaultReferences" name="references" value="defaultReferences" checked=$references|compare:"defaultReferences" label="plugins.generic.jatsParser.settings.defaultReferences"}
-		{/fbvFormSection}
-		{fbvFormSection list=true}
-			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.display.pdf"}
+			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.convert.pdf"}
 		{/fbvFormSection}
 
 		{assign var='otherStyleValue' value=true}

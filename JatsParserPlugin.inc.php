@@ -15,8 +15,8 @@ require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.jatsParser.classes.JATSParserDocument');
 import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
-import('lib.pkp.classes.file.SubmissionFileManager');
 import('lib.pkp.classes.citation.Citation');
+import('lib.pkp.classes.file.PrivateFileManager');
 
 use JATSParser\Body\Document;
 use JATSParser\PDF\TCPDFDocument;
@@ -338,11 +338,14 @@ class JatsParserPlugin extends GenericPlugin {
 			return ['key' => $localeKey, 'label' => $localeNames[$localeKey]];
 		}, $supportedSubmissionLocales);
 
-		$submissionFileDao = DAORegistry::getDAO("SubmissionFileDAO");
-		$submissionFiles = $submissionFileDao->getLatestRevisions($submission->getId(), SUBMISSION_FILE_PRODUCTION_READY);
+		$submissionFiles = Services::get('submissionFile')->getMany([
+			'submissionIds' => [$submission->getId()],
+			'fileStages' => [SUBMISSION_FILE_PRODUCTION_READY],
+		]);
+
 		$submissionFilesXML = array();
 		foreach ($submissionFiles as $submissionFile) {
-			if (in_array($submissionFile->getFileType(), array("application/xml", "text/xml"))) {
+			if (in_array($submissionFile->getData('mimetype'), array("application/xml", "text/xml"))) {
 				$submissionFilesXML[] = $submissionFile;
 			}
 		}
@@ -362,10 +365,9 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		$form = new PublicationJATSUploadForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionFilesXML, $msg);
-		$workflowData = $templateMgr->getTemplateVars('workflowData');
-		$workflowData['components'][FORM_PUBLICATION_JATS_FULLTEXT] = $form->getConfig();
-
-		$templateMgr->assign('workflowData', $workflowData);
+		$state = $templateMgr->getTemplateVars('state');
+		$state['components'][FORM_PUBLICATION_JATS_FULLTEXT] = $form->getConfig();
+		$templateMgr->assign('state', $state);
 
 		$templateMgr->display($this->getTemplateResource("workflowJatsFulltext.tpl"));
 	}
@@ -378,7 +380,6 @@ class JatsParserPlugin extends GenericPlugin {
 	function loadFullTextAssocHandler($hookName, $args) {
 		$page = $args[0];
 		$op = $args[1];
-		$request = $this->getRequest();
 
 		if ($page == 'article' && $op == 'downloadFullTextAssoc') {
 			define('HANDLER_CLASS', 'FullTextArticleHandler');
@@ -403,14 +404,13 @@ class JatsParserPlugin extends GenericPlugin {
 		if (!array_key_exists('jatsParser::fullTextFileId', $params)) return false;
 
 		$localePare = $params['jatsParser::fullTextFileId'];
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
 		foreach ($localePare as $localeKey => $fileId) {
 			if (empty($fileId)) {
 				$newPublication->setData('jatsParser::fullText', null, $localeKey);
 				$newPublication->setData('jatsParser::fullTextFileId', null, $localeKey);
 				continue;
 			}
-			$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY);
+			$submissionFile = Services::get('submissionFile')->get($fileId);
 			$htmlDocument = $this->getFullTextFromJats($submissionFile);
 			$newPublication->setData('jatsParser::fullText', $htmlDocument->saveAsHTML(), $localeKey);
 		}
@@ -432,8 +432,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$fileId = $params['jatsParser::references'];
 		if (!$fileId) return false;
 
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-		$submissionFile = $submissionFileDao->getLatestRevision($fileId, SUBMISSION_FILE_PRODUCTION_READY);
+		$submissionFile = Services::get('submissionFile')->get($fileId);
 		$htmlDocument = $this->getFullTextFromJats($submissionFile);
 
 		$request = $this->getRequest();
@@ -462,8 +461,8 @@ class JatsParserPlugin extends GenericPlugin {
 		$request = $args[3];
 
 		if (!array_key_exists('jatsParser::pdfGalley', $params)) return false;
-		$submission = Services::get('submission')->get($newPublication->getData('submissionId')); /* @var $submission Submission */
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
+		if (!$this->getSetting($request->getContext()->getId(), 'convertToPdf')) return false;
+
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
 
 		$localePare = $params['jatsParser::pdfGalley'];
@@ -474,7 +473,7 @@ class JatsParserPlugin extends GenericPlugin {
 
 			// Set real path to images, attached to the original JATS XML file
 			$jatsFileId = $newPublication->getData('jatsParser::fullTextFileId', $localeKey);
-			$jatsSubmissionFile = $submissionFileDao->getLatestRevision($jatsFileId, null, $submission->getId());
+			$jatsSubmissionFile = Services::get('submissionFile')->get($jatsFileId);
 			if ($jatsSubmissionFile) {
 				$fullText = $this->_setSupplImgPath($jatsSubmissionFile, $fullText);
 			}
@@ -496,7 +495,7 @@ class JatsParserPlugin extends GenericPlugin {
 			// Create associated submission file and update the galley
 			$submissionFile = $this->_setPdfSubmissionFile($pdf, $newPublication, $galley);
 			if ($submissionFile) {
-				$galley->setFileId($submissionFile->getFileId());
+				$galley->setData('fileId', $submissionFile->getData('fileId'));
 				$articleGalleyDao->updateObject($galley);
 			}
 			// remove galley if submission file is missing
@@ -530,6 +529,7 @@ class JatsParserPlugin extends GenericPlugin {
 	 */
 	private function _setPdfSubmissionFile(string $pdfBinaryString, Publication $publication, ArticleGalley $galley) {
 		$submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
+		$request = $this->getRequest();
 
 		// Create a temporary file
 		$tmpFile = tempnam(sys_get_temp_dir(), 'jatsParser');
@@ -537,31 +537,40 @@ class JatsParserPlugin extends GenericPlugin {
 
 		// Set main Submission File data
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
-		$submissionFile = $submissionFileDao->newDataObjectByGenreId(GENRE_CATEGORY_DOCUMENT); /* @var $submissionFile SubmissionFile */
-		$genreDAO = DAORegistry::getDAO('GenreDAO');
-		$genre = $genreDAO->getByKey('SUBMISSION', $submission->getData('contextId'));
-		$submissionFile->setGenreId($genre->getId());
-		$submissionFile->setAssocType(ASSOC_TYPE_GALLEY);
-		$submissionFile->setAssocId($galley->getId());
-		$submissionFile->setFileStage(SUBMISSION_FILE_PROOF);
-		$submissionFile->setSubmissionId($submission->getId());
-		$submissionFile->setFileType('application/pdf');
-		$submissionFile->setFileSize(filesize($tmpFile));
-		$submissionFile->setRevision(1);
-		$submissionFile->setDateUploaded(Core::getCurrentDate());
-		$submissionFile->setDateModified(Core::getCurrentDate());
-		$submissionFile->setUploaderUserId($this->getRequest()->getUser()->getId());
-		$submissionFile->setSubmissionLocale($galley->getLocale());
+		$submissionDir = Services::get('submissionFile')->getSubmissionDir($submission->getData('contextId'), $submission->getId());
+		$fileId = Services::get('file')->add(
+			$tmpFile,
+			$submissionDir . DIRECTORY_SEPARATOR . uniqid() . '.pdf'
+		);
 
 		// Set original filename, get it from the JATS XML file
 		$jatsFileId = $publication->getData('jatsParser::fullTextFileId', $galley->getLocale());
-		$jatsFile = $submissionFileDao->getLatestRevision($jatsFileId, null, $submission->getId());
-		$filename = $jatsFile->getOriginalFileName() ?
-			pathinfo($jatsFile->getOriginalFileName())['filename'] . '.pdf' :
-			'document.pdf';
-		$submissionFile->setOriginalFileName($filename);
-		$submissionFile = $submissionFileDao->insertObject($submissionFile, $tmpFile);
-		unlink($tmpFile);
+		$jatsFile = Services::get('submissionFile')->get($jatsFileId);
+
+		$name = [];
+		foreach ($jatsFile->getData('name') as $locale => $sourceName) {
+			$name[$locale] = pathinfo($sourceName)['filename'] . '.pdf';
+		}
+
+		// Finally transfer data to PDF galley
+		$genreDAO = DAORegistry::getDAO('GenreDAO');
+		$genre = $genreDAO->getByKey('SUBMISSION', $submission->getData('contextId'));
+		$submissionFile = $submissionFileDao->newDataObject();
+		$submissionFile->setAllData(
+			[
+				'fileId' => $fileId,
+				'assocType' => ASSOC_TYPE_GALLEY,
+				'assocId' => $galley->getId(),
+				'fileStage' => SUBMISSION_FILE_PROOF,
+				'mimetype' => 'application/pdf',
+				'locale' => $galley->getData('locale'),
+				'genreId' => $genre->getId(),
+				'name' => $name,
+				'submissionId' => $submission->getId(),
+			]);
+		$submissionFile = Services::get('submissionFile')->add($submissionFile, $request);
+
+		unlink($tmpFile); // remove temporary file
 		return $submissionFile;
 	}
 
@@ -655,7 +664,9 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @brief retrieves PHP DOM representation of the article's full-text
 	 */
 	public function getFullTextFromJats (SubmissionFile $submissionFile): HTMLDocument {
-		$htmlDocument = new HTMLDocument(new Document($submissionFile->getFilePath()));
+		import('lib.pkp.classes.file.PrivateFileManager');
+		$fileMgr = new PrivateFileManager();
+		$htmlDocument = new HTMLDocument(new Document($fileMgr->getBasePath() . DIRECTORY_SEPARATOR . $submissionFile->getData('path')));
 		return $htmlDocument;
 	}
 
@@ -670,11 +681,9 @@ class JatsParserPlugin extends GenericPlugin {
 		$output =& $args[2];
 		$publication = $templateMgr->getTemplateVars('publication');
 		$submission = $templateMgr->getTemplateVars('article');
-		$submissionId = $submission->getId();
 		$fullTexts = $publication->getData('jatsParser::fullText');
 
 		$submissionFileId = 0;
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
 		$submissionFile = null;
 
 		$request = $this->getRequest();
@@ -686,7 +695,7 @@ class JatsParserPlugin extends GenericPlugin {
 			$html = $fullTexts[$currentLocale];
 
 			$submissionFileId = $publication->getData('jatsParser::fullTextFileId', $currentLocale);
-			$submissionFile = $submissionFileDao->getLatestRevision($submissionFileId, SUBMISSION_FILE_PRODUCTION_READY, $submissionId);
+			$submissionFile = Services::get('submissionFile')->get($submissionFileId);
 		} else {
 			$locales = AppLocale::getAllLocales();
 			$msg = __('plugins.generic.jatsParser.article.fulltext.availableLocale');
@@ -725,28 +734,41 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @brief Substitute path to attached images for full-text HTML
 	 */
 	function _setSupplImgPath(SubmissionFile $submissionFile, string $htmlString): string {
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-		$dependentFiles = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getFileId(), $submissionFile->getSubmissionId());
+		$dependentFilesIterator = Services::get('submissionFile')->getMany([
+			'assocTypes' => [ASSOC_TYPE_SUBMISSION_FILE],
+			'assocIds' => [$submissionFile->getId()],
+			'submissionIds' => [$submissionFile->getData('submissionId')],
+			'fileStages' => [SUBMISSION_FILE_DEPENDENT],
+			'includeDependentFiles' => true,
+		]);
 		$request = $this->getRequest();
 		$imageFiles = [];
 
-		foreach ($dependentFiles as $dependentFile) {
-			if (get_class($dependentFile) !== 'SubmissionArtworkFile') continue;
-			if (!in_array($dependentFile->getFileType(), self::getSupportedSupplFileTypes())) continue;
-			$submissionId = $submissionFile->getSubmissionId();
+		$privateFileManager = new PrivateFileManager();
+		$genreDao = DAORegistry::getDAO('GenreDAO');
+		foreach ($dependentFilesIterator as $dependentFile) {
+			$genre = $genreDao->getById($dependentFile->getData('genreId'));
+			if ($genre->getCategory() !== GENRE_CATEGORY_ARTWORK) continue; // only art works are supported
+			if (!in_array($dependentFile->getData('mimetype'), self::getSupportedSupplFileTypes())) continue; // check if MIME type is supported
+			$submissionId = $submissionFile->getData('submissionId');
 			switch ($request->getRequestedOp()) {
 				case 'view':
-					$filePath = $request->url(null, 'article', 'downloadFullTextAssoc', array($submissionId, $dependentFile->getAssocId(), $dependentFile->getFileId()));
+					$filePath = $request->url(null, 'article', 'downloadFullTextAssoc', array($submissionId, $dependentFile->getData('assocId'), $dependentFile->getData('fileId')));
 					break;
 				case 'editPublication':
 					// API Handler cannot process $op, $path or $anchor in url()
-					$image = file_get_contents($dependentFile->getFilePath());
+					$image = file_get_contents($privateFileManager->getBasePath() . DIRECTORY_SEPARATOR . $dependentFile->getData('path'));
 					$imageBase64 = base64_encode($image);
 					$filePath = '@' . $imageBase64; // Format, supported by TCPDF
 					break;
 			}
 
-			$imageFiles[$dependentFile->getOriginalFileName()] = $filePath;
+			$imageFileNames = array_values($dependentFile->getData('name')); // localized
+			foreach ($imageFileNames as $imageFileName) {
+				if (empty($imageFileName)) continue;
+				if (array_key_exists($imageFileName, $imageFiles)) continue;
+				$imageFiles[$imageFileName] = $filePath;
+			}
 		}
 
 		if (empty($imageFiles)) return  $htmlString;
@@ -855,11 +877,12 @@ class JatsParserPlugin extends GenericPlugin {
 	 * @brief iterate through all submissions and add full-text from  galleys
 	 */
 	public function importGalleys() {
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
 		$request = $this->getRequest();
 		$context = $request->getContext();
 		$user = $request->getUser();
 		$publicationDao = DAORegistry::getDAO('PublicationDAO');
+		$fileManager = new PrivateFileManager();
 
 		$submissions = Services::get('submission')->getMany([
 			'contextId' => $context->getId(),
@@ -883,24 +906,66 @@ class JatsParserPlugin extends GenericPlugin {
 
 				$submissionFile = $galley->getFile();
 				/** @var $submissionFile SubmissionFile */
-				$document = new Document($submissionFile->getFilePath());
+				$document = new Document($fileManager->getBasePath() . DIRECTORY_SEPARATOR . $submissionFile->getData('path'));
 				if (empty($document->getArticleSections())) continue;
 
-				$submissionFileManager = new SubmissionFileManager($context->getId(), $submissionFile->getSubmissionId());
-				$newSubmissionFile = $submissionFileManager->copySubmissionFile($submissionFile->getFilePath(), SUBMISSION_FILE_PRODUCTION_READY, $user->getId(), null, $submissionFile->getGenreId());
+				// Copy galley as a production ready submission file
+				$submissionDir = Services::get('submissionFile')->getSubmissionDir($request->getContext()->getId(), $submission->getId());
+				$fileId = Services::get('file')->add(
+					$fileManager->getBasePath() . DIRECTORY_SEPARATOR . $submissionFile->getData('path'),
+					$submissionDir . '/' . uniqid() . '.xml'
+				);
+
+				$newSubmissionFile = $submissionFileDao->newDataObject();
+				$newSubmissionFile->setAllData(
+					[
+						'fileId' => $fileId,
+						'uploaderUserId' => $user->getId(),
+						'fileStage' => SUBMISSION_FILE_PRODUCTION_READY,
+						'submissionId' => $submission->getId(),
+						'genreId' => $submissionFile->getData('genreId'),
+						'name' => $submissionFile->getData('name'),
+					],
+				);
+				$newSubmissionFile = Services::get('submissionFile')->add($newSubmissionFile, $request);
 
 				// copy and attach dependent files, only images are supported
-				$assocFiles = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $submissionFile->getId());
+				$assocFiles = Services::get('submissionFile')->getMany(
+					[
+						'assocTypes' => [ASSOC_TYPE_SUBMISSION_FILE],
+						'assocIds' => [$submissionFile->getId()],
+						'submissionIds' => [$submission->getId()],
+						'fileStages' => [SUBMISSION_FILE_DEPENDENT],
+						'includeDependentFiles' => true,
+					]
+				);
 				foreach ($assocFiles as $assocFile) {
 					/** @var $assocFile SubmissionFile */
-					if (in_array($assocFile->getFileType(), $this->getSupportedSupplFileTypes())) {
-						$newAssocFile = $submissionFileManager->copySubmissionFile($assocFile->getFilePath(), SUBMISSION_FILE_DEPENDENT, $user->getId(), null, $assocFile->getGenreId(), $assocFile->getAssocType(), $newSubmissionFile->getId());
-						$newAssocFile->setOriginalFileName($assocFile->getOriginalFileName()); // should have preserved original file name to be retrieved for front-end correctly
-						$submissionFileDao->updateObject($newAssocFile);
+					if (in_array($assocFile->getData('mimetype'), $this->getSupportedSupplFileTypes())) {
+						$newAssocFileId = Services::get('file')->add(
+							$fileManager->getBasePath() . DIRECTORY_SEPARATOR . $assocFile->getData('path'),
+							$submissionDir . '/' . uniqid() . '.' . $fileManager->parseFileExtension($assocFile->getData('path'))
+						);
+
+						$assocSubmissionFile = $submissionFileDao->newDataObject();
+						$assocSubmissionFile->setAllData([
+							'fileId' => $newAssocFileId,
+							'assocId' => $newSubmissionFile->getId(),
+							'assocType' => ASSOC_TYPE_SUBMISSION_FILE,
+							'uploaderUserId' => $user->getId(),
+							'fileStage' =>  SUBMISSION_FILE_DEPENDENT,
+							'submissionId' => $submission->getId(),
+							'genreId' => $assocFile->getData('genreId'),
+							'name' => $assocFile->getData('name'),
+							'caption' => $assocFile->getData('caption'),
+							'copyrightOwner' => $assocFile->getData('copyrightOwner'),
+                            'credit' => $assocFile->getData('credit'),
+                            'terms' =>$assocFile->getData('terms'),
+						]);
+						Services::get('submissionFile')->add($assocSubmissionFile, $request);
 					}
 				}
 
-				// Convert and save as a Publication property
 				$htmlDocument = new HTMLDocument($document);
 				$htmlString = $htmlDocument->saveAsHTML();
 				$publication->setData('jatsParser::fullTextFileId', $newSubmissionFile->getId(), $galleyLocale);
@@ -941,7 +1006,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$submissionFiles = [];
 		foreach ($submissionFileIds as $submissionFileId) {
 			// Check if file ID is valid and object can be returned
-			if ($submissionFile = $submissionFileDao->getLatestRevision($submissionFileId)) {
+			if ($submissionFile = $submissionFileDao->getById($submissionFileId)) {
 				$submissionFiles[] = $submissionFile;
 			}
 		}
@@ -952,7 +1017,7 @@ class JatsParserPlugin extends GenericPlugin {
 		foreach ($submissionFiles as $submissionFile) {
 			$options[] = [
 				'value' => $submissionFile->getId(),
-				'label' => $submissionFile->getLocalizedName(),
+				'label' => $submissionFile->getLocalizedData('name'),
 			];
 		}
 

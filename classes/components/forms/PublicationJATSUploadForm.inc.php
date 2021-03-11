@@ -22,6 +22,7 @@ class PublicationJATSUploadForm extends FormComponent {
 	 * @param $locales array Supported locales
 	 * @param $publication \Publication publication to change settings for
 	 * @param $submissionFiles array of SubmissionFile with xml type
+	 * @param $msg string field description
 	 */
 	public function __construct($action, $locales, $publication, $submissionFiles, $msg) {
 		/**
@@ -38,9 +39,9 @@ class PublicationJATSUploadForm extends FormComponent {
 			$lang = [];
 			if (empty($submissionFiles)) break;
 			foreach ($submissionFiles as $submissionFile) {
-				$subName = $submissionFile->getName($locale);
+				$subName = $submissionFile->getData('name', $locale);
 				if (empty($subName)) {
-					$subName = $submissionFile->getLocalizedName();
+					$subName = $submissionFile->getLocalizedData('name');
 				}
 				$lang[] = array(
 					'value' => $submissionFile->getId(),
@@ -67,6 +68,10 @@ class PublicationJATSUploadForm extends FormComponent {
 		$emptyValues = array_fill_keys(array_keys($options), null);
 		empty($values) ? $values = $emptyValues : $values = array_merge($emptyValues, $values);
 
+		$plugin = PluginRegistry::getPlugin('generic', 'jatsparserplugin'); /* @var $plugin JATSParserPlugin */
+		$context = Application::get()->getRequest()->getContext();
+		$convertToPdf = $plugin->getSetting($context->getId(), 'convertToPdf');
+
 		if (!empty($options)) {
 			$this->addField(new FieldOptions('jatsParser::fullTextFileId', [
 				'label' => __('plugins.generic.jatsParser.publication.jats.label'),
@@ -75,12 +80,15 @@ class PublicationJATSUploadForm extends FormComponent {
 				'type' => 'radio',
 				'options' => $options,
 				'value' => $values,
-			]))->addField(new FieldOptions('jatsParser::pdfGalley', [
-				'label' => __('plugins.generic.jatsParser.publication.jats.pdf.label'),
-				'type' => 'checkbox',
-				'isMultilingual' => true,
-				'options' => $pdfOptions,
 			]));
+			if ($convertToPdf) {
+				$this->addField(new FieldOptions('jatsParser::pdfGalley', [
+					'label' => __('plugins.generic.jatsParser.publication.jats.pdf.label'),
+					'type' => 'checkbox',
+					'isMultilingual' => true,
+					'options' => $pdfOptions,
+				]));
+			}
 		} else {
 			$this->addField(new FieldHTML("addProductionReadyFiles", array(
 				'description' => $msg

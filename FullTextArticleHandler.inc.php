@@ -24,34 +24,44 @@ class FullTextArticleHandler extends ArticleHandler {
 		$dispatcher = $request->getDispatcher();
 		if (empty($fileId) || !$this->article || !$this->publication) $dispatcher->handle404();
 
+		if (!$this->userCanViewGalley($request, $this->article->getId())) {
+			header('HTTP/1.0 403 Forbidden');
+			echo '403 Forbidden<br>';
+			exit;
+		}
+
 		$fullTextFileIds = $this->publication->getData('jatsParser::fullTextFileId');
 		if (empty($fullTextFileIds)) $dispatcher->handle404();
 
 		// Find if the file is an image dependent from the XML file, from which full-text was generated.
-		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
-		$dependentFiles = [];
-		foreach ($fullTextFileIds as $fullTextFileId) {
-			$dependentFilesArray = $submissionFileDao->getLatestRevisionsByAssocId(ASSOC_TYPE_SUBMISSION_FILE, $fullTextFileId, $this->article->getId(), SUBMISSION_FILE_DEPENDENT);
-			$dependentFiles = array_merge($dependentFiles, $dependentFilesArray);
-		}
+		$dependentFilesIterator = Services::get('submissionFile')->getMany([
+			'assocTypes' => [ASSOC_TYPE_SUBMISSION_FILE],
+			'assocIds' => array_values($fullTextFileIds),
+			'submissionIds' => [$this->article->getId()],
+			'fileStages' => [SUBMISSION_FILE_DEPENDENT],
+			'includeDependentFiles' => true,
+		]);
 
-		if (empty($dependentFiles)) $dispatcher->handler404();
+		if (is_null($dependentFilesIterator->current())) $dispatcher->handler404();
 
 		$submissionFile = null;
-		foreach ($dependentFiles as $dependentFile) {
-			 if ($fileId == $dependentFile->getFileId()) {
-				 $submissionFile = $dependentFile;
-			 	break;
-			 }
+		foreach ($dependentFilesIterator as $dependentFile) {
+			if ($fileId == $dependentFile->getData('fileId')) {
+				$submissionFile = $dependentFile;
+				break;
+			}
 		}
 
 		if (!$submissionFile) $dispatcher->handle404();
 
-		if (!in_array($submissionFile->getFileType(), $this->_plugin::getSupportedSupplFileTypes())) $dispatcher->handler404();
+		if (!in_array($submissionFile->getData('mimetype'), $this->_plugin::getSupportedSupplFileTypes())) $dispatcher->handler404();
 
-		// Download file
-		import('lib.pkp.classes.file.SubmissionFileManager');
-		$submissionFileManager = new SubmissionFileManager($this->article->getContextId(), $this->article->getId());
-		$submissionFileManager->downloadById($fileId);
+		// Download file if exists
+		if (!Services::get('file')->fs->has($submissionFile->getData('path'))) {
+			$request->getDispatcher()->handle404();
+		}
+
+		$filename = Services::get('file')->formatFilename($submissionFile->getData('path'), $submissionFile->getLocalizedData('name'));
+		Services::get('file')->download($submissionFile->getData('fileId'), $filename);
 	}
 }
