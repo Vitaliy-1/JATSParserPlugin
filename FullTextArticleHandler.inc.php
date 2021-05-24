@@ -62,6 +62,6 @@ class FullTextArticleHandler extends ArticleHandler {
 		}
 
 		$filename = Services::get('file')->formatFilename($submissionFile->getData('path'), $submissionFile->getLocalizedData('name'));
-		Services::get('file')->download($submissionFile->getData('fileId'), $filename);
+		Services::get('file')->download($submissionFile->getData('path'), $filename);
 	}
 }
