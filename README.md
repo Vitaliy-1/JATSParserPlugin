@@ -14,7 +14,7 @@ OJS3 Plugin for parsing JATS XML and displaying it on article detail page.
 4. To change image logo in resulted PDF just replace `JATSParser/logo/logo.jpg` file by yours.
 ### Usage
 After activation the plugin adds new item to the publication form:
-![Screenshot from the publication page when plugin is activated](https://github.com/Vitaliy-1/JATSParserPlugin/blob/master/images/jatsParser_scr_1.png?raw=true)
+![Screenshot from the publication page when plugin is activated](https://github.com/Vitaliy-1/JATSParserPlugin/blob/main/images/jatsParser_scr_1.png?raw=true)
 The first select option contains the list of XML files uploaded to the production ready stage where is possible to pick the file that will be converted and saved as article's full-text. Before saving, a result of a conversion can be previewed. 
 Under the hood the conversion process transforms JATS XML into HTML and saves the results in the database.
 
