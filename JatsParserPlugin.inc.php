@@ -742,7 +742,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$genreDao = DAORegistry::getDAO('GenreDAO');
 		foreach ($dependentFilesIterator as $dependentFile) {
 			$genre = $genreDao->getById($dependentFile->getData('genreId'));
-			if ($genre->getCategory() !== GENRE_CATEGORY_ARTWORK) continue; // only art works are supported
+			if ($genre && $genre->getCategory() !== GENRE_CATEGORY_ARTWORK) continue; // only art works are supported
 			if (!in_array($dependentFile->getData('mimetype'), self::getSupportedSupplFileTypes())) continue; // check if MIME type is supported
 			$submissionId = $submissionFile->getData('submissionId');
 			switch ($request->getRequestedOp()) {
