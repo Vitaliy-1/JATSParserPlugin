@@ -21,7 +21,7 @@ class FullTextArticleHandler extends ArticleHandler {
 	 */
 	function downloadFullTextAssoc($args, $request) {
 		$fileId = $args[2];
-		$dispatcher = $request->getDispatcher();
+		$dispatcher = $request->getDispatcher(); /** @var $dispatcher Dispatcher */
 		if (empty($fileId) || !$this->article || !$this->publication) $dispatcher->handle404();
 
 		if (!$this->userCanViewGalley($request, $this->article->getId())) {
@@ -42,7 +42,7 @@ class FullTextArticleHandler extends ArticleHandler {
 			'includeDependentFiles' => true,
 		]);
 
-		if (is_null($dependentFilesIterator->current())) $dispatcher->handler404();
+		if (is_null($dependentFilesIterator->current())) $dispatcher->handle404();
 
 		$submissionFile = null;
 		foreach ($dependentFilesIterator as $dependentFile) {
@@ -54,7 +54,7 @@ class FullTextArticleHandler extends ArticleHandler {
 
 		if (!$submissionFile) $dispatcher->handle404();
 
-		if (!in_array($submissionFile->getData('mimetype'), $this->_plugin::getSupportedSupplFileTypes())) $dispatcher->handler404();
+		if (!in_array($submissionFile->getData('mimetype'), $this->_plugin::getSupportedSupplFileTypes())) $dispatcher->handle404();
 
 		// Download file if exists
 		if (!Services::get('file')->fs->has($submissionFile->getData('path'))) {
