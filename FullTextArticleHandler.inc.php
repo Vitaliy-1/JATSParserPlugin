@@ -34,6 +34,7 @@ class FullTextArticleHandler extends ArticleHandler {
 		if (empty($fullTextFileIds)) $dispatcher->handle404();
 
 		// Find if the file is an image dependent from the XML file, from which full-text was generated.
+		import('lib.pkp.classes.submission.SubmissionFile'); // const
 		$dependentFilesIterator = Services::get('submissionFile')->getMany([
 			'assocTypes' => [ASSOC_TYPE_SUBMISSION_FILE],
 			'assocIds' => array_values($fullTextFileIds),
