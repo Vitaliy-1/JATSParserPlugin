@@ -109,3 +109,6 @@ msgstr "e.g.: american-medical-association"
 
 msgid "plugins.generic.jatsParser.publication.jats.links.label"
 msgstr "Format in-text links to references?"
+
+msgid "plugins.generic.jatsParser.settings.convert.pdf"
+msgstr "Enable PDF conversion"
