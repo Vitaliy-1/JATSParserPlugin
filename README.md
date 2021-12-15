@@ -29,9 +29,9 @@ After publication full-text will be shown on the article landing page under the 
 * OJS 3.1+
 * Lens Galley Plugin must be turned off
 ## Examples
-* Example of the JATS XML: https://github.com/Vitaliy-1/JATSParser/blob/master/example.xml
-* HTML example: http://ojsdemo.e-medjournal.com/index.php/jatsparser/article/view/8/8
-* PDF example: http://ojsdemo.e-medjournal.com/index.php/jatsparser/article/view/8/8?download=pdf
+* Example of the JATS XML: https://github.com/Vitaliy-1/JATSParser/blob/main/examples/example.xml
+* HTML example: https://e-medjournal.com/index.php/psp/article/view/213
+* PDF example: https://uk.e-medjournal.com/index.php/psp/article/view/296/486
 ## Release notes
 ### 2.2.0
 Starting from this version JATS Parser Plugin starts to serve HTML statically and will no longer support rendering of the full-text on the fly on the galley page. Instead full-text is generated on demand from production ready JATS XML files and saved as a part of the publication. 
