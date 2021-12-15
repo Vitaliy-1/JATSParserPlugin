@@ -353,7 +353,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$dispatcher = $request->getDispatcher();
 		$submissionProps = Services::get('submission')->getProperties($submission, array('stageId'), array('request' => $request));
 		$currentPath = $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'fullTextPreview', $submission->getId(), $submissionProps);
-		if (!empty($submissionFiles)) {
+		if (!empty($submissionFilesXML)) {
 			$msg = $templateMgr->smartyTranslate(array(
 				'key' => 'plugins.generic.jatsParser.publication.jats.description',
 				'params' => array("previewPath" => $currentPath)
