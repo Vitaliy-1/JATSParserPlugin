@@ -991,7 +991,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$publication = Repo::publication()->get($publicationId);
 		if (!$publication) return;
 
-		$submissionFileIds = array_unique($publication->getData('jatsParser::fullTextFileId'));
+		$submissionFileIds = array_unique($publication->getData('jatsParser::fullTextFileId') ?? []);
 		if (empty($submissionFileIds)) return;
 
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
