@@ -338,6 +338,7 @@ class JatsParserPlugin extends GenericPlugin {
 			return ['key' => $localeKey, 'label' => $localeNames[$localeKey]];
 		}, $supportedSubmissionLocales);
 
+		import('lib.pkp.classes.submission.SubmissionFile'); // const
 		$submissionFiles = Services::get('submissionFile')->getMany([
 			'submissionIds' => [$submission->getId()],
 			'fileStages' => [SUBMISSION_FILE_PRODUCTION_READY],
