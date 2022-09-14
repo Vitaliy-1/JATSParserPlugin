@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+
+<!--
+  * plugins/generic/jatsParser/locale/en_US/locale.xml
+  *
+  * Copyright (c) 2017 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
+  * Distributed under the GNU GPL v3.
+  *
+  * jatsParser plugin localization strings
+  -->
+
+<locale name="en_US" full_name="U.S. English">
+	<message key="plugins.generic.jatsParser.displayName">JATSParser Plugin</message>
+	<message key="plugins.generic.jatsParser.description">The plugin transforms JATS XML into HTML and PDF for viewing on the journal's front-end</message>
+	<message key="plugins.generic.jatsParser.galleys.info">View article in other formats</message>
+	<message key="plugins.generic.jatsParser.navigation.article">Article</message>
+	<message key="plugins.generic.jatsParser.navigation.details">Details</message>
+	<message key="plugins.generic.jatsParser.navigation.metrics">Metrics</message>
+	<message key="plugins.generic.jatsParser.openAccess.label">open access</message>
+	<message key="plugins.generic.jatsParser.references.link">Find in text</message>
+	<message key="plugins.generic.jatsParser.pdf.read.label">Read as PDF</message>
+	<message key="plugins.generic.jatsParser.pdf.read.symbol-text">PDF</message>
+	<message key="plugins.generic.jatsParser.article.authorBio">Bio</message>
+
+	<!-- Plugin settings -->
+	<message key="plugins.generic.jatsParser.workflow.settings">JATS Parser Settings</message>
+	<message key="plugins.generic.jatsParser.settings.description">JATSParser plugin settings menu</message>
+	<message key="plugins.generic.jatsParser.settings.jatsReferences">Force to display references from JATS XML</message>
+	<message key="plugins.generic.jatsParser.settings.ojsReferences">Force to display parsed references from OJS</message>
+	<message key="plugins.generic.jatsParser.settings.defaultReferences">Default</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.articlePage.description">Allow plugin to display converted JATS XML galleys on article landing page. By default the first XML galley fetched will be displayed. This can be changed individually via JATS Parser galley settings under each uploaded galley.</message>
+	<message key="plugins.generic.jatsParser.settings.display.articlePage">Display JATS XML on article landing page</message>
+	<message key="plugins.generic.jatsParser.settings.display.pdf">Convert JATS XML to PDF</message>
+
+	<!-- Plugin galley settings -->
+	<message key="plugins.generic.jatsParser.galley.settings.display">Display Settings</message>
+	<message key="plugins.generic.jatsParser.galley.settings.display.description">These settings are applied to XML galleys on individual basis.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault.description">This option allows to choose JATS XML galley that will be displayed on article landing page. Note that for this option to work, "Display galleys on article landing page" should be enabled via plugin's settings. By default the plugin will pick up the first uploaded XML galley.</message>
+	<message key="plugins.generic.jatsParser.galley.settings.displayDefault">Display as a default</message>
+</locale>

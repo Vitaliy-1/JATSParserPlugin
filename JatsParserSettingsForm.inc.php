@@ -2,16 +2,16 @@
 
 
 /**
- * @file plugins/generic/jatsParser/JatsParserSettingsForm.inc.php
- *
+* @file plugins/generic/jatsParser/JatsParserSettingsForm.inc.php
+*
  * Copyright (c) 2017-2018 Vitaliy Bezsheiko, MD, Department of Psychosomatic Medicine and Psychotherapy, Bogomolets National Medical University, Kyiv, Ukraine
- * Distributed under the GNU GPL v3.
+* Distributed under the GNU GPL v3.
  *
  * @class JatsParserSettingsForm
  * @ingroup plugins_generic_jatsParser
- *
+*
  * @brief Form for journal managers to modify jatsParser plugin settings
- */
+*/
 
 import('lib.pkp.classes.form.Form');
 
@@ -46,36 +46,35 @@ class JatsParserSettingsForm extends Form {
 		$contextId = $this->_journalId ;
 		$plugin = $this->_plugin;
 
+		$this->setData('references', $plugin->getSetting($contextId, 'references'));
 		$this->setData('convertToPdf', $plugin->getSetting($contextId, 'convertToPdf'));
-		$this->setData('citationStyle', $plugin->getSetting($contextId, 'citationStyle'));
 	}
 
 	/**
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('convertToPdf', 'citationStyle', 'customStyleInput', 'galleysImport'));
+		$this->readUserVars(array('references', 'convertToPdf'));
 	}
 
 	/**
 	 * Fetch the form.
 	 * @copydoc Form::fetch()
 	 */
-	function fetch($request, $template = null, $display = false) {
+	function fetch($request) {
 		$templateMgr = TemplateManager::getManager($request);
-		$templateMgr->assign([
-			'pluginName' => $this->_plugin->getName(),
-			'citationStyles' => $this->_plugin::getSupportedCitationStyles()
-		]);
-		return parent::fetch($request, $template, $display);
+		$templateMgr->assign('pluginName', $this->_plugin->getName());
+		return parent::fetch($request);
 	}
 
 	/**
 	 * Save settings.
 	 */
-	function execute(...$functionArgs) {
+	function execute() {
 		$plugin = $this->_plugin;
 		$contextId = $this->_journalId ;
+
+		$plugin->updateSetting($contextId, 'references', $this->getData('references'));
 
 		$convertToPdf = $this->getData('convertToPdf');
 		if (!$convertToPdf) {
@@ -84,20 +83,5 @@ class JatsParserSettingsForm extends Form {
 			$convertToPdf = true;
 		}
 		$plugin->updateSetting($contextId, 'convertToPdf', $convertToPdf);
-
-		// Citation Style Format
-		$citationStyle = $this->getData('citationStyle');
-		if ($citationStyle == 'customStyle') {
-			$plugin->updateSetting($contextId, 'citationStyle', $this->getData('customStyleInput'));
-		} else {
-			$plugin->updateSetting($contextId, 'citationStyle', $this->getData('citationStyle'));
-		}
-
-		// Import galleys
-		if ($importGalleys = $this->getData('galleysImport')) {
-			$plugin->importGalleys();
-		}
-
-		parent::execute(...$functionArgs);
 	}
 }
