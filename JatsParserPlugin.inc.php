@@ -210,11 +210,12 @@ class JatsParserPlugin extends GenericPlugin {
 		}
 
 		// Abstract
+    // TODO: En esta seccion se puede modificar el estilo del abstract
 		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
 			$pdfDocument->setCellPaddings(5, 5, 5, 5);
-			$pdfDocument->SetFillColor(248, 248, 255);
-			$pdfDocument->SetFont('dejavuserif', '', 10);
-			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 140, 0)));
+			$pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
+			$pdfDocument->SetFont('dejavuserif', '', 10); // Letra
+			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
 			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
 			$pdfDocument->Ln(4);
 		}
