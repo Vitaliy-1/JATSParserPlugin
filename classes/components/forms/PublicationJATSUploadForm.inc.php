@@ -72,6 +72,8 @@ class PublicationJATSUploadForm extends FormComponent {
 		$context = Application::get()->getRequest()->getContext();
 		$convertToPdf = $plugin->getSetting($context->getId(), 'convertToPdf');
 
+// TODO: Acá se pueden agregar opciones al menú de JatsParser dentro de la sección de publicación
+
 		if (!empty($options)) {
 			$this->addField(new FieldOptions('jatsParser::fullTextFileId', [
 				'label' => __('plugins.generic.jatsParser.publication.jats.label'),
