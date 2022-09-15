@@ -1,4 +1,4 @@
-{**
+ {**
  * plugins/generic/JATSParserPlugin/settingsForm.tpl
  *
  * Copyright (c) 2017-2018 Vitalii Bezsheiko
@@ -18,20 +18,55 @@
 	{csrf}
 	{include file="controllers/notification/inPlaceNotification.tpl" notificationId="jatsParserSettingsFormNotification"}
 
-	<div id="description">{translate key="plugins.generic.jatsParser.settings.description"}</div>
-
-	{fbvFormArea id="jatsParserSettingsFormArea"}
+	{fbvFormArea id="jatsParserSettingsFormArea" title="plugins.generic.jatsParser.settings.description"}
 		{fbvFormSection list=true}
-			{fbvElement type="radio" id="jatsReferences" name="references" value="jatsReferences" checked=$references|compare:"jatsReferences" label="plugins.generic.jatsParser.settings.jatsReferences"}
-			{fbvElement type="radio" id="ojsReferences" name="references" value="ojsReferences" checked=$references|compare:"ojsReferences" label="plugins.generic.jatsParser.settings.ojsReferences"}
-			{fbvElement type="radio" id="defaultReferences" name="references" value="defaultReferences" checked=$references|compare:"defaultReferences" label="plugins.generic.jatsParser.settings.defaultReferences"}
+			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.convert.pdf"}
 		{/fbvFormSection}
-		{fbvFormSection list=true}
-			{fbvElement type="checkbox" id="convertToPdf" name="convertToPdf" checked=$convertToPdf label="plugins.generic.jatsParser.settings.display.pdf"}
+
+		{assign var='otherStyleValue' value=true}
+		{fbvFormSection list=true description="plugins.generic.jatsParser.style.description"}
+			{foreach from=$citationStyles item="citationStyleItem"}
+				{if $citationStyleItem["id"]|compare:$citationStyle}
+					{assign var='otherStyleValue' value=false}
+				{/if}
+				{fbvElement type="radio" id=$citationStyleItem["id"] name="citationStyle" value=$citationStyleItem["id"] checked=$citationStyleItem["id"]|compare:$citationStyle label=$citationStyleItem["title"]}
+			{/foreach}
+			{fbvElement type="radio" id="customStyle" name="citationStyle" value="customStyle" checked=$otherStyleValue label="plugins.generic.jatsParser.style.custom"}
+        {/fbvFormSection}
+		{fbvFormSection}
+			{if $otherStyleValue}
+                {fbvElement type="text" id="customStyleInput" name="customStyleInput" value=$citationStyle label="plugins.generic.jatsParser.style.label"}
+			{else}
+				{fbvElement type="text" id="customStyleInput" name="customStyleInput" disabled=true label="plugins.generic.jatsParser.style.label"}
+			{/if}
 		{/fbvFormSection}
 	{/fbvFormArea}
+
+    {fbvFormArea id="jatsParserGalleyImport" title="plugins.generic.jatsParser.galley.import"}
+		{fbvFormSection for="galleysImport" list=true description="plugins.generic.jatsParser.galley.import.description"}
+			{fbvElement type="checkbox" id="galleysImport" name="galleysImport" label="plugins.generic.jatsParser.galley.import.title"}
+		{/fbvFormSection}
+    {/fbvFormArea}
 
 	{fbvFormButtons}
 	<p><span class="formRequired">{translate key="common.requiredField"}</span></p>
 
 </form>
+<script type="text/javascript">
+    {literal}
+		$(document).ready(function() {
+			var customStyleInput = $('input[name="customStyleInput"]');
+			var inputs = $('input[name="citationStyle"]');
+			inputs.change(function () {
+				if ($(this).is(':checked')) {
+					var checkedItemId = $(this).attr('id');
+					if (checkedItemId === 'customStyle') {
+						customStyleInput.removeAttr('disabled');
+					} else {
+						customStyleInput.attr('disabled', 'disabled');
+					}
+				}
+			});
+		});
+	{/literal}
+</script>

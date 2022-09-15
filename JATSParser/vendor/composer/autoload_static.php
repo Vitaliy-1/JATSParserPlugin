@@ -4,9 +4,24 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit091355fbb6e009670e76e1a30f9d6758
+class ComposerStaticInitb220cb2537f1fa2dbef437752ce3f351
 {
+    public static $files = array (
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        'd9e2a8c16442dde496ed7a052bc063c9' => __DIR__ . '/..' . '/seboettg/citeproc-php/src/functions.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
+        'S' => 
+        array (
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Seboettg\\Collection\\' => 20,
+            'Seboettg\\CiteProc\\' => 18,
+        ),
+        'M' => 
+        array (
+            'MyCLabs\\Enum\\' => 13,
+        ),
         'J' => 
         array (
             'JATSParser\\' => 11,
@@ -14,6 +29,22 @@ class ComposerStaticInit091355fbb6e009670e76e1a30f9d6758
     );
 
     public static $prefixDirsPsr4 = array (
+        'Symfony\\Polyfill\\Mbstring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Seboettg\\Collection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/seboettg/collection/src',
+        ),
+        'Seboettg\\CiteProc\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/seboettg/citeproc-php/src',
+        ),
+        'MyCLabs\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/myclabs/php-enum/src',
+        ),
         'JATSParser\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/JATSParser',
@@ -21,6 +52,7 @@ class ComposerStaticInit091355fbb6e009670e76e1a30f9d6758
     );
 
     public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Datamatrix' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/datamatrix.php',
         'PDF417' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
         'QRcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
@@ -40,9 +72,9 @@ class ComposerStaticInit091355fbb6e009670e76e1a30f9d6758
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit091355fbb6e009670e76e1a30f9d6758::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit091355fbb6e009670e76e1a30f9d6758::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit091355fbb6e009670e76e1a30f9d6758::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitb220cb2537f1fa2dbef437752ce3f351::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitb220cb2537f1fa2dbef437752ce3f351::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitb220cb2537f1fa2dbef437752ce3f351::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -82,11 +82,16 @@ class Section extends AbstractElement {
 	private function extractContent (\DOMElement $section) {
 		$content = array();
 		$sectionNodes = $this->xpath->evaluate("./node()", $section);
-		foreach ($sectionNodes as $sectionElement) {
+		foreach ($sectionNodes as $key => $sectionElement) {
 			switch ($sectionElement->nodeName) {
 				case "p":
 					$par = new Par($sectionElement);
 					$content[] = $par;
+					if (!empty($par->getBlockElements())) {
+						foreach ($par->getBlockElements() as $blockElement) {
+							$content[] = $blockElement;
+						}
+					}
 					break;
 				case "list":
 					$list = new Listing($sectionElement);

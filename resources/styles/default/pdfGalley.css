@@ -1,0 +1,29 @@
+span.label {
+	font-size: 10px;
+	font-weight: bold;
+}
+
+span.title {
+	font-size: 10px;
+	font-style: italic;
+}
+
+span.notes, p.caption, table {
+	font-size: 10px;
+}
+
+div.caption {
+	line-height: 90%;
+}
+
+a {
+	color: #530101;
+}
+
+th {
+	background-color: #F8F8FF;
+}
+
+.caption br {
+	line-height: 50%;
+}

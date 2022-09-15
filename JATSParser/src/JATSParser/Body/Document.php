@@ -124,6 +124,11 @@ class Document {
 					case "p":
 						$par = new Par($content);
 						$articleContent[] = $par;
+						if (!empty($par->getBlockElements())) {
+							foreach ($par->getBlockElements() as $blockElement) {
+								$articleContent[] = $blockElement;
+							}
+						}
 						break;
 					case "list":
 						$list = new Listing($content);

@@ -2,237 +2,170 @@
 
 
 use JATSParser\Back\AbstractReference;
+use JATSParser\Back\Individual;
 use JATSParser\Back\Journal;
 use JATSParser\Back\Book;
 use JATSParser\Back\Chapter;
 use JATSParser\Back\Conference;
 
 
-class Reference extends \DOMElement {
+class Reference {
 
-	public function __construct() {
+	/** @var $content \stdClass */
+	private $content;
+	private $jatsReference;
 
-		parent::__construct("li");
-
+	public function __construct(AbstractReference $jatsReference) {
+		$this->jatsReference = $jatsReference;
+		$this->setContent();
 	}
 
-	public function setContent(AbstractReference $jatsReference) {
+	public function setContent() {
+		if (!isset($this->content)) $this->content = new \stdClass();
 
-		$this->setAttribute("id", $jatsReference->getId());
+		$this->setSimpleProperty('id', 'getId');
 
-		switch (get_class($jatsReference)) {
+		if (!empty($this->jatsReference->getAuthors())) {
+			foreach ($this->jatsReference->getAuthors() as $individual) {
+				if (get_class($individual) == 'JATSParser\Back\Individual') { /** @var $individual Individual */
+					$author = new \stdClass();
+					if (!empty($individual->getGivenNames())) {
+						$author->family = $individual->getSurname();
+					}
+
+					if (!empty($individual->getSurname())) {
+						$author->given = $individual->getGivenNames();
+					}
+
+					$this->content->author[] = $author;
+
+				}
+			}
+		}
+
+		if (!empty($this->jatsReference->getEditors())) {
+			foreach ($this->jatsReference->getEditors() as $individual) {
+				if (get_class($individual) == 'JATSParser\Back\Individual') { /** @var $individual Individual */
+					$editor = new \stdClass();
+					if (!empty($individual->getGivenNames())) {
+						$editor->family = $individual->getSurname();
+					}
+
+					if (!empty($individual->getSurname())) {
+						$editor->given = $individual->getGivenNames();
+					}
+
+					$this->content->editor[] = $editor;
+				}
+			}
+		}
+
+		$this->setSimpleProperty('url', 'getUrl');
+		$this->setSimpleProperty('title', 'getTitle');
+
+		// specific properties
+		if (checkdate(1, 1, (int) $this->jatsReference->getYear())) {
+			$this->setDate('issued', 'getYear');
+		}
+		$this->setSimpleProperty('container-title', 'getJournal');
+		$this->setSimpleProperty('journal', 'getJournal');
+		$this->setSimpleProperty('volume', 'getVolume');
+		$this->setSimpleProperty('issue', 'getIssue');
+		$this->setSimpleProperty('page-first', 'getFpage');
+		$this->setSimpleProperty('page', 'getPages');
+
+		if (method_exists($this->jatsReference, 'getPubIdType') && array_key_exists('doi', $this->jatsReference->getPubIdType())) {
+			$doi = $this->jatsReference->getPubIdType()['doi'];
+			// Can't pass URL, see https://github.com/Vitaliy-1/JATSParserPlugin/issues/63
+			if (self::isDoiUrl($doi)) {
+				$doi = substr_replace($doi, '', 0, strlen(DOI_REFERENCE_PREFIX));
+			}
+			$this->content->{'DOI'} =$doi;
+		}
+
+		$this->setSimpleProperty('publisher', 'getPublisherName');
+		$this->setSimpleProperty('publisher-place', 'getPublisherLoc');
+		$this->setSimpleProperty('container-title', 'getBook');
+		$this->setSimpleProperty('event', 'getConfName');
+		$this->setDate('event-date', 'getConfDate');
+		$this->setSimpleProperty('event-place', 'getConfLoc');
+
+		switch (get_class($this->jatsReference)) {
+
 			case "JATSParser\Back\Journal":
 
 				/* @var $jatsReference Journal */
-
-				// extracting reference authors
-
-				ReferenceMethods::extractAuthors($jatsReference, $this);
-
-				// exctracting reference body
-
-				if ($jatsReference->getTitle()) {
-					$journalTitle = $this->ownerDocument->createTextNode(" " . htmlspecialchars(trim($jatsReference->getTitle())). ".");
-					$this->appendChild($journalTitle);
-				}
-
-				if ($jatsReference->getJournal()) {
-					$journalName = $this->ownerDocument->createElement("i", htmlspecialchars( " " . trim($jatsReference->getJournal())) . ".");
-					$this->appendChild($journalName);
-				}
-
-				if ($jatsReference->getYear() != '' && ($jatsReference->getVolume() == '' && $jatsReference->getIssue() == '' && $jatsReference->getFpage() == '' && $jatsReference->getLpage() == '')) {
-					$journalYear = $this->ownerDocument->createTextNode(" " . $jatsReference->getYear() . ". ");
-					$this->appendChild($journalYear);
-				} elseif ($jatsReference->getYear() != '') {
-					$journalYear = $this->ownerDocument->createTextNode(" " . $jatsReference->getYear() . ";");
-					$this->appendChild($journalYear);
-				}
-
-				if ($jatsReference->getVolume() != '' && $jatsReference != '') {
-					$journalVolume = $this->ownerDocument->createTextNode(" " . $jatsReference->getVolume());
-					$this->appendChild($journalVolume);
-				}
-
-				if ($jatsReference->getIssue() != '' && $jatsReference->getVolume() != '') {
-					$journalIssue = $this->ownerDocument->createTextNode("(" . $jatsReference->getIssue() . ")");
-					$this->appendChild($journalIssue);
-				} elseif ($jatsReference->getIssue() != '' && $jatsReference->getVolume() == '') {
-					$journalIssue = $this->ownerDocument->createTextNode(" " . $jatsReference->getIssue());
-					$this->appendChild($journalIssue);
-				}
-
-				if (($jatsReference->getFpage() != '' || $jatsReference->getLpage() != '') && ($jatsReference->getVolume() != '' || $jatsReference->getIssue() != '')) {
-					$betweenFAndLPage = $this->ownerDocument->createTextNode(":");
-					$this->appendChild($betweenFAndLPage);
-				}
-
-				if ($jatsReference->getFpage() != '' && $jatsReference->getLpage() == '') {
-					$fpage = $this->ownerDocument->createTextNode($jatsReference->getFpage() . '. ');
-					$this->appendChild($fpage);
-				} elseif ($jatsReference->getFpage() != '') {
-					$fpage = $this->ownerDocument->createTextNode($jatsReference->getFpage());
-					$this->appendChild($fpage);
-				}
-
-				if ($jatsReference->getLpage() != '' && $jatsReference->getFpage() != '') {
-					$lpage = $this->ownerDocument->createTextNode("-" . $jatsReference->getLpage() . '. ');
-					$this->appendChild($lpage);
-				} elseif ($jatsReference->getLpage() != '' && $jatsReference->getFpage() == '') {
-					$lpage = $this->ownerDocument->createTextNode($jatsReference->getLpage() . '. ');
-					$this->appendChild($lpage);
-				}
-
-				ReferenceMethods::extractLinks($jatsReference, $this);
+				$this->content->type = 'article-journal';
 				break;
 
 			case "JATSParser\Back\Book":
 
 				/* @var $jatsReference Book */
-				ReferenceMethods::extractAuthors($jatsReference, $this);
+				$this->content->type = 'book';
 
-				if ($jatsReference->getTitle() != '') {
-					$bookTitle = $this->ownerDocument->createTextNode(" " . htmlspecialchars(trim($jatsReference->getTitle())). ".");
-					$this->appendChild($bookTitle);
-				}
-
-				if ($jatsReference->getPublisherName() != '' && $jatsReference->getPublisherLoc() != '') {
-					$pubName= $this->ownerDocument->createTextNode(" " . htmlspecialchars(trim($jatsReference->getPublisherName()). ":"));
-					$this->appendChild($pubName);
-				} elseif ($jatsReference->getPublisherName() != '' && $jatsReference->getPublisherLoc() == '' && $jatsReference->getYear() != '') {
-					$pubName= $this->ownerDocument->createTextNode(" " . htmlspecialchars(trim($jatsReference->getPublisherName()). ";"));
-					$this->appendChild($pubName);
-				} elseif ($jatsReference->getPublisherName() != '' && $jatsReference->getPublisherLoc() == '' && $jatsReference->getYear() == '') {
-					$pubName= $this->ownerDocument->createTextNode(" " . htmlspecialchars(trim($jatsReference->getPublisherName()). ". "));
-					$this->appendChild($pubName);
-				}
-
-				if ($jatsReference->getPublisherLoc() != '' && $jatsReference->getYear() != '') {
-					$pubLoc = $this->ownerDocument->createTextNode( " " . htmlspecialchars(trim($jatsReference->getPublisherLoc() . ";")));
-					$this->appendChild($pubLoc);
-				} elseif ($jatsReference->getPublisherLoc() != '' && $jatsReference->getYear() == '') {
-					$pubLoc = $this->ownerDocument->createTextNode( " " . htmlspecialchars(trim($jatsReference->getPublisherLoc() . ". ")));
-					$this->appendChild($pubLoc);
-				}
-
-				if ($jatsReference->getYear() != '') {
-					$year = $this->ownerDocument->createTextNode(' ' . htmlspecialchars(trim($jatsReference->getYear())) . '. ');
-					$this->appendChild($year);
-				}
-
-				ReferenceMethods::extractLinks($jatsReference, $this);
 				break;
 
 			case "JATSParser\Back\Chapter":
 
 				/* @var $jatsReference Chapter */
-				// extracting reference authors
+				$this->content->type = 'chapter';
 
-				ReferenceMethods::extractAuthors($jatsReference, $this);
-
-				if ($jatsReference->getTitle() != '') {
-					$chapterTitle = $this->ownerDocument->createTextNode(" " . htmlspecialchars(trim($jatsReference->getTitle())) . ". ");
-					$this->appendChild($chapterTitle);
-				}
-
-				if (!empty($jatsReference->getEditors())) {
-					$editorsBlock = $this->ownerDocument->createTextNode("In: ");
-					$this->appendChild($editorsBlock);
-					ReferenceMethods::extractEditors($jatsReference, $this);
-				}
-
-				if ($jatsReference->getBook() != '') {
-					$chBookTitle = $this->ownerDocument->createElement("i");
-					$chBookTitle->nodeValue = " " . htmlspecialchars(trim($jatsReference->getBook())) . ". ";
-					$this->appendChild($chBookTitle);
-				}
-
-				if ($jatsReference->getPublisherName() != '' && $jatsReference->getPublisherLoc() != '') {
-					$chapterPubName = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getPublisherName())) . ": ");
-					$this->appendChild($chapterPubName);
-
-				} elseif ($jatsReference->getPublisherName() != '' && $jatsReference->getPublisherLoc() == '' && $jatsReference->getYear() != '') {
-					$chapterPubName = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getPublisherName())) . "; ");
-					$this->appendChild($chapterPubName);
-				} elseif ($jatsReference->getPublisherName() != '' && $jatsReference->getPublisherLoc() == '' && $jatsReference->getYear() == '') {
-					$chapterPubName = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getPublisherName())) . ". ");
-					$this->appendChild($chapterPubName);
-				}
-
-				if ($jatsReference->getPublisherLoc() != '' && $jatsReference->getYear() != '') {
-					$chapterPubLoc = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getPublisherName())) . "; ");
-					$this->appendChild($chapterPubLoc);
-				} elseif ($jatsReference->getPublisherLoc() != '' && $jatsReference->getYear() == '') {
-					$chapterPubLoc = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getPublisherName())) . ". ");
-					$this->appendChild($chapterPubLoc);
-				}
-
-				if ($jatsReference->getYear() != "" && ($jatsReference->getFpage() != '' || $jatsReference->getLpage() != '')) {
-					$chapterYear = $this->ownerDocument->createTextNode($jatsReference->getYear() . ":");
-					$this->appendChild($chapterYear);
-				} elseif ($jatsReference->getYear() != '') {
-					$chapterYear = $this->ownerDocument->createTextNode($jatsReference->getYear() . ". ");
-					$this->appendChild($chapterYear);
-				}
-
-				if ($jatsReference->getFpage() != '' && $jatsReference->getLpage() != '') {
-					$chapterFpage = $this->ownerDocument->createTextNode($jatsReference->getFpage() . "-");
-					$this->appendChild($chapterFpage);
-				} elseif ($jatsReference->getFpage() != '' && $jatsReference->getLpage() == '') {
-					$chapterFpage = $this->ownerDocument->createTextNode($jatsReference->getFpage() . ".");
-					$this->appendChild($chapterFpage);
-				}
-
-				if ($jatsReference->getLpage()) {
-					$chapterLpage = $this->ownerDocument->createTextNode($jatsReference->getLpage() . ". ");
-					$this->appendChild($chapterLpage);
-				}
-
-				ReferenceMethods::extractLinks($jatsReference, $this);
 				break;
 
 			case "JATSParser\Back\Conference":
 
 				/* @var $jatsReference Conference */
-				// extracting reference authors
+				$this->content->type = 'conference';
 
-				ReferenceMethods::extractAuthors($jatsReference, $this);
-
-				if ($jatsReference->getTitle() != '') {
-					$chapterTitle = $this->ownerDocument->createTextNode(" " . htmlspecialchars(trim($jatsReference->getTitle())) . ". ");
-					$this->appendChild($chapterTitle);
-				}
-
-				if ($jatsReference->getConfName() != '') {
-					$conferenceTitle = $this->ownerDocument->createTextNode("Paper presented at: " . htmlspecialchars(trim($jatsReference->getTitle())) . "; ");
-					$this->appendChild($conferenceTitle);
-				}
-
-				if ($jatsReference->getConfDate() != '' && $jatsReference->getYear() != '' && $jatsReference->getConfLoc() != '') {
-					$conferenceDate = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getConfDate())) . ", ");
-					$this->appendChild($conferenceDate);
-				} elseif ($jatsReference->getConfDate() != '' && $jatsReference->getYear() == '' && $jatsReference->getConfLoc() != '') {
-					$conferenceDate = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getConfDate())) . "; ");
-					$this->appendChild($conferenceDate);
-				} elseif ($jatsReference->getConfDate() != '' && $jatsReference->getYear() == '' && $jatsReference->getConfLoc() == '') {
-					$conferenceDate = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getConfDate())) . ". ");
-					$this->appendChild($conferenceDate);
-				}
-
-				if ($jatsReference->getYear() != '' && $jatsReference->getConfLoc() != '') {
-					$conferenceYear = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getYear())) . '; ');
-					$this->appendChild($conferenceYear);
-				} elseif ($jatsReference->getYear() != '' && $jatsReference->getConfLoc() == '') {
-					$conferenceYear = $this->ownerDocument->createTextNode(htmlspecialchars(trim($jatsReference->getYear())) . '. ');
-					$this->appendChild($conferenceYear);
-				}
-
-
-				ReferenceMethods::extractLinks($jatsReference, $this);
 				break;
-
-
 		}
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getContent(): \stdClass
+	{
+		return $this->content;
+	}
+
+	/**
+	 * @param $property string JSON property
+	 * @param $method string method to retrieve property from JATS Parser Reference
+	 * @return void
+	 */
+	protected function setSimpleProperty(string $property, string $method): void {
+		if (method_exists($this->jatsReference, $method) && !empty($this->jatsReference->$method())) {
+			$this->content->{$property} = $this->jatsReference->$method();
+		}
+	}
+
+	protected function setDate(string $property, string $method): void {
+		if (method_exists($this->jatsReference, $method) && !empty($this->jatsReference->$method())) {
+			$date = new \stdClass();
+			$date->{'date-parts'}[][] = $this->jatsReference->$method();
+			$this->content->{$property} = $date;
+		}
+	}
+
+	/**
+	 * @return bool
+	 * @brief checks if generated CJSON-CSL doesn't contain ref specific info, e.g., title, authors, year.
+	 * TODO find a better way of CSL validation
+	 */
+	public function refIsEmpty(): bool {
+		$csl = (array) $this->content;
+		// ID and type are assigned irrespectively to the reference content
+		unset($csl['id']);
+		unset($csl['type']);
+		return empty($csl);
+	}
+
+	public function getJatsReference(): AbstractReference {
+		return $this->jatsReference;
+	}
+
+	public static function isDoiUrl($doi) {
+		return substr($doi, 0, strlen(DOI_REFERENCE_PREFIX)) === DOI_REFERENCE_PREFIX;
+	}
 }

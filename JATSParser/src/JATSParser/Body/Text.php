@@ -71,14 +71,5 @@ class Text implements JATSElement {
 				$this->type[] = $parentNode->nodeName;
 			}
 		}
-
-		/* text inside table cells needs special treatment */
-		if ($parentNode->nodeName == "p") {
-			$parentNodeOfParent = $parentNode->parentNode;
-			if ($parentNodeOfParent->nodeName == "th" || $parentNodeOfParent->nodeName == "td") {
-				$this->type[] = $parentNode->nodeName;
-				$this->extractTextNodeModifiers($parentNode);
-			}
-		}
 	}
 }

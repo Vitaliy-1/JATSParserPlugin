@@ -77,6 +77,10 @@ abstract class AbstractElement implements JATSElement {
 
 		return $titleOrCaption;
 	}
+
+	static function mappedBlockElements() {
+		return ["Figure" => "fig", "Table" => "table-wrap"];
+	}
 }
 
 

@@ -12,11 +12,8 @@ class Par extends \DOMElement {
 
 	public function setContent(JATSPar $jatsPar) {
 
-		/* @var $jatsText JATSText */
 		foreach ($jatsPar->getContent() as $jatsText) {
-
 			HTMLText::extractText($jatsText, $this);
-
 		}
 	}
 }

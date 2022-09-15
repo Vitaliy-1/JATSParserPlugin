@@ -14,17 +14,16 @@ class Figure extends \DOMElement {
 	}
 
 	public function setContent(JATSFigure $jatsFigure) {
-		
+
 		// Add image wrapped inside div (to avoid issues with overlapping by caption)
 		$divNode = $this->ownerDocument->createElement("div");
 		$divNode->setAttribute("class", "figure");
 		$this->appendChild($divNode);
-		
+
 		$srcNode = $this->ownerDocument->createElement("img");
 		$divNode->appendChild($srcNode);
-		$srcNode->setAttribute("src", $jatsFigure->getLink());
-		
-		
+		$srcNode->setAttribute("src", rawurlencode($jatsFigure->getLink()));
+
 		$titleNode = $this->ownerDocument->createElement("p");
 		$titleNode->setAttribute("class", "caption");
 		$this->appendChild($titleNode);
@@ -40,7 +39,7 @@ class Figure extends \DOMElement {
 			$textNode = $this->ownerDocument->createTextNode(HTMLText::checkPunctuation($jatsFigure->getLabel()));
 			$spanLabel->appendChild($textNode);
 		}
-		
+
 		/* Set figure title
         * @var $figureTitle JATSText
         */
@@ -52,7 +51,7 @@ class Figure extends \DOMElement {
 				HTMLText::extractText($figureTitle, $spanTitle);
 			}
 		}
-		
+
 		/* Set figure notes
         * @var $figureContent JATSPar
         */
@@ -65,5 +64,5 @@ class Figure extends \DOMElement {
 			}
 		}
 	}
-	
+
 }

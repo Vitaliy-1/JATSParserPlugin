@@ -1,0 +1,111 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2021-03-01T09:33:47+00:00\n"
+"PO-Revision-Date: 2021-03-01T09:33:47+00:00\n"
+"Language: \n"
+
+msgid "plugins.generic.jatsParser.displayName"
+msgstr "JATSParser плагін"
+
+msgid "plugins.generic.jatsParser.description"
+msgstr "Перетворює JATS XML в HTML та PDF для відображення на сторінці галереї"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocale"
+msgstr "Повний текст статті доступний для такої мови:"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocales"
+msgstr "Повний текст статті доступний для таких мов:"
+
+msgid "plugins.generic.jatsParser.workflow.settings"
+msgstr "Налаштування JATS парсера"
+
+msgid "plugins.generic.jatsParser.settings.description"
+msgstr "Форма налаштувань для плагіна JATSParser"
+
+msgid "plugins.generic.jatsParser.settings.covert.pdf"
+msgstr "Активувати перетворення JATS XML в PDF"
+
+msgid "plugins.generic.jatsParser.galley.import"
+msgstr "Завантаження гранок JATS XML"
+
+msgid "plugins.generic.jatsParser.galley.import.description"
+msgstr "Ця опція дозволяє завантажити повний текст для всіх публікацій із гранок у форматі JATS XML. Завантаження не відбудеться якщо публікація вже має повний текст. Імпорт почнеться одразу після збереження цієї форми"
+
+msgid "plugins.generic.jatsParser.galley.import.title"
+msgstr "Завантаження повного тексту із гранок"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext"
+msgstr "Повний текст"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext.success"
+msgstr "Повний текст успішно завантажився"
+
+msgid "plugins.generic.jatsParser.publication.jats.label"
+msgstr "Створити повний текст"
+
+msgid "plugins.generic.jatsParser.publication.jats.description"
+msgstr "Виберіть зверстаний файл у форматі JATS XML для створення повного тексту."
+
+msgid "plugins.generic.jatsParser.publication.jats.descriptionEmpty"
+msgstr "Список файлів у форматі JATS XML порожній. Будь ласка, завантажте файл на стадії верстки для того, щоб він став доступний для створення повного тексту."
+
+msgid "plugins.generic.jatsParser.publication.jats.references.label"
+msgstr "Взяти бібліографічний список з JATS XML файлу?"
+
+msgid "plugins.generic.jatsParser.publication.jats.references.description"
+msgstr "Бібліографічний список буде взятий із JATS XML та збережений як частина публікації. Всі посилання, вже включені у публікацію, будуть переписані."
+
+msgid "plugins.generic.jatsParser.publication.jats.pdf.label"
+msgstr "Створити PDF гранку?"
+
+msgid "plugins.generic.jatsParser.publication.galley.pdf.label"
+msgstr "PDF"
+
+msgid "plugins.generic.jatsParser.style.acm-sig-proceedings"
+msgstr "ACM"
+
+msgid "plugins.generic.jatsParser.style.acs-nano"
+msgstr "ACS"
+
+msgid "plugins.generic.jatsParser.style.apa"
+msgstr "APA"
+
+msgid "plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas"
+msgstr "ABNT"
+
+msgid "plugins.generic.jatsParser.style.chicago-author-date"
+msgstr "Chicago"
+
+msgid "plugins.generic.jatsParser.style.harvard-cite-them-right"
+msgstr "Harvard"
+
+msgid "plugins.generic.jatsParser.style.ieee"
+msgstr "IEEE"
+
+msgid "plugins.generic.jatsParser.style.modern-language-association"
+msgstr "MLA"
+
+msgid "plugins.generic.jatsParser.style.turabian-fullnote-bibliography"
+msgstr "Turabian"
+
+msgid "plugins.generic.jatsParser.style.vancouver"
+msgstr "Vancouver"
+
+msgid "plugins.generic.jatsParser.style.custom"
+msgstr "Інші стилі цитувань"
+
+msgid "plugins.generic.jatsParser.style.description"
+msgstr "Стиль цитування для посилань, який буде використовуватись плагіном. Для інших стилів цитувань зверніть увагу на <a target=\"_blank\" href=\"https://github.com/citation-style-language/styles\">CSL репозиторій</a>, щоб упевнитись що він підтримується."
+
+msgid "plugins.generic.jatsParser.style.label"
+msgstr "наприклад: american-medical-association"
+
+msgid "plugins.generic.jatsParser.publication.jats.links.label"
+msgstr "Відформатувати посилання на бібліографічний список в тексті статті?"

@@ -1,5 +1,6 @@
 <?php namespace JATSParser\Back;
 
+use docx2jats\jats\Element;
 use JATSParser\Back\Reference as Reference;
 use JATSParser\Back\Collaboration as Collaboration;
 use JATSParser\Body\Document as Document;
@@ -30,6 +31,10 @@ abstract class AbstractReference implements Reference
 	/* @var $pubIdType array publication Identifier for a cited publication */
 	protected $pubIdType;
 
+	protected $rawReference = '';
+
+	protected $isMixed = false;
+
 	abstract public function getId();
 
 	abstract public function getTitle();
@@ -53,6 +58,12 @@ abstract class AbstractReference implements Reference
 		$this->year = $this->extractFromElement($reference, './/year[1]');
 		$this->url = $this->extractFromElement($reference, './/ext-link[@ext-link-type="uri"]');
 		$this->pubIdType = $this->extractPubIdType($reference);
+
+		$citNode = $this->getFirstChildElement($reference);
+		if ($citNode) {
+			if ($citNode->tagName === 'mixed-citation') $this->isMixed = true;
+			$this->rawReference = $citNode->nodeValue;
+		}
 	}
 
 	protected function extractFromElement(\DOMElement $reference, string $xpathExpression)
@@ -61,7 +72,7 @@ abstract class AbstractReference implements Reference
 		$searchNodes = $this->xpath->query($xpathExpression, $reference);
 		if ($searchNodes->length > 0) {
 			foreach ($searchNodes as $searchNode) {
-				$property = $searchNode->nodeValue;
+				$property = htmlspecialchars(trim($searchNode->nodeValue));
 			}
 		}
 		return $property;
@@ -151,5 +162,35 @@ abstract class AbstractReference implements Reference
 			}
 		}
 		return $pubIdType;
+	}
+
+	/**
+	 * @return bool
+	 * @brief check if it's mixed citation (may have untagged text)
+	 */
+	public function isMixed(): bool {
+		return $this->isMixed;
+	}
+
+	/**
+	 * @return string
+	 * @brief contains only the text/nodeValue of the reference node
+	 */
+	public function getRawReference(): string {
+		return $this->rawReference;
+	}
+
+	/**
+	 * @param \DOMElement $el
+	 * @return \DOMElement|null
+	 * @brief return the first child element that is a DOMElement, e.g., to avoid DOMText children
+	 */
+	protected function getFirstChildElement(\DOMElement $el): ?\DOMElement {
+		foreach ($el->childNodes as $refChild) {
+			if ($refChild->nodeType === XML_ELEMENT_NODE) {
+				return $refChild;
+			}
+		}
+		return null;
 	}
 }

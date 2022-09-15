@@ -132,4 +132,13 @@ class Journal extends AbstractReference
 	{
 		return $this->journal;
 	}
+
+	public function getPages(): string
+	{
+		$pages = '';
+
+		if (!empty($this->getFpage()) && !empty($this->getLpage())) $pages = $this->getFpage() . '-' . $this->getLpage();
+
+		return $pages;
+	}
 }
