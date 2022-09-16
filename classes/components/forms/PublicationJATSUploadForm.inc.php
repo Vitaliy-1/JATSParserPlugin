@@ -34,6 +34,8 @@ class PublicationJATSUploadForm extends FormComponent {
 
 		$options = [];
 		$pdfOptions = [];
+		$templateOptions = [];
+		 
 		foreach ($locales as $value) {
 			$locale = $value['key'];
 			$lang = [];
@@ -61,6 +63,15 @@ class PublicationJATSUploadForm extends FormComponent {
 				'value' => true,
 				'label' => __('common.yes')
 			);
+
+			$templates = array('Template1','Template2','Template3');
+			foreach ($templates as $template) {
+				$templateOptions[$locale][] = array(
+				'value' => $template,
+				'label' => $template
+				);
+			}
+
 		}
 
 		// Update the values so the proper option is selected on thr form initiation if full-text isn't selected for the specific locale
@@ -89,6 +100,12 @@ class PublicationJATSUploadForm extends FormComponent {
 					'type' => 'checkbox',
 					'isMultilingual' => true,
 					'options' => $pdfOptions,
+				]));
+				$this->addField(new FieldOptions('jatsParser::pdfGalley', [
+					'label' => 'Select Template',
+					'type' => 'radio',
+					'isMultilingual' => true,
+					'options' => $templateOptions,
 				]));
 			}
 		} else {
