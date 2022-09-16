@@ -226,8 +226,9 @@ class JatsParserPlugin extends GenericPlugin {
 
 		$htmlString .= "\n" . '<style>' . "\n" . file_get_contents($this->getPluginPath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
 		$htmlString = $this->_prepareForPdfGalley($htmlString);
-		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto aun falta ver la codificacion de esto
-		$pdfDocument->writeHTML($htmlString, true, false, true, false, '');
+		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto
+		// Se puede escoger entre: R, L, C, J   ||  R = Right, L = Left, C = Center, J = Justified
+		$pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
 
 		return $pdfDocument->Output('article.pdf', 'S');
 	}
