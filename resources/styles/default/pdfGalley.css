@@ -1,13 +1,23 @@
+/* 
+ * El span Label modifica los labels de figuras y tablas EJ: Figura 1 
+ */
 span.label {
 	font-size: 10px;
 	font-weight: bold;
 }
 
+/* 
+ * El span title modifica los titulos de figuras y tablas EJ: Figura 1:  *Revistas de....*
+ * Modifica el Revistas de....
+ */
 span.title {
 	font-size: 10px;
 	font-style: italic;
 }
 
+/* 
+ * Texto dentro de las tablas
+ */
 span.notes, p.caption, table {
 	font-size: 10px;
 }
