@@ -2,8 +2,10 @@
 
 use JATSParser\PDF\TCPDFDocument;
 
+
 /**
  * This class is in charge of the pdf making
+ * Uses TCPDF library
  */
 class PdfGenerator
 {
@@ -62,6 +64,8 @@ class PdfGenerator
 
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
 
+		// TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
+		// Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
 		$pdfDocument->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
 		$pdfDocument->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
 		$pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
@@ -75,8 +79,18 @@ class PdfGenerator
 
 		// Article title
 
-		$pdfDocument->SetFillColor(255, 255, 255);
-		$pdfDocument->SetFont('dejavuserif', 'B', 20);
+		$pdfDocument->SetFillColor(255, 255, 255); // Esta función modifica el color de fondo de la sección del título y de la sección de autores 
+		$pdfDocument->SetFont('times', 'B', 10); // Esta función permite cambiar la fuente.
+		/* El primer parámetro es la fuente a utilizar, por defecto se pueden elgir las siguientes opciones:
+			times (Times-Roman), timesb (Times-Bold), timesi (Times-Italic), timesbi (Times-BoldItalic), helvetica (Helvetica), helveticab (Helvetica-Bold),
+			helveticai (Helvetica-Oblique), helveticabi (Helvetica-BoldOblique), courier (Courier), courierb (Courier-Bold), courieri (Courier-Oblique),
+			courierbi (Courier-BoldOblique), symbol (Symbol), zapfdingbats (ZapfDingbats)
+			El segundo parámetro es el estilo, se puede elegir entre las siguientes opciones: 
+			empty string: regular, B: bold, I: italic, U: underline, D: line trough, O: overline
+			El tercer parámetro es el tamaño de la fuente.
+		*/ 
+
+		// Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
 		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'L', 1, 1, '', '', true);
 		$pdfDocument->Ln(6);
 
@@ -84,6 +98,7 @@ class PdfGenerator
 		$authors = $publication->getData('authors');
 		if (count($authors) > 0) {
 			/* @var $author Author */
+			// En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
 			foreach ($authors as $author) {
 				$pdfDocument->SetFont('dejavuserif', 'I', 10);
 

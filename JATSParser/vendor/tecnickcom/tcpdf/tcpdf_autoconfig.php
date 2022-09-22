@@ -100,6 +100,9 @@ if (!defined('K_PATH_IMAGES')) {
 	}
 }
 
+// TODO: Acá se definen muchas constantes utilizadas en el generador de PDF 
+// Las constantes pueden modifcarse para obtener nuevos estilos
+
 if (!defined('PDF_HEADER_LOGO')) {
 	$tcpdf_header_logo = '';
 	if (@file_exists(K_PATH_IMAGES.'tcpdf_logo.jpg')) {
