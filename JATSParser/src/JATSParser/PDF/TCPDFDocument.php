@@ -10,6 +10,7 @@ class TCPDFDocument extends \TCPDF {
 	function __construct(string $htmlDocument = null) {
 
 		// setting up PDF
+		//TODO modificar este constructor para poder cambiar el formato de la página y su orientación
 		parent::__construct(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 	}

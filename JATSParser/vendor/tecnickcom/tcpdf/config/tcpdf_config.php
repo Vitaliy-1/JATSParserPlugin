@@ -81,6 +81,9 @@
  */
 //define ('K_PATH_CACHE', '/tmp/');
 
+// TODO: Acá se definen muchas constantes utilizadas en el generador de PDF 
+// Las constantes pueden modifcarse para obtener nuevos estilos
+
 /**
  * Generic name for a blank image.
  */
