@@ -28,13 +28,22 @@ class PdfGenerator
 		$pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
 	}
 
+	private function _createTitleSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	{
+		$pdfDocument->SetFillColor(255, 255, 255); //rgb
+		$pdfDocument->SetFont('times', 'B', 10);
+		// Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
+		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'L', 1, 1, '', '', true);
+		$pdfDocument->Ln(6);
+	}
+
 	private function _createAbstractSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
 	{
 		// TODO: En esta seccion se puede modificar el estilo del abstract
 		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
 			$pdfDocument->setCellPaddings(5, 5, 5, 5);
 			$pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
-			$pdfDocument->SetFont('dejavuserif', '', 10); // Letra
+			$pdfDocument->SetFont('dejavuserif', '', 10);
 			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
 			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
 			$pdfDocument->Ln(4);
@@ -103,7 +112,6 @@ class PdfGenerator
 		// extends TCPDF object
 		$pdfDocument = new TCPDFDocument();
 
-		$this->_setTitle($pdfDocument, $publication, $localeKey);
 
 		// get the logo
 		$journal = $request->getContext();
@@ -119,8 +127,6 @@ class PdfGenerator
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
 		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
 
-		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
-		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
 
 		$articleDataString = '';
 
@@ -136,38 +142,19 @@ class PdfGenerator
 			$articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
 		}
 
+
+		$this->_setTitle($pdfDocument, $publication, $localeKey);
+		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
+		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
 		$this->_setFundamentalVisualizationParamters($pdfDocument);
 
 		$pdfDocument->AddPage();
 
-		// Article title
-		// Esta función modifica el color de fondo de la sección del título y de la sección de autores 
-		$pdfDocument->SetFillColor(255, 255, 255);
-
-		$pdfDocument->SetFont('times', 'B', 10); // Esta función permite cambiar la fuente.
-		/* El primer parámetro es la fuente a utilizar, por defecto se pueden elgir las siguientes opciones:
-			times (Times-Roman), timesb (Times-Bold), timesi (Times-Italic), timesbi (Times-BoldItalic), 
-			helvetica (Helvetica), helveticab (Helvetica-Bold),helveticai (Helvetica-Oblique), 
-			helveticabi (Helvetica-BoldOblique), courier (Courier), courierb (Courier-Bold), courieri (Courier-Oblique),
-			courierbi (Courier-BoldOblique), symbol (Symbol), zapfdingbats (ZapfDingbats)
-			El segundo parámetro es el estilo, se puede elegir entre las siguientes opciones: 
-			empty string: regular, B: bold, I: italic, U: underline, D: line trough, O: overline
-			El tercer parámetro es el tamaño de la fuente.
-		*/
-
-		// Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
-		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'L', 1, 1, '', '', true);
-		$pdfDocument->Ln(6);
-
-		// Article's authors
+		$this->_createTitleSection($pdfDocument, $publication, $localeKey);
 		$this->_createAuthorsSection($pdfDocument, $publication, $localeKey);
-
-
 		$this->_createAbstractSection($pdfDocument, $publication, $localeKey);
-
 		$this->_createTextSection($pdfDocument, $publication, $htmlString, $pluginPath);
-
 
 		return $pdfDocument->Output('article.pdf', 'S');
 	}
