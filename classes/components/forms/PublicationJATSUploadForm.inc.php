@@ -8,7 +8,8 @@ use JATSParser\HTML\Document as HTMLDocument;
 
 define("FORM_PUBLICATION_JATS_FULLTEXT", "jatsUpload");
 
-class PublicationJATSUploadForm extends FormComponent {
+class PublicationJATSUploadForm extends FormComponent
+{
 	/** @copydoc FormComponent::$id */
 	public $id = FORM_PUBLICATION_JATS_FULLTEXT;
 
@@ -24,7 +25,8 @@ class PublicationJATSUploadForm extends FormComponent {
 	 * @param $submissionFiles array of SubmissionFile with xml type
 	 * @param $msg string field description
 	 */
-	public function __construct($action, $locales, $publication, $submissionFiles, $msg) {
+	public function __construct($action, $locales, $publication, $submissionFiles, $msg)
+	{
 		/**
 		 * @var $submissionFile SubmissionFile
 		 */
@@ -35,7 +37,7 @@ class PublicationJATSUploadForm extends FormComponent {
 		$options = [];
 		$pdfOptions = [];
 		$templateOptions = [];
-		 
+
 		foreach ($locales as $value) {
 			$locale = $value['key'];
 			$lang = [];
@@ -49,7 +51,6 @@ class PublicationJATSUploadForm extends FormComponent {
 					'value' => $submissionFile->getId(),
 					'label' => $subName
 				);
-
 			}
 
 			$lang[] = array(
@@ -64,14 +65,13 @@ class PublicationJATSUploadForm extends FormComponent {
 				'label' => __('common.yes')
 			);
 
-			$templates = array('Template1','Template2','Template3');
+			$templates = array('Template1', 'Template2', 'Template3');
 			foreach ($templates as $template) {
 				$templateOptions[$locale][] = array(
-				'value' => $template,
-				'label' => $template
+					'value' => $template,
+					'label' => $template
 				);
 			}
-
 		}
 
 		// Update the values so the proper option is selected on thr form initiation if full-text isn't selected for the specific locale
@@ -83,7 +83,7 @@ class PublicationJATSUploadForm extends FormComponent {
 		$context = Application::get()->getRequest()->getContext();
 		$convertToPdf = $plugin->getSetting($context->getId(), 'convertToPdf');
 
-// TODO: Acá se pueden agregar opciones al menú de JatsParser dentro de la sección de publicación
+		// TODO: Acá se pueden agregar opciones al menú de JatsParser dentro de la sección de publicación
 
 		if (!empty($options)) {
 			$this->addField(new FieldOptions('jatsParser::fullTextFileId', [
@@ -101,7 +101,7 @@ class PublicationJATSUploadForm extends FormComponent {
 					'isMultilingual' => true,
 					'options' => $pdfOptions,
 				]));
-				$this->addField(new FieldOptions('jatsParser::pdfGalley', [
+				$this->addField(new FieldOptions('jatsParser::selectedTemplate', [
 					'label' => 'Select Template',
 					'type' => 'radio',
 					'isMultilingual' => true,

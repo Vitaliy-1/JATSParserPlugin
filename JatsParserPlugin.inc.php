@@ -13,6 +13,7 @@
 
 require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 
+import('plugins.generic.jatsParser.ChromePhp');
 import('lib.pkp.classes.plugins.GenericPlugin');
 import('plugins.generic.jatsParser.classes.JATSParserDocument');
 import('plugins.generic.jatsParser.classes.components.forms.PublicationJATSUploadForm');
@@ -313,10 +314,15 @@ class JatsParserPlugin extends GenericPlugin
 		$newPublication = $args[0]; /* @var $newPublication Publication */
 		$params = $args[2];
 		$request = $args[3];
+		// TODO: Se localiza el templeate seleccionado se encuentra en $args[2] junto con las opciones todas las opciones seleccionados
+		ChromePhp::log($args[2]);
 
 		if (!array_key_exists('jatsParser::pdfGalley', $params)) return false;
 		if (!$this->getSetting($request->getContext()->getId(), 'convertToPdf')) return false;
 
+		if (array_key_exists('jatsParser::selectedTemplate', $params)) {
+			ChromePhp::log('Si capta el template');
+		}
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
 
 		$localePare = $params['jatsParser::pdfGalley'];
@@ -340,6 +346,7 @@ class JatsParserPlugin extends GenericPlugin
 			$fullText = $this->_setReferences($newPublication, $localeKey, $fullText);
 
 			// Finally, convert and receive TCPDF output as a binary string
+			// TODO: Se localiza el llamado a la generación del pdf
 			$pdf = $this->pdfCreation($fullText, $newPublication, $request, $localeKey);
 
 			// Create a PDF Galley
