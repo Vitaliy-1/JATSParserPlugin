@@ -9,12 +9,8 @@ import('plugins.generic.jatsParser.ChromePhp');
  */
 class PdfGenerator
 {
-
-
-
 	private function _setTitle(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
 	{
-
 		$pdfDocument->setTitle($publication->getLocalizedFullTitle($localeKey));
 	}
 
@@ -32,7 +28,6 @@ class PdfGenerator
 		$pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
 	}
 
-
 	private function _createAbstractSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
 	{
 		// TODO: En esta seccion se puede modificar el estilo del abstract
@@ -44,6 +39,48 @@ class PdfGenerator
 			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
 			$pdfDocument->Ln(4);
 		}
+	}
+
+	private function _createAuthorsSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	{
+		$authors = $publication->getData('authors');
+		if (count($authors) > 0) {
+			/* @var $author Author */
+			// En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
+			foreach ($authors as $author) {
+				$pdfDocument->SetFont('dejavuserif', 'I', 10);
+
+				// Calculating the line height for author name and affiliation
+				$authorName = htmlspecialchars($author->getGivenName($localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($localeKey));
+				$affiliation = htmlspecialchars($author->getAffiliation($localeKey));
+
+				$authorLineWidth = 60;
+				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, $authorName);
+
+				$affiliationLineWidth = 110;
+				$afilliationStringHeight = $pdfDocument->getStringHeight(110, $affiliation);
+
+				$authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
+
+				// Writing affiliations into cells
+				$pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
+				$pdfDocument->SetFont('dejavuserif', '', 10);
+				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
+			}
+			$pdfDocument->Ln(6);
+		}
+	}
+	private function _createTextSection(TCPDFDocument $pdfDocument, Publication $publication, string $htmlString, string $pluginPath): void
+	{
+		// Text (goes from JATSParser
+		$pdfDocument->setCellPaddings(0, 0, 0, 0);
+		$pdfDocument->SetFont('dejavuserif', '', 10);
+
+		$htmlString .= "\n" . '<style>' . "\n" . file_get_contents($pluginPath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
+		$htmlString = $this->_prepareForPdfGalley($htmlString);
+		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto
+		// Se puede escoger entre: R, L, C, J   ||  R = Right, L = Left, C = Center, J = Justified
+		$pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
 	}
 	/**
 	 * @param $article Submission
@@ -124,44 +161,13 @@ class PdfGenerator
 		$pdfDocument->Ln(6);
 
 		// Article's authors
-		$authors = $publication->getData('authors');
-		if (count($authors) > 0) {
-			/* @var $author Author */
-			// En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
-			foreach ($authors as $author) {
-				$pdfDocument->SetFont('dejavuserif', 'I', 10);
-
-				// Calculating the line height for author name and affiliation
-				$authorName = htmlspecialchars($author->getGivenName($localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($localeKey));
-				$affiliation = htmlspecialchars($author->getAffiliation($localeKey));
-
-				$authorLineWidth = 60;
-				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, $authorName);
-
-				$affiliationLineWidth = 110;
-				$afilliationStringHeight = $pdfDocument->getStringHeight(110, $affiliation);
-
-				$authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
-
-				// Writing affiliations into cells
-				$pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
-				$pdfDocument->SetFont('dejavuserif', '', 10);
-				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
-			}
-			$pdfDocument->Ln(6);
-		}
+		$this->_createAuthorsSection($pdfDocument, $publication, $localeKey);
 
 
 		$this->_createAbstractSection($pdfDocument, $publication, $localeKey);
-		// Text (goes from JATSParser
-		$pdfDocument->setCellPaddings(0, 0, 0, 0);
-		$pdfDocument->SetFont('dejavuserif', '', 10);
 
-		$htmlString .= "\n" . '<style>' . "\n" . file_get_contents($pluginPath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
-		$htmlString = $this->_prepareForPdfGalley($htmlString);
-		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto
-		// Se puede escoger entre: R, L, C, J   ||  R = Right, L = Left, C = Center, J = Justified
-		$pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
+		$this->_createTextSection($pdfDocument, $publication, $htmlString, $pluginPath);
+
 
 		return $pdfDocument->Output('article.pdf', 'S');
 	}
