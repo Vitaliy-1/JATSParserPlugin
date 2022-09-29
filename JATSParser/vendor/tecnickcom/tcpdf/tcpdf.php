@@ -5814,7 +5814,7 @@ class TCPDF {
 	 * @param float $h Cell minimum height. The cell extends automatically if needed.
 	 * @param string $txt String to print
 	 * @param mixed $border Indicates if borders must be drawn around the cell. The value can be a number:<ul><li>0: no border (default)</li><li>1: frame</li></ul> or a string containing some or all of the following characters (in any order):<ul><li>L: left</li><li>T: top</li><li>R: right</li><li>B: bottom</li></ul> or an array of line styles for each border group - for example: array('LTRB' => array('width' => 2, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => array(0, 0, 0)))
-	 * @param string $align Allows to center or align the text. Possible values are:<ul><li>L or empty string: left align</li><li>C: center</li><li>R: right align</li><li>J: justification (default value when $ishtml=false)</li></ul>
+	 * @param string $align Allows to center or align the text. Possible values are:L or empty string = left align | C = center | R = right align | J = justification (default value when $ishtml=false)
 	 * @param boolean $fill Indicates if the cell background must be painted (true) or transparent (false).
 	 * @param int $ln Indicates where the current position should go after the call. Possible values are:<ul><li>0: to the right</li><li>1: to the beginning of the next line [DEFAULT]</li><li>2: below</li></ul>
 	 * @param float $x x position in user units
