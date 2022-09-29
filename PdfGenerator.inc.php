@@ -9,6 +9,48 @@ import('plugins.generic.jatsParser.ChromePhp');
  */
 class PdfGenerator
 {
+
+	/**
+	 * @param $article Submission
+	 * @param $request PKPRequest
+	 * @param $htmlDocument HTMLDocument
+	 * @param $issue Issue
+	 * @param
+	 */
+	public function createPdf(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath): string
+	{
+		// HTML preparation
+		$context = $request->getContext(); /* @var $context Journal */
+
+		//$this->imageUrlReplacement($xmlGalley, $xpath);
+		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
+
+		// extends TCPDF object
+		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
+
+		$articleDataString = $this->_getArticleDataString($publication, $request, $localeKey);
+		$pdfDocument = new TCPDFDocument();
+		$pdfHeaderLogo = $this->_getHeaderLogo($request);
+		$pdfDocument->SetCreator(PDF_CREATOR);
+		$journal = $request->getContext();
+
+		$this->_setTitle($pdfDocument, $publication, $localeKey);
+		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
+		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
+		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
+		$this->_setFundamentalVisualizationParamters($pdfDocument);
+
+		$pdfDocument->AddPage();
+
+		$this->_createTitleSection($pdfDocument, $publication, $localeKey);
+		$this->_createAuthorsSection($pdfDocument, $publication, $localeKey);
+		$this->_createAbstractSection($pdfDocument, $publication, $localeKey);
+		$this->_createTextSection($pdfDocument, $publication, $htmlString, $pluginPath);
+
+		return $pdfDocument->Output('article.pdf', 'S');
+	}
+
 	private function _setTitle(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
 	{
 		$pdfDocument->setTitle($publication->getLocalizedFullTitle($localeKey));
@@ -26,6 +68,19 @@ class PdfGenerator
 		$pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
 		$pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 		$pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
+	}
+
+	private function _getHeaderLogo(Request $request): string
+	{
+		$journal = $request->getContext();
+		$thumb = $journal->getLocalizedData('journalThumbnail');
+		if (!empty($thumb)) {
+			$journalFilesPath = __DIR__ . '/../../../' . Config::getVar('files', 'public_files_dir') . '/journals/' . $journal->getId() . '/'; // TCPDF accepts only relative path
+			$pdfHeaderLogoLocation = $journalFilesPath . $thumb['uploadName'];
+		} else {
+			$pdfHeaderLogoLocation = __DIR__ . "/JATSParser/logo/logo.jpg";
+		}
+		return $pdfHeaderLogoLocation;
 	}
 
 	private function _createTitleSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
@@ -79,6 +134,7 @@ class PdfGenerator
 			$pdfDocument->Ln(6);
 		}
 	}
+
 	private function _createTextSection(TCPDFDocument $pdfDocument, Publication $publication, string $htmlString, string $pluginPath): void
 	{
 		// Text (goes from JATSParser
@@ -91,72 +147,27 @@ class PdfGenerator
 		// Se puede escoger entre: R, L, C, J   ||  R = Right, L = Left, C = Center, J = Justified
 		$pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
 	}
-	/**
-	 * @param $article Submission
-	 * @param $request PKPRequest
-	 * @param $htmlDocument HTMLDocument
-	 * @param $issue Issue
-	 * @param
-	 */
-	public function createPdf(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath): string
+
+	private function _getArticleDataString(Publication $publication, Request $request, string $localeKey): string
+
 	{
-		// HTML preparation
+		$articleDataString = '';
 		$context = $request->getContext(); /* @var $context Journal */
 		$submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
 		$issueDao = DAORegistry::getDAO('IssueDAO');
 		$issue = $issueDao->getBySubmissionId($submission->getId(), $context->getId());
 
-		//$this->imageUrlReplacement($xmlGalley, $xpath);
-		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
-
-		// extends TCPDF object
-		$pdfDocument = new TCPDFDocument();
-
-
-		// get the logo
-		$journal = $request->getContext();
-		$thumb = $journal->getLocalizedData('journalThumbnail');
-		if (!empty($thumb)) {
-			$journalFilesPath = __DIR__ . '/../../../' . Config::getVar('files', 'public_files_dir') . '/journals/' . $journal->getId() . '/'; // TCPDF accepts only relative path
-			$pdfHeaderLogo = $journalFilesPath . $thumb['uploadName'];
-		} else {
-			$pdfHeaderLogo = __DIR__ . "/JATSParser/logo/logo.jpg";
-		}
-
-		$pdfDocument->SetCreator(PDF_CREATOR);
-		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
-		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
-
-
-		$articleDataString = '';
-
 		if ($issue && $issueIdentification = $issue->getIssueIdentification()) {
 			$articleDataString .= $issueIdentification;
 		}
-
 		if ($pages = $publication->getLocalizedData('subject', $localeKey)) {
 			$articleDataString .= ", " . $pages;
 		}
-
 		if ($doi = $publication->getData('pub-id::doi')) {
 			$articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
 		}
 
-
-		$this->_setTitle($pdfDocument, $publication, $localeKey);
-		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
-		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
-		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
-		$this->_setFundamentalVisualizationParamters($pdfDocument);
-
-		$pdfDocument->AddPage();
-
-		$this->_createTitleSection($pdfDocument, $publication, $localeKey);
-		$this->_createAuthorsSection($pdfDocument, $publication, $localeKey);
-		$this->_createAbstractSection($pdfDocument, $publication, $localeKey);
-		$this->_createTextSection($pdfDocument, $publication, $htmlString, $pluginPath);
-
-		return $pdfDocument->Output('article.pdf', 'S');
+		return $articleDataString;
 	}
 
 
