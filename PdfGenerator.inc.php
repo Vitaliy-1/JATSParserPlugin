@@ -2,7 +2,7 @@
 
 use JATSParser\PDF\TCPDFDocument;
 
-
+import('plugins.generic.jatsParser.ChromePhp');
 /**
  * This class is in charge of the pdf making
  * Uses TCPDF library
@@ -27,6 +27,7 @@ class PdfGenerator
 		//$this->imageUrlReplacement($xmlGalley, $xpath);
 		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
 
+		ChromePhp::log('asd');
 		// extends TCPDF object
 		$pdfDocument = new TCPDFDocument();
 
@@ -78,17 +79,19 @@ class PdfGenerator
 		$pdfDocument->AddPage();
 
 		// Article title
+		// Esta función modifica el color de fondo de la sección del título y de la sección de autores 
+		$pdfDocument->SetFillColor(255, 255, 255);
 
-		$pdfDocument->SetFillColor(255, 255, 255); // Esta función modifica el color de fondo de la sección del título y de la sección de autores 
 		$pdfDocument->SetFont('times', 'B', 10); // Esta función permite cambiar la fuente.
 		/* El primer parámetro es la fuente a utilizar, por defecto se pueden elgir las siguientes opciones:
-			times (Times-Roman), timesb (Times-Bold), timesi (Times-Italic), timesbi (Times-BoldItalic), helvetica (Helvetica), helveticab (Helvetica-Bold),
-			helveticai (Helvetica-Oblique), helveticabi (Helvetica-BoldOblique), courier (Courier), courierb (Courier-Bold), courieri (Courier-Oblique),
+			times (Times-Roman), timesb (Times-Bold), timesi (Times-Italic), timesbi (Times-BoldItalic), 
+			helvetica (Helvetica), helveticab (Helvetica-Bold),helveticai (Helvetica-Oblique), 
+			helveticabi (Helvetica-BoldOblique), courier (Courier), courierb (Courier-Bold), courieri (Courier-Oblique),
 			courierbi (Courier-BoldOblique), symbol (Symbol), zapfdingbats (ZapfDingbats)
 			El segundo parámetro es el estilo, se puede elegir entre las siguientes opciones: 
 			empty string: regular, B: bold, I: italic, U: underline, D: line trough, O: overline
 			El tercer parámetro es el tamaño de la fuente.
-		*/ 
+		*/
 
 		// Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
 		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'L', 1, 1, '', '', true);
