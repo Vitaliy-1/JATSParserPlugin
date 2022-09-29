@@ -9,6 +9,42 @@ import('plugins.generic.jatsParser.ChromePhp');
  */
 class PdfGenerator
 {
+
+
+
+	private function _setTitle(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	{
+
+		$pdfDocument->setTitle($publication->getLocalizedFullTitle($localeKey));
+	}
+
+	private function _setFundamentalVisualizationParamters(TCPDFDocument $pdfDocument): void
+	{
+		// TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
+		// Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
+		$pdfDocument->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+		$pdfDocument->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
+		$pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+		$pdfDocument->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+		$pdfDocument->SetHeaderMargin(PDF_MARGIN_HEADER);
+		$pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
+		$pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+		$pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
+	}
+
+
+	private function _createAbstractSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	{
+		// TODO: En esta seccion se puede modificar el estilo del abstract
+		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
+			$pdfDocument->setCellPaddings(5, 5, 5, 5);
+			$pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
+			$pdfDocument->SetFont('dejavuserif', '', 10); // Letra
+			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
+			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
+			$pdfDocument->Ln(4);
+		}
+	}
 	/**
 	 * @param $article Submission
 	 * @param $request PKPRequest
@@ -27,11 +63,10 @@ class PdfGenerator
 		//$this->imageUrlReplacement($xmlGalley, $xpath);
 		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
 
-		ChromePhp::log('asd');
 		// extends TCPDF object
 		$pdfDocument = new TCPDFDocument();
 
-		$pdfDocument->setTitle($publication->getLocalizedFullTitle($localeKey));
+		$this->_setTitle($pdfDocument, $publication, $localeKey);
 
 		// get the logo
 		$journal = $request->getContext();
@@ -46,6 +81,7 @@ class PdfGenerator
 		$pdfDocument->SetCreator(PDF_CREATOR);
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
 		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
+
 		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
 		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
 
@@ -64,17 +100,7 @@ class PdfGenerator
 		}
 
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
-
-		// TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
-		// Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
-		$pdfDocument->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
-		$pdfDocument->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
-		$pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-		$pdfDocument->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-		$pdfDocument->SetHeaderMargin(PDF_MARGIN_HEADER);
-		$pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
-		$pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
-		$pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
+		$this->_setFundamentalVisualizationParamters($pdfDocument);
 
 		$pdfDocument->AddPage();
 
@@ -125,17 +151,8 @@ class PdfGenerator
 			$pdfDocument->Ln(6);
 		}
 
-		// Abstract
-		// TODO: En esta seccion se puede modificar el estilo del abstract
-		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
-			$pdfDocument->setCellPaddings(5, 5, 5, 5);
-			$pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
-			$pdfDocument->SetFont('dejavuserif', '', 10); // Letra
-			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
-			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
-			$pdfDocument->Ln(4);
-		}
 
+		$this->_createAbstractSection($pdfDocument, $publication, $localeKey);
 		// Text (goes from JATSParser
 		$pdfDocument->setCellPaddings(0, 0, 0, 0);
 		$pdfDocument->SetFont('dejavuserif', '', 10);
