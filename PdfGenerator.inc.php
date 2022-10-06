@@ -10,8 +10,8 @@ import('plugins.generic.jatsParser.ChromePhp');
 class PdfGenerator
 {
 	private string $_htmlString;
-	private $_publication;
-	private $_request;
+	private Publication $_publication;
+	private Request $_request;
 	private string $_localeKey;
 	private string $_pluginPath;
 	private TCPDFDocument $_pdfDocument;
