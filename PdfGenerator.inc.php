@@ -29,6 +29,14 @@ class PdfGenerator
 
 	public function createPdf(): string
 	{
+
+		$data = file_get_contents($pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
+		$prueba = json_decode($data, true);
+
+		ChromePhp::log("Hola Mundo");
+		ChromePhp::log($prueba);
+
+
 		// HTML preparation
 		$context = $this->_request->getContext(); /* @var $context Journal */
 
@@ -49,6 +57,7 @@ class PdfGenerator
 		$this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
 		$this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($this->_localeKey), $articleDataString);
 		$this->_setFundamentalVisualizationParamters($this->_pdfDocument);
+		$pdfDocument->setPageFormat("A4", "L"); // Recibe el formato y la orientación del documento como parámetros.
 
 		$this->_pdfDocument->AddPage();
 

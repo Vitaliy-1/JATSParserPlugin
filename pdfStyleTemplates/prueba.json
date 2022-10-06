@@ -1,0 +1,36 @@
+{
+  "title": {
+    "fillColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255
+    },
+    "font": {
+      "type": "times",
+      "style": "B",
+      "size": 12
+    },
+    "textAling": "C",
+    "lineBreakSize": 6
+  },
+  "Abstract": {
+    "padings": {
+      "left": 5,
+      "top": 5,
+      "right": 5,
+      "bottom": 5
+    },
+    "fillColor": {
+      "red": 255,
+      "green": 255,
+      "blue": 255
+    },
+    "font": {
+      "type": "times",
+      "style": "B",
+      "size": 12
+    },
+    "textAling": "C",
+    "lineBreakSize": 6
+  }
+}
