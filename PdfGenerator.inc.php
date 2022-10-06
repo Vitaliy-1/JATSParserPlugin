@@ -10,17 +10,27 @@ import('plugins.generic.jatsParser.ChromePhp');
 class PdfGenerator
 {
 
-	/**
-	 * @param $article Submission
-	 * @param $request PKPRequest
-	 * @param $htmlDocument HTMLDocument
-	 * @param $issue Issue
-	 * @param
-	 */
-	public function createPdf(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath): string
+	private string $_htmlString;
+	private $_publication;
+	private $_request;
+	private string $_localeKey;
+	private string $_pluginPath;
+	private TCPDFDocument $_pdfDocument;
+
+	public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath)
+	{
+		$this->_htmlString = $htmlString;
+		$this->_publication = $publication;
+		$this->_request = $request;
+		$this->_localeKey = $localeKey;
+		$this->_pluginPath = $pluginPath;
+		$this->_pdfDocument = new TCPDFDocument();
+	}
+
+	public function createPdf(): string
 	{
 		// HTML preparation
-		$context = $request->getContext(); /* @var $context Journal */
+		$context = $this->_request->getContext(); /* @var $context Journal */
 
 		//$this->imageUrlReplacement($xmlGalley, $xpath);
 		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
@@ -29,31 +39,30 @@ class PdfGenerator
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
 		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
 
-		$articleDataString = $this->_getArticleDataString($publication, $request, $localeKey);
-		$pdfDocument = new TCPDFDocument();
-		$pdfHeaderLogo = $this->_getHeaderLogo($request);
-		$pdfDocument->SetCreator(PDF_CREATOR);
-		$journal = $request->getContext();
+		$articleDataString = $this->_getArticleDataString($this->_publication, $this->_request, $this->_localeKey);
+		$pdfHeaderLogo = $this->_getHeaderLogo($this->_request);
+		$this->_pdfDocument->SetCreator(PDF_CREATOR);
+		$journal = $this->_request->getContext();
 
-		$this->_setTitle($pdfDocument, $publication, $localeKey);
-		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
-		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
-		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
-		$this->_setFundamentalVisualizationParamters($pdfDocument);
+		$this->_setTitle($this->_pdfDocument);
+		$this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
+		$this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
+		$this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($this->_localeKey), $articleDataString);
+		$this->_setFundamentalVisualizationParamters($this->_pdfDocument);
 
-		$pdfDocument->AddPage();
+		$this->_pdfDocument->AddPage();
 
-		$this->_createTitleSection($pdfDocument, $publication, $localeKey);
-		$this->_createAuthorsSection($pdfDocument, $publication, $localeKey);
-		$this->_createAbstractSection($pdfDocument, $publication, $localeKey);
-		$this->_createTextSection($pdfDocument, $publication, $htmlString, $pluginPath);
+		$this->_createTitleSection();
+		$this->_createAuthorsSection();
+		$this->_createAbstractSection();
+		$this->_createTextSection();
 
-		return $pdfDocument->Output('article.pdf', 'S');
+		return $this->_pdfDocument->Output('article.pdf', 'S');
 	}
 
-	private function _setTitle(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _setTitle(TCPDFDocument $pdfDocument): void
 	{
-		$pdfDocument->setTitle($publication->getLocalizedFullTitle($localeKey));
+		$pdfDocument->setTitle($this->_publication->getLocalizedFullTitle($this->_localeKey));
 	}
 
 	private function _setFundamentalVisualizationParamters(TCPDFDocument $pdfDocument): void
@@ -83,69 +92,69 @@ class PdfGenerator
 		return $pdfHeaderLogoLocation;
 	}
 
-	private function _createTitleSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _createTitleSection(): void
 	{
-		$pdfDocument->SetFillColor(255, 255, 255); //rgb
-		$pdfDocument->SetFont('times', 'B', 10);
+		$this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
+		$this->_pdfDocument->SetFont('times', 'B', 10);
 		// Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
-		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'L', 1, 1, '', '', true);
-		$pdfDocument->Ln(6);
+		$this->_pdfDocument->MultiCell('', '', $this->_publication->getLocalizedFullTitle($this->_localeKey), 0, 'L', 1, 1, '', '', true);
+		$this->_pdfDocument->Ln(6);
 	}
 
-	private function _createAbstractSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _createAbstractSection(): void
 	{
 		// TODO: En esta seccion se puede modificar el estilo del abstract
-		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
-			$pdfDocument->setCellPaddings(5, 5, 5, 5);
-			$pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
-			$pdfDocument->SetFont('dejavuserif', '', 10);
-			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
-			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
-			$pdfDocument->Ln(4);
+		if ($abstract = $this->_publication->getLocalizedData('abstract', $this->_localeKey)) {
+			$this->_pdfDocument->setCellPaddings(5, 5, 5, 5);
+			$this->_pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
+			$this->_pdfDocument->SetFont('dejavuserif', '', 10);
+			$this->_pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
+			$this->_pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
+			$this->_pdfDocument->Ln(4);
 		}
 	}
 
-	private function _createAuthorsSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _createAuthorsSection(): void
 	{
-		$authors = $publication->getData('authors');
+		$authors = $this->_publication->getData('authors');
 		if (count($authors) > 0) {
 			/* @var $author Author */
 			// En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
 			foreach ($authors as $author) {
-				$pdfDocument->SetFont('dejavuserif', 'I', 10);
+				$this->_pdfDocument->SetFont('dejavuserif', 'I', 10);
 
 				// Calculating the line height for author name and affiliation
-				$authorName = htmlspecialchars($author->getGivenName($localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($localeKey));
-				$affiliation = htmlspecialchars($author->getAffiliation($localeKey));
+				$authorName = htmlspecialchars($author->getGivenName($this->_localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($this->_localeKey));
+				$affiliation = htmlspecialchars($author->getAffiliation($this->_localeKey));
 
 				$authorLineWidth = 60;
-				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, $authorName);
+				$authorNameStringHeight = $this->_pdfDocument->getStringHeight($authorLineWidth, $authorName);
 
 				$affiliationLineWidth = 110;
-				$afilliationStringHeight = $pdfDocument->getStringHeight(110, $affiliation);
+				$afilliationStringHeight = $this->_pdfDocument->getStringHeight(110, $affiliation);
 
 				$authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
 
 				// Writing affiliations into cells
-				$pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
-				$pdfDocument->SetFont('dejavuserif', '', 10);
-				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
+				$this->_pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
+				$this->_pdfDocument->SetFont('dejavuserif', '', 10);
+				$this->_pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
 			}
-			$pdfDocument->Ln(6);
+			$this->_pdfDocument->Ln(6);
 		}
 	}
 
-	private function _createTextSection(TCPDFDocument $pdfDocument, Publication $publication, string $htmlString, string $pluginPath): void
+	private function _createTextSection(): void
 	{
 		// Text (goes from JATSParser
-		$pdfDocument->setCellPaddings(0, 0, 0, 0);
-		$pdfDocument->SetFont('dejavuserif', '', 10);
+		$this->_pdfDocument->setCellPaddings(0, 0, 0, 0);
+		$this->_pdfDocument->SetFont('dejavuserif', '', 10);
 
-		$htmlString .= "\n" . '<style>' . "\n" . file_get_contents($pluginPath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
-		$htmlString = $this->_prepareForPdfGalley($htmlString);
+		$this->_htmlString .= "\n" . '<style>' . "\n" . file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
+		$htmlString = $this->_prepareForPdfGalley($this->_htmlString);
 		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto
 		// Se puede escoger entre: R, L, C, J   ||  R = Right, L = Left, C = Center, J = Justified
-		$pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
+		$this->_pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
 	}
 
 	private function _getArticleDataString(Publication $publication, Request $request, string $localeKey): string
