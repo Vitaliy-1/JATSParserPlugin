@@ -1,26 +1,21 @@
-<?php
-
-namespace JATSParser\PDF;
+<?php namespace JATSParser\PDF;
 
 use JATSParser\Body\Document as JATSDocument;
 use JATSParser\HTML\Document as HTMLDocument;
+require_once(__DIR__ .'/../../../vendor/tecnickcom/tcpdf/tcpdf.php');
 
-require_once(__DIR__ . '/../../../vendor/tecnickcom/tcpdf/tcpdf.php');
 
+class TCPDFDocument extends \TCPDF {
 
-class TCPDFDocument extends \TCPDF
-{
-
-	function __construct(string $htmlDocument = null)
-	{
+	function __construct(string $htmlDocument = null) {
 
 		// setting up PDF
 		//TODO modificar este constructor para poder cambiar el formato de la página y su orientación
 		parent::__construct(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+
 	}
 
-	public function Header()
-	{
+	public function Header() {
 		if ($this->header_xobjid === false) {
 			// start a new XObject Template
 			$this->header_xobjid = $this->startTemplate($this->w, $this->tMargin);
@@ -32,10 +27,10 @@ class TCPDFDocument extends \TCPDF
 			} else {
 				$this->x = $this->original_lMargin;
 			}
-			if (($headerdata['logo']) and ($headerdata['logo'] != K_BLANK_IMAGE)) {
+			if (($headerdata['logo']) AND ($headerdata['logo'] != K_BLANK_IMAGE)) {
 				$imgtype = \TCPDF_IMAGES::getImageFileType($headerdata['logo']);
 				$headerdata['logo_width'] = 12;
-				if (($imgtype == 'eps') or ($imgtype == 'ai')) {
+				if (($imgtype == 'eps') OR ($imgtype == 'ai')) {
 					$this->ImageEps($headerdata['logo'], '', '', $headerdata['logo_width']);
 				} elseif ($imgtype == 'svg') {
 					$this->ImageSVG($headerdata['logo'], '', '', $headerdata['logo_width']);
@@ -56,11 +51,11 @@ class TCPDFDocument extends \TCPDF
 			$cw = $this->w - $this->original_lMargin - $this->original_rMargin - ($headerdata['logo_width'] * 1.2);
 			$this->SetTextColorArray($this->header_text_color);
 			// header title
-			$this->SetFont('times', 'BI', 11);
+			$this->SetFont('dejavuserif', 'BI', 11);
 			$this->SetX($header_x);
 			$this->Cell($cw, $cell_height, $headerdata['title'], 0, 1, '', 0, '', 0);
 			// header string
-			$this->SetFont('times', '', 9);
+			$this->SetFont('dejavuserif', '', 9);
 			$this->SetX($header_x);
 			$this->MultiCell($cw, $cell_height, $headerdata['string'], 0, '', 0, 1, '', '', true, 0, false, true, 0, 'T', false);
 			// print an ending header line
@@ -77,7 +72,7 @@ class TCPDFDocument extends \TCPDF
 		// print header template
 		$x = 0;
 		$dx = 0;
-		if (!$this->header_xobj_autoreset and $this->booklet and (($this->page % 2) == 0)) {
+		if (!$this->header_xobj_autoreset AND $this->booklet AND (($this->page % 2) == 0)) {
 			// adjust margins for booklet mode
 			$dx = ($this->original_lMargin - $this->original_rMargin);
 		}
@@ -92,4 +87,5 @@ class TCPDFDocument extends \TCPDF
 			$this->header_xobjid = false;
 		}
 	}
+
 }

@@ -7,11 +7,6 @@ import('plugins.generic.jatsParser.ChromePhp');
  * This class is in charge of the pdf making
  * Uses TCPDF library
  */
-
-/**
- * Hola Javi
- *
- **/
 class PdfGenerator
 {
 	private string $_htmlString;
@@ -56,14 +51,14 @@ class PdfGenerator
 		$this->_pdfDocument->SetCreator(PDF_CREATOR);
 		$journal = $this->_request->getContext();
 
-		$this->_pdfdocument->setPageFormat("A4", "P"); // Recibe el formato y la orientación del documento como parámetros.
-
-		$this->_setTitle($this->_pdfDocument, $this->_publication, $this->_localeKey);
+		$this->_setTitle($this->_pdfDocument);
 		$this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
 		$this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
-		//$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
-		$this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH);
+		$this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($this->_localeKey), $articleDataString);
 		$this->_setFundamentalVisualizationParamters($this->_pdfDocument);
+		$this->_pdfDocument->setPageFormat("A4", "L"); // Recibe el formato y la orientación del documento como parámetros.
+
+		$this->_pdfDocument->AddPage();
 
 		$this->_createTitleSection();
 		$this->_createAuthorsSection();
@@ -108,11 +103,10 @@ class PdfGenerator
 	private function _createTitleSection(): void
 	{
 		$this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
-		$this->_pdfDocument->SetFont('times', 'B', 21);
+		$this->_pdfDocument->SetFont('times', 'B', 10);
 		// Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
-		$this->_pdfDocument->MultiCell('', '', $this->_publication->getLocalizedFullTitle($this->_localeKey), 0, 'C', 1, 1, '', '', true);
+		$this->_pdfDocument->MultiCell('', '', $this->_publication->getLocalizedFullTitle($this->_localeKey), 0, 'L', 1, 1, '', '', true);
 		$this->_pdfDocument->Ln(6);
-		$this->_pdfDocument->AddPage();
 	}
 
 	private function _createAbstractSection(): void
@@ -120,12 +114,11 @@ class PdfGenerator
 		// TODO: En esta seccion se puede modificar el estilo del abstract
 		if ($abstract = $this->_publication->getLocalizedData('abstract', $this->_localeKey)) {
 			$this->_pdfDocument->setCellPaddings(5, 5, 5, 5);
-			$this->_pdfDocument->SetFillColor(255, 255, 255); // Color de fondo del abstract
-			$this->_pdfDocument->SetFont('times', 'I', 9);
-			$this->_pdfDocument->SetLineStyle(array('width' => 0.0, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 255, 255)));  // Tipo de linea divisoria y color
+			$this->_pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
+			$this->_pdfDocument->SetFont('dejavuserif', '', 10);
+			$this->_pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
 			$this->_pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
 			$this->_pdfDocument->Ln(4);
-			$this->_pdfDocument->AddPage();
 		}
 	}
 
@@ -136,7 +129,7 @@ class PdfGenerator
 			/* @var $author Author */
 			// En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
 			foreach ($authors as $author) {
-				$this->_pdfDocument->SetFont('times', 'I', 10);
+				$this->_pdfDocument->SetFont('dejavuserif', 'I', 10);
 
 				// Calculating the line height for author name and affiliation
 				$authorName = htmlspecialchars($author->getGivenName($this->_localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($this->_localeKey));
@@ -152,7 +145,7 @@ class PdfGenerator
 
 				// Writing affiliations into cells
 				$this->_pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
-				$this->_pdfDocument->SetFont('times', '', 10);
+				$this->_pdfDocument->SetFont('dejavuserif', '', 10);
 				$this->_pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
 			}
 			$this->_pdfDocument->Ln(6);
@@ -163,13 +156,13 @@ class PdfGenerator
 	{
 		// Text (goes from JATSParser
 		$this->_pdfDocument->setCellPaddings(0, 0, 0, 0);
-		$this->_pdfDocument->SetFont('times', '', 11);
-		// $pdfDocument->setCellHeightRatio(13.2);
+		$this->_pdfDocument->SetFont('dejavuserif', '', 10);
+
 		$this->_htmlString .= "\n" . '<style>' . "\n" . file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
-		$this->_htmlString = $this->_prepareForPdfGalley($this->_htmlString);
+		$htmlString = $this->_prepareForPdfGalley($this->_htmlString);
 		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto
 		// Se puede escoger entre: R, L, C, J   ||  R = Right, L = Left, C = Center, J = Justified
-		$this->_pdfDocument->writeHTML($this->_htmlString, true, false, true, false, 'J');
+		$this->_pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
 	}
 
 	private function _getArticleDataString(Publication $publication, Request $request, string $localeKey): string
