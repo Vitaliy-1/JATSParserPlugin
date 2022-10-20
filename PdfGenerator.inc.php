@@ -7,6 +7,11 @@ import('plugins.generic.jatsParser.ChromePhp');
  * This class is in charge of the pdf making
  * Uses TCPDF library
  */
+
+/**
+ * Hola Javi
+ *
+ **/
 class PdfGenerator
 {
 	private string $_htmlString;
