@@ -18,7 +18,9 @@ span.title {
 /* 
  * Texto dentro de las tablas
  */
-span.notes, p.caption, table {
+span.notes,
+p.caption,
+table {
 	font-size: 10px;
 }
 
@@ -36,4 +38,8 @@ th {
 
 .caption br {
 	line-height: 50%;
+}
+
+p {
+	text-indent: 30px
 }

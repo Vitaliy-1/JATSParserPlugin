@@ -43,12 +43,13 @@ class PdfGenerator
 		$pdfDocument->SetCreator(PDF_CREATOR);
 		$journal = $request->getContext();
 
-		$pdfDocument->setPageFormat("A4", "L"); // Recibe el formato y la orientación del documento como parámetros.
+		$pdfDocument->setPageFormat("A4", "P"); // Recibe el formato y la orientación del documento como parámetros.
 
 		$this->_setTitle($pdfDocument, $publication, $localeKey);
 		$pdfDocument->SetAuthor($publication->getAuthorString($userGroups));
 		$pdfDocument->SetSubject($publication->getLocalizedData('subject', $localeKey));
-		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
+		//$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($localeKey), $articleDataString);
+		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH);
 		$this->_setFundamentalVisualizationParamters($pdfDocument);
 
 		$pdfDocument->AddPage();
@@ -96,10 +97,11 @@ class PdfGenerator
 	private function _createTitleSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
 	{
 		$pdfDocument->SetFillColor(255, 255, 255); //rgb
-		$pdfDocument->SetFont('times', 'B', 10);
+		$pdfDocument->SetFont('times', 'B', 21);
 		// Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
-		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'L', 1, 1, '', '', true);
+		$pdfDocument->MultiCell('', '', $publication->getLocalizedFullTitle($localeKey), 0, 'C', 1, 1, '', '', true);
 		$pdfDocument->Ln(6);
+		$pdfDocument->AddPage();
 	}
 
 	private function _createAbstractSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
@@ -107,11 +109,12 @@ class PdfGenerator
 		// TODO: En esta seccion se puede modificar el estilo del abstract
 		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
 			$pdfDocument->setCellPaddings(5, 5, 5, 5);
-			$pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
-			$pdfDocument->SetFont('dejavuserif', '', 10);
-			$pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
+			$pdfDocument->SetFillColor(255, 255, 255); // Color de fondo del abstract
+			$pdfDocument->SetFont('times', 'I', 9);
+			$pdfDocument->SetLineStyle(array('width' => 0.0, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 255, 255)));  // Tipo de linea divisoria y color
 			$pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
 			$pdfDocument->Ln(4);
+			$pdfDocument->AddPage();
 		}
 	}
 
@@ -122,7 +125,7 @@ class PdfGenerator
 			/* @var $author Author */
 			// En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
 			foreach ($authors as $author) {
-				$pdfDocument->SetFont('dejavuserif', 'I', 10);
+				$pdfDocument->SetFont('times', 'I', 10);
 
 				// Calculating the line height for author name and affiliation
 				$authorName = htmlspecialchars($author->getGivenName($localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($localeKey));
@@ -138,7 +141,7 @@ class PdfGenerator
 
 				// Writing affiliations into cells
 				$pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
-				$pdfDocument->SetFont('dejavuserif', '', 10);
+				$pdfDocument->SetFont('times', '', 10);
 				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
 			}
 			$pdfDocument->Ln(6);
@@ -149,8 +152,8 @@ class PdfGenerator
 	{
 		// Text (goes from JATSParser
 		$pdfDocument->setCellPaddings(0, 0, 0, 0);
-		$pdfDocument->SetFont('dejavuserif', '', 10);
-
+		$pdfDocument->SetFont('times', '', 11);
+		// $pdfDocument->setCellHeightRatio(13.2);
 		$htmlString .= "\n" . '<style>' . "\n" . file_get_contents($pluginPath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
 		$htmlString = $this->_prepareForPdfGalley($htmlString);
 		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto
