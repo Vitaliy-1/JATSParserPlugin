@@ -127,8 +127,8 @@ class JatsParserPlugin extends GenericPlugin
 	 */
 	private function pdfCreation(string $htmlString, Publication $publication, Request $request, string $localeKey): string
 	{
-		$pdfCreator = new PdfGenerator();
-		return $pdfCreator->createPdf($htmlString, $publication, $request, $localeKey, $this->getPluginPath());
+		$pdfCreator = new PdfGenerator($htmlString,  $publication,  $request,  $localeKey, $this->getPluginPath());
+		return $pdfCreator->createPdf();
 	}
 
 

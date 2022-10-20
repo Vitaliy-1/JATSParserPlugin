@@ -9,18 +9,27 @@ import('plugins.generic.jatsParser.ChromePhp');
  */
 class PdfGenerator
 {
+	private string $_htmlString;
+	private Publication $_publication;
+	private Request $_request;
+	private string $_localeKey;
+	private string $_pluginPath;
+	private TCPDFDocument $_pdfDocument;
 
-	/**
-	 * @param $article Submission
-	 * @param $request PKPRequest
-	 * @param $htmlDocument HTMLDocument
-	 * @param $issue Issue
-	 * @param
-	 */
-	public function createPdf(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath): string
+	public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath)
+	{
+		$this->_htmlString = $htmlString;
+		$this->_publication = $publication;
+		$this->_request = $request;
+		$this->_localeKey = $localeKey;
+		$this->_pluginPath = $pluginPath;
+		$this->_pdfDocument = new TCPDFDocument();
+	}
+
+	public function createPdf(): string
 	{
 
-		$data = file_get_contents($pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
+		$data = file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
 		$prueba = json_decode($data, true);
 
 		ChromePhp::log("Hola Mundo");
@@ -28,7 +37,7 @@ class PdfGenerator
 
 
 		// HTML preparation
-		$context = $request->getContext(); /* @var $context Journal */
+		$context = $this->_request->getContext(); /* @var $context Journal */
 
 		//$this->imageUrlReplacement($xmlGalley, $xpath);
 		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
@@ -37,11 +46,10 @@ class PdfGenerator
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
 		$userGroups = $userGroupDao->getByContextId($context->getId())->toArray();
 
-		$articleDataString = $this->_getArticleDataString($publication, $request, $localeKey);
-		$pdfDocument = new TCPDFDocument();
-		$pdfHeaderLogo = $this->_getHeaderLogo($request);
-		$pdfDocument->SetCreator(PDF_CREATOR);
-		$journal = $request->getContext();
+		$articleDataString = $this->_getArticleDataString($this->_publication, $this->_request, $this->_localeKey);
+		$pdfHeaderLogo = $this->_getHeaderLogo($this->_request);
+		$this->_pdfDocument->SetCreator(PDF_CREATOR);
+		$journal = $this->_request->getContext();
 
 		$pdfDocument->setPageFormat("A4", "P"); // Recibe el formato y la orientación del documento como parámetros.
 
@@ -52,19 +60,17 @@ class PdfGenerator
 		$pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH);
 		$this->_setFundamentalVisualizationParamters($pdfDocument);
 
-		$pdfDocument->AddPage();
+		$this->_createTitleSection();
+		$this->_createAuthorsSection();
+		$this->_createAbstractSection();
+		$this->_createTextSection();
 
-		$this->_createTitleSection($pdfDocument, $publication, $localeKey);
-		$this->_createAuthorsSection($pdfDocument, $publication, $localeKey);
-		$this->_createAbstractSection($pdfDocument, $publication, $localeKey);
-		$this->_createTextSection($pdfDocument, $publication, $htmlString, $pluginPath);
-
-		return $pdfDocument->Output('article.pdf', 'S');
+		return $this->_pdfDocument->Output('article.pdf', 'S');
 	}
 
-	private function _setTitle(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _setTitle(TCPDFDocument $pdfDocument): void
 	{
-		$pdfDocument->setTitle($publication->getLocalizedFullTitle($localeKey));
+		$pdfDocument->setTitle($this->_publication->getLocalizedFullTitle($this->_localeKey));
 	}
 
 	private function _setFundamentalVisualizationParamters(TCPDFDocument $pdfDocument): void
@@ -94,7 +100,7 @@ class PdfGenerator
 		return $pdfHeaderLogoLocation;
 	}
 
-	private function _createTitleSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _createTitleSection(): void
 	{
 		$pdfDocument->SetFillColor(255, 255, 255); //rgb
 		$pdfDocument->SetFont('times', 'B', 21);
@@ -104,7 +110,7 @@ class PdfGenerator
 		$pdfDocument->AddPage();
 	}
 
-	private function _createAbstractSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _createAbstractSection(): void
 	{
 		// TODO: En esta seccion se puede modificar el estilo del abstract
 		if ($abstract = $publication->getLocalizedData('abstract', $localeKey)) {
@@ -118,9 +124,9 @@ class PdfGenerator
 		}
 	}
 
-	private function _createAuthorsSection(TCPDFDocument $pdfDocument, Publication $publication, string $localeKey): void
+	private function _createAuthorsSection(): void
 	{
-		$authors = $publication->getData('authors');
+		$authors = $this->_publication->getData('authors');
 		if (count($authors) > 0) {
 			/* @var $author Author */
 			// En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
@@ -128,14 +134,14 @@ class PdfGenerator
 				$pdfDocument->SetFont('times', 'I', 10);
 
 				// Calculating the line height for author name and affiliation
-				$authorName = htmlspecialchars($author->getGivenName($localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($localeKey));
-				$affiliation = htmlspecialchars($author->getAffiliation($localeKey));
+				$authorName = htmlspecialchars($author->getGivenName($this->_localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($this->_localeKey));
+				$affiliation = htmlspecialchars($author->getAffiliation($this->_localeKey));
 
 				$authorLineWidth = 60;
-				$authorNameStringHeight = $pdfDocument->getStringHeight($authorLineWidth, $authorName);
+				$authorNameStringHeight = $this->_pdfDocument->getStringHeight($authorLineWidth, $authorName);
 
 				$affiliationLineWidth = 110;
-				$afilliationStringHeight = $pdfDocument->getStringHeight(110, $affiliation);
+				$afilliationStringHeight = $this->_pdfDocument->getStringHeight(110, $affiliation);
 
 				$authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
 
@@ -144,11 +150,11 @@ class PdfGenerator
 				$pdfDocument->SetFont('times', '', 10);
 				$pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
 			}
-			$pdfDocument->Ln(6);
+			$this->_pdfDocument->Ln(6);
 		}
 	}
 
-	private function _createTextSection(TCPDFDocument $pdfDocument, Publication $publication, string $htmlString, string $pluginPath): void
+	private function _createTextSection(): void
 	{
 		// Text (goes from JATSParser
 		$pdfDocument->setCellPaddings(0, 0, 0, 0);
@@ -158,7 +164,7 @@ class PdfGenerator
 		$htmlString = $this->_prepareForPdfGalley($htmlString);
 		//  TODO: En el ultimo parametro es donde se escoge la alineacion del texto
 		// Se puede escoger entre: R, L, C, J   ||  R = Right, L = Left, C = Center, J = Justified
-		$pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
+		$this->_pdfDocument->writeHTML($htmlString, true, false, true, false, 'J');
 	}
 
 	private function _getArticleDataString(Publication $publication, Request $request, string $localeKey): string
