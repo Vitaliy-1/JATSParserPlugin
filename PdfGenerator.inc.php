@@ -32,8 +32,8 @@ class PdfGenerator
     $data = file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
     $prueba = json_decode($data, true);
 
-    ChromePhp::log("Hola Mundo");
-    ChromePhp::log($prueba);
+    // ChromePhp::log("Hola Mundo");
+    // ChromePhp::log($prueba);
 
 
     // HTML preparation
