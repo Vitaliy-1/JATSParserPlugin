@@ -246,7 +246,8 @@ class PdfGenerator
   {
 		//TODO Probar esto en la compu de charlie
     $articleDataString = '';
-    $context = $request->getContext(); /* @var $context Journal */
+		//TODO agregar journal como atrbuto de clase
+    $context = $request->getContext(); /* @var $context Journal */ 
     $submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
     $issueDao = DAORegistry::getDAO('IssueDAO');
     $issue = $issueDao->getBySubmissionId($submission->getId(), $context->getId());
