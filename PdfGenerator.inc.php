@@ -1,6 +1,8 @@
 <?php
 
+use JATSParser\Back\Journal;
 use JATSParser\PDF\TCPDFDocument;
+
 
 import('plugins.generic.jatsParser.ChromePhp');
 /**
@@ -15,6 +17,7 @@ class PdfGenerator
   private string $_localeKey;
   private string $_pluginPath;
   private TCPDFDocument $_pdfDocument;
+	
 
   public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath)
   {
@@ -32,7 +35,24 @@ class PdfGenerator
     $data = file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
     $prueba = json_decode($data, true);
 
-    // ChromePhp::log("Hola Mundo");
+
+		// $article =& $record->getData('article');
+		// $journal =& $record->getData('journal');
+		// $section =& $record->getData('section');
+		// $issue =& $record->getData('issue');
+		// $galleys =& $record->getData('galleys');
+		// $articleId = $article->getId();
+		// $publication = $article->getCurrentPublication();
+
+		// $request = Application::get()->getRequest();
+
+		// $abbreviation = $journal->getLocalizedSetting('abbreviation');
+		// $printIssn = $journal->getSetting('printIssn');
+		// $onlineIssn = $journal->getSetting('onlineIssn');
+		// $articleLocale = $article->getLocale();
+
+
+    // ChromePhp::log($issue);
     // ChromePhp::log($prueba);
 
 
@@ -50,14 +70,14 @@ class PdfGenerator
     $pdfHeaderLogo = $this->_getHeaderLogo($this->_request);
     $this->_pdfDocument->SetCreator(PDF_CREATOR);
     $journal = $this->_request->getContext();
-
+		
     $this->_setTitle($this->_pdfDocument);
     $this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
     $this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
     $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($this->_localeKey), $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
     $this->_pdfDocument->setPageFormat('A4', "P"); // Recibe el formato y la orientación del documento como parámetros.
-
+		
     $this->_pdfDocument->AddPage();
     $this->_createFrontPage();
 
@@ -223,8 +243,8 @@ class PdfGenerator
   }
 
   private function _getArticleDataString(Publication $publication, Request $request, string $localeKey): string
-
   {
+		//TODO Probar esto en la compu de charlie
     $articleDataString = '';
     $context = $request->getContext(); /* @var $context Journal */
     $submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
@@ -240,6 +260,8 @@ class PdfGenerator
     if ($doi = $publication->getData('pub-id::doi')) {
       $articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
     }
+
+		ChromePhp::log($context);
 
     return $articleDataString;
   }
