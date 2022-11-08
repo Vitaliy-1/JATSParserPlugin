@@ -26,6 +26,11 @@ div.caption {
 	line-height: 90%;
 }
 
+p {
+	color: #530101;
+	line-height: 18pt;
+}
+
 a {
 	color: #530101;
 }
