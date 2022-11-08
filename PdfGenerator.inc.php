@@ -101,17 +101,47 @@ class PdfGenerator
     return $pdfHeaderLogoLocation;
   }
 
+  private function _printPairInfo(string $name, string $info)
+  {
+    $this->_pdfDocument->SetFont('times', '', 7);
+    $a = '<b>' . $name . ' </b>' . $info;
+    $this->_pdfDocument->writeHTML($a, true, false, false, false, 'R');
+  }
   private function _createFrontPage(): void
   {
+
     $this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
     $this->_pdfDocument->SetFont('times', 'B', 15);
-    // Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
-    $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 0, '', '', true);
-    $this->_pdfDocument->Ln(3);
+    $this->_pdfDocument->setCellHeightRatio(1.2);
     $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 1, '', '', true);
-    $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 1, '', '', true);
+    // $this->_printPairInfo('Journal ID (publisher-id):', 'mb');
+    $this->_printPairInfo('Abbreviated Title:', 'Madera bosques');
+    $this->_printPairInfo('ISSN (print):', '1405-0471');
+    $this->_printPairInfo('Publisher:', 'Instituto de Ecología A.C. ');
+    //
+    $this->_pdfDocument->SetFont('times', 'B', 15);
+    $this->_pdfDocument->Ln(1);
+    $this->_pdfDocument->MultiCell('', '', 'Article/Issue Information', 0, 'R', 1, 1, '', '', true);
+    $this->_printPairInfo('Volume:', '23');
+    $this->_printPairInfo('Issue:', '3');
+    $this->_printPairInfo('Pages:', '07-14');
+    $this->_printPairInfo('DOI:', '10.21829/myb.2017.2331418  ');
+    $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
+    $this->_printPairInfo('Award ID:', '203316');
+
+
+    // $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 1, '', '', true);
+    // $this->_pdfDocument->SetFont('times', 'B', 7);
+    // $this->_pdfDocument->MultiCell('', '', 'Journal ID (publisher-id):', 0, 'R', 1, 0, '', '', true);
+    // $this->_pdfDocument->SetFont('times', '', 7);
+    // $this->_pdfDocument->MultiCell('', '', 'mb', 0, 'R', 1, 1, '', '', true);
+    // $this->_pdfDocument->setCellHeightRatio(1.2);
+    // $this->_pdfDocument->SetFont('times', 'B', 7);
+    // $this->_pdfDocument->MultiCell('', '', 'Title:', 0, 'R', 1, 0, '', '', true);
+    // $this->_pdfDocument->SetFont('times', '', 7);
+    // $this->_pdfDocument->MultiCell('', '', 'Madera y bosques', 0, 'R', 1, 0, '', '', true);
     // $h,
-    // $txt,
+    // $txt2
     // $border = 0,
     // $align = 'J',
     // $fill = false,
@@ -131,9 +161,8 @@ class PdfGenerator
     $this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
     $this->_pdfDocument->SetFont('times', 'B', 10);
     // Con el quinto parámetro se puede cambiar la alineación del título, L = left , R = right, C = Center, J = Justify
-    $this->_pdfDocument->MultiCell('', '', $this->_publication->getLocalizedFullTitle($this->_localeKey), 0, 'L', 1, 1, '', '', true);
     $this->_pdfDocument->Ln(6);
-    $this->_pdfDocument->MultiCell('', '', $this->_publication->getLocalizedFullTitle($this->_localeKey), 0, 'L', 1, 1, '', '', true);
+    // $this->_pdfDocument->MultiCell('', '', $this->_publication->getLocalizedFullTitle($this->_localeKey), 0, 'L', 1, 1, '', '', true);
   }
 
   private function _createAbstractSection(): void
@@ -183,7 +212,8 @@ class PdfGenerator
   {
     // Text (goes from JATSParser
     $this->_pdfDocument->setCellPaddings(0, 0, 0, 0);
-    $this->_pdfDocument->SetFont('dejavuserif', '', 10);
+    $this->_pdfDocument->SetFont('times', '', 12);
+    // $this->_pdfDocument->setCellHeightRatio(1.5);
 
     $this->_htmlString .= "\n" . '<style>' . "\n" . file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'styles' . DIRECTORY_SEPARATOR . 'default' . DIRECTORY_SEPARATOR . 'pdfGalley.css') . '</style>';
     $htmlString = $this->_prepareForPdfGalley($this->_htmlString);
