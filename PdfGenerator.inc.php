@@ -170,9 +170,9 @@ class PdfGenerator
     // TODO: En esta seccion se puede modificar el estilo del abstract
     if ($abstract = $this->_publication->getLocalizedData('abstract', $this->_localeKey)) {
       $this->_pdfDocument->setCellPaddings(5, 5, 5, 5);
-      $this->_pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
-      $this->_pdfDocument->SetFont('dejavuserif', '', 10);
-      $this->_pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
+      $this->_pdfDocument->SetFillColor(255, 255, 255); // Color de fondo del abstract
+      $this->_pdfDocument->SetFont('times', '', 11);
+      $this->_pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 255, 255)));  // Tipo de linea divisoria y color
       $this->_pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
       $this->_pdfDocument->Ln(4);
     }
@@ -185,7 +185,7 @@ class PdfGenerator
       /* @var $author Author */
       // En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
       foreach ($authors as $author) {
-        $this->_pdfDocument->SetFont('dejavuserif', 'I', 10);
+        $this->_pdfDocument->SetFont('times', 'I', 10);
 
         // Calculating the line height for author name and affiliation
         $authorName = htmlspecialchars($author->getGivenName($this->_localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($this->_localeKey));
@@ -201,7 +201,7 @@ class PdfGenerator
 
         // Writing affiliations into cells
         $this->_pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
-        $this->_pdfDocument->SetFont('dejavuserif', '', 10);
+        $this->_pdfDocument->SetFont('times', '', 10);
         $this->_pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
       }
       $this->_pdfDocument->Ln(6);
