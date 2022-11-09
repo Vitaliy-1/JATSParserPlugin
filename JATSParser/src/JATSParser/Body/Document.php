@@ -158,10 +158,7 @@ class Document {
 				}
 			}
 		}
-ChromePhp::log('ArticleContent');
-ChromePhp::log($articleContent);
 		$this->articleContent = $articleContent;
-ChromePhp::log($this->articleContent);
 	}
 
 }
