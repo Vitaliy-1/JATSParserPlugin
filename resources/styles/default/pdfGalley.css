@@ -27,12 +27,13 @@ div.caption {
 }
 
 p {
-	color: #530101;
+	color: black;
 	line-height: 18pt;
+	text-indent: 20pt;
 }
 
 a {
-	color: #530101;
+	color: black;
 }
 
 th {
@@ -41,4 +42,9 @@ th {
 
 .caption br {
 	line-height: 50%;
+}
+
+h2 {
+	font-size: 17pt;
+	font-weight: bold;
 }

@@ -1,6 +1,9 @@
 <?php 
 
+use JATSParser\Back\Journal;
 use JATSParser\PDF\TCPDFDocument;
+
+
 import('plugins.generic.jatsParser.ChromePhp');
 // import('plugins.generic.jatsParser.KeywordGroup');
 // import('plugins.generic.jatsParser.PdfGenerator');
@@ -16,6 +19,7 @@ class PdfGenerator
   private string $_localeKey;
   private string $_pluginPath;
   private TCPDFDocument $_pdfDocument;
+	
 
   /* @var $document \DOMDocument */
   private $document;
@@ -64,8 +68,26 @@ class PdfGenerator
     $data = file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
     $prueba = json_decode($data, true);
 
-    // $logger = new ChromeLogger();
-    // $logger->notice("awesome sauce!");
+
+		// $article =& $record->getData('article');
+		// $journal =& $record->getData('journal');
+		// $section =& $record->getData('section');
+		// $issue =& $record->getData('issue');
+		// $galleys =& $record->getData('galleys');
+		// $articleId = $article->getId();
+		// $publication = $article->getCurrentPublication();
+
+		// $request = Application::get()->getRequest();
+
+		// $abbreviation = $journal->getLocalizedSetting('abbreviation');
+		// $printIssn = $journal->getSetting('printIssn');
+		// $onlineIssn = $journal->getSetting('onlineIssn');
+		// $articleLocale = $article->getLocale();
+
+
+    // ChromePhp::log($issue);
+    // ChromePhp::log($prueba);
+
 
     // HTML preparation
     $context = $this->_request->getContext(); /* @var $context Journal */
@@ -81,14 +103,14 @@ class PdfGenerator
     $pdfHeaderLogo = $this->_getHeaderLogo($this->_request);
     $this->_pdfDocument->SetCreator(PDF_CREATOR);
     $journal = $this->_request->getContext();
-
+		
     $this->_setTitle($this->_pdfDocument);
     $this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
     $this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
     $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($this->_localeKey), $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
     $this->_pdfDocument->setPageFormat('A4', "P"); // Recibe el formato y la orientación del documento como parámetros.
-
+		
     $this->_pdfDocument->AddPage();
 
     $this->_createFrontPage();
@@ -223,9 +245,9 @@ class PdfGenerator
     // TODO: En esta seccion se puede modificar el estilo del abstract
     if ($abstract = $this->_publication->getLocalizedData('abstract', $this->_localeKey)) {
       $this->_pdfDocument->setCellPaddings(5, 5, 5, 5);
-      $this->_pdfDocument->SetFillColor(204, 255, 255); // Color de fondo del abstract
-      $this->_pdfDocument->SetFont('dejavuserif', '', 10);
-      $this->_pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(65, 163, 231)));  // Tipo de linea divisoria y color
+      $this->_pdfDocument->SetFillColor(255, 255, 255); // Color de fondo del abstract
+      $this->_pdfDocument->SetFont('times', '', 11);
+      $this->_pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 255, 255)));  // Tipo de linea divisoria y color
       $this->_pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
       $this->_pdfDocument->Ln(4);
     }
@@ -238,7 +260,7 @@ class PdfGenerator
       /* @var $author Author */
       // En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
       foreach ($authors as $author) {
-        $this->_pdfDocument->SetFont('dejavuserif', 'I', 10);
+        $this->_pdfDocument->SetFont('times', 'I', 10);
 
         // Calculating the line height for author name and affiliation
         $authorName = htmlspecialchars($author->getGivenName($this->_localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($this->_localeKey));
@@ -254,7 +276,7 @@ class PdfGenerator
 
         // Writing affiliations into cells
         $this->_pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
-        $this->_pdfDocument->SetFont('dejavuserif', '', 10);
+        $this->_pdfDocument->SetFont('times', '', 10);
         $this->_pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
       }
       $this->_pdfDocument->Ln(6);
@@ -276,10 +298,11 @@ class PdfGenerator
   }
 
   private function _getArticleDataString(Publication $publication, Request $request, string $localeKey): string
-
   {
+		//TODO Probar esto en la compu de charlie
     $articleDataString = '';
-    $context = $request->getContext(); /* @var $context Journal */
+		//TODO agregar journal como atrbuto de clase
+    $context = $request->getContext(); /* @var $context Journal */ 
     $submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
     $issueDao = DAORegistry::getDAO('IssueDAO');
     $issue = $issueDao->getBySubmissionId($submission->getId(), $context->getId());
@@ -293,6 +316,8 @@ class PdfGenerator
     if ($doi = $publication->getData('pub-id::doi')) {
       $articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
     }
+
+		ChromePhp::log($context);
 
     return $articleDataString;
   }
