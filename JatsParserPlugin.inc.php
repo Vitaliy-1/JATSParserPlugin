@@ -125,9 +125,12 @@ class JatsParserPlugin extends GenericPlugin
 	 * @param $issue Issue
 	 * @param
 	 */
-	private function pdfCreation(string $htmlString, Publication $publication, Request $request, string $localeKey): string
+	private function pdfCreation(string $htmlString, Publication $publication, Request $request, string $localeKey, $submissionFileForPdf): string
 	{
-		$pdfCreator = new PdfGenerator($htmlString,  $publication,  $request,  $localeKey, $this->getPluginPath());
+		import('lib.pkp.classes.file.PrivateFileManager');
+		$fileMgr = new PrivateFileManager();
+		$path = $fileMgr->getBasePath() . DIRECTORY_SEPARATOR . $submissionFileForPdf->getData('path');
+		$pdfCreator = new PdfGenerator($htmlString,  $publication,  $request,  $localeKey, $this->getPluginPath(), $path);
 		return $pdfCreator->createPdf();
 	}
 
@@ -314,15 +317,25 @@ class JatsParserPlugin extends GenericPlugin
 		$newPublication = $args[0]; /* @var $newPublication Publication */
 		$params = $args[2];
 		$request = $args[3];
-		// TODO: Se localiza el templeate seleccionado se encuentra en $args[2] junto con las opciones todas las opciones seleccionados
-		ChromePhp::log($args[2]);
+
+		$localePare = $params['jatsParser::fullTextFileId'];
+    $submissionFileForPdf =0;
+
+		foreach ($localePare as $localeKey => $fileId) {
+			if (empty($fileId)) {
+				$newPublication->setData('jatsParser::fullText', null, $localeKey);
+				$newPublication->setData('jatsParser::fullTextFileId', null, $localeKey);
+				continue;
+			}
+			$submissionFileForPdf = Services::get('submissionFile')->get($fileId);
+			// $htmlDocument = $this->getFullTextFromJats($submissionFile);
+			// $newPublication->setData('jatsParser::fullText', $htmlDocument->saveAsHTML(), $localeKey);
+		// $submissionFileForPdf = Services::get('submissionFile')->get($fileId);
+		}
 
 		if (!array_key_exists('jatsParser::pdfGalley', $params)) return false;
 		if (!$this->getSetting($request->getContext()->getId(), 'convertToPdf')) return false;
 
-		if (array_key_exists('jatsParser::selectedTemplate', $params)) {
-			ChromePhp::log('Si capta el template');
-		}
 		$articleGalleyDao = DAORegistry::getDAO('ArticleGalleyDAO'); /* @var $articleGalleyDao ArticleGalleyDAO */
 
 		$localePare = $params['jatsParser::pdfGalley'];
@@ -334,6 +347,8 @@ class JatsParserPlugin extends GenericPlugin
 			// Set real path to images, attached to the original JATS XML file
 			$jatsFileId = $newPublication->getData('jatsParser::fullTextFileId', $localeKey);
 			$jatsSubmissionFile = Services::get('submissionFile')->get($jatsFileId);
+
+
 			if ($jatsSubmissionFile) {
 				$fullText = $this->_setSupplImgPath($jatsSubmissionFile, $fullText);
 			}
@@ -347,7 +362,7 @@ class JatsParserPlugin extends GenericPlugin
 
 			// Finally, convert and receive TCPDF output as a binary string
 			// TODO: Se localiza el llamado a la generación del pdf
-			$pdf = $this->pdfCreation($fullText, $newPublication, $request, $localeKey);
+			$pdf = $this->pdfCreation($fullText, $newPublication, $request, $localeKey, $submissionFileForPdf);
 
 			// Create a PDF Galley
 			$galleyId = $this->createGalley($localeKey, $newPublication);

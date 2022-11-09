@@ -1,8 +1,9 @@
-<?php
+<?php 
 
 use JATSParser\PDF\TCPDFDocument;
-
 import('plugins.generic.jatsParser.ChromePhp');
+// import('plugins.generic.jatsParser.KeywordGroup');
+// import('plugins.generic.jatsParser.PdfGenerator');
 /**
  * This class is in charge of the pdf making
  * Uses TCPDF library
@@ -16,25 +17,55 @@ class PdfGenerator
   private string $_pluginPath;
   private TCPDFDocument $_pdfDocument;
 
-  public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath)
+  /* @var $document \DOMDocument */
+  private $document;
+
+  /* @var $xpath \DOMXPath */
+  // private static $xpath;
+
+
+  /* var $articleSections array */
+  // private $articleContent = array();
+
+
+  public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath, $submissionPluginPath)
   {
+
     $this->_htmlString = $htmlString;
     $this->_publication = $publication;
     $this->_request = $request;
     $this->_localeKey = $localeKey;
     $this->_pluginPath = $pluginPath;
     $this->_pdfDocument = new TCPDFDocument();
-  }
+    // $document = new \DOMDocument;
+    // $this->document = $document->load($documentPath);
+    // self::$xpath = new \DOMXPath($document);
 
+    // $this->extractContent();
+// TODO: Ver donde poner esto
+  }
+  // private function extractContent()
+  // {
+  //   $articleContent = array();
+  //   foreach (self::$xpath->evaluate("/article/front") as $front) {
+  //     foreach (self::$xpath->evaluate(".//sec|./p|./kwd-group", $front) as $content) {
+  //       switch ($content->nodeName) {
+  //         case "kwd-group":
+  //           $keywordGroup = new KeywordGroup($content);
+  //           $articleContent[] = $keywordGroup;
+  //           break;
+  //       }
+  //     }
+  //   }
+  //   $this->articleContent = $articleContent;
+  // }
   public function createPdf(): string
   {
-
     $data = file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
     $prueba = json_decode($data, true);
 
-    // ChromePhp::log("Hola Mundo");
-    // ChromePhp::log($prueba);
-
+    // $logger = new ChromeLogger();
+    // $logger->notice("awesome sauce!");
 
     // HTML preparation
     $context = $this->_request->getContext(); /* @var $context Journal */
@@ -59,7 +90,9 @@ class PdfGenerator
     $this->_pdfDocument->setPageFormat('A4', "P"); // Recibe el formato y la orientación del documento como parámetros.
 
     $this->_pdfDocument->AddPage();
+
     $this->_createFrontPage();
+    // $this->_createKeywordsSection($keywords);
 
     $this->_createTitleSection();
     $this->_createAuthorsSection();
@@ -69,6 +102,26 @@ class PdfGenerator
     return $this->_pdfDocument->Output('article.pdf', 'S');
   }
 
+  private function _createKeywordsSection($keywords)
+  {
+    $this->_pdfDocument->SetFontSize(21);
+    $this->_pdfDocument->MultiCell('', '', 'Keywords', 0, 'C', 1, 1, '', '', true);
+    // for ($keyword = 0; $keyword < $keywords; $keyword++) {
+    //   # code...
+    // }
+    // for ($i=0; $i < ; $i++) { 
+    //   # code...
+    // }
+    // for ($i=0; $i < ; $i++) { 
+    //   # code...
+    // }
+    // for ($i=0; $i < ; $i++) { 
+    //   # code...
+    // }
+    // for ($i=0; $i < ; $i++) { 
+    //   # code...
+    // }
+  }
   private function _setTitle(TCPDFDocument $pdfDocument): void
   {
     $pdfDocument->setTitle($this->_publication->getLocalizedFullTitle($this->_localeKey));
@@ -114,7 +167,7 @@ class PdfGenerator
     $this->_pdfDocument->SetFont('times', 'B', 15);
     $this->_pdfDocument->setCellHeightRatio(1.2);
     $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 1, '', '', true);
-    // $this->_printPairInfo('Journal ID (publisher-id):', 'mb');
+    $this->_printPairInfo('Journal ID (publisher-id):', 'mb');
     $this->_printPairInfo('Abbreviated Title:', 'Madera bosques');
     $this->_printPairInfo('ISSN (print):', '1405-0471');
     $this->_printPairInfo('Publisher:', 'Instituto de Ecología A.C. ');
