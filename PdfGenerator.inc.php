@@ -1,10 +1,15 @@
-<?php 
+<?php
 
 use JATSParser\Back\Journal;
+use JATSParser\Body\Figure;
+use JATSParser\Body\KeywordGroup;
 use JATSParser\PDF\TCPDFDocument;
+use JATSParser\Body\Section;
 
 
 import('plugins.generic.jatsParser.ChromePhp');
+import('plugins.generic.jatsParser.KeywordGroup');
+
 // import('plugins.generic.jatsParser.KeywordGroup');
 // import('plugins.generic.jatsParser.PdfGenerator');
 /**
@@ -19,17 +24,17 @@ class PdfGenerator
   private string $_localeKey;
   private string $_pluginPath;
   private TCPDFDocument $_pdfDocument;
-	
+
 
   /* @var $document \DOMDocument */
   private $document;
 
   /* @var $xpath \DOMXPath */
-  // private static $xpath;
+  private static $xpath;
 
 
   /* var $articleSections array */
-  // private $articleContent = array();
+  private $articleContent = array();
 
 
   public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath, $submissionPluginPath)
@@ -41,48 +46,47 @@ class PdfGenerator
     $this->_localeKey = $localeKey;
     $this->_pluginPath = $pluginPath;
     $this->_pdfDocument = new TCPDFDocument();
-    // $document = new \DOMDocument;
-    // $this->document = $document->load($documentPath);
-    // self::$xpath = new \DOMXPath($document);
+    ChromePhp::log('Reciviendo path del xml');
+    ChromePhp::log($submissionPluginPath);
+    $document = new \DOMDocument;
+    $this->document = $document->load($submissionPluginPath);
+    self::$xpath = new \DOMXPath($document);
 
-    // $this->extractContent();
-// TODO: Ver donde poner esto
+    $this->extractContent();
+    // TODO: Ver donde poner esto
   }
-  // private function extractContent()
-  // {
-  //   $articleContent = array();
-  //   foreach (self::$xpath->evaluate("/article/front") as $front) {
-  //     foreach (self::$xpath->evaluate(".//sec|./p|./kwd-group", $front) as $content) {
-  //       switch ($content->nodeName) {
-  //         case "kwd-group":
-  //           $keywordGroup = new KeywordGroup($content);
-  //           $articleContent[] = $keywordGroup;
-  //           break;
-  //       }
-  //     }
-  //   }
-  //   $this->articleContent = $articleContent;
-  // }
+  private function extractContent()
+  {
+    $articleContent = array();
+		foreach (self::$xpath->evaluate("/article/front/article-meta/kwd-group") as $kwdGroupNode) {
+            $kwGroupFound = new KeywordGroup($kwdGroupNode,self::$xpath);
+            ChromePhp::log('title FOund and saved');
+            ChromePhp::log($kwGroupFound->getTitle());
+            ChromePhp::log($kwGroupFound->getContent());
+    }
+    $this->articleContent = $articleContent;
+  }
+
   public function createPdf(): string
   {
     $data = file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
     $prueba = json_decode($data, true);
+		//TODO agregar journal como atrbuto de clase
 
+    // $article =& $record->getData('article');
+    // $journal =& $record->getData('journal');
+    // $section =& $record->getData('section');
+    // $issue =& $record->getData('issue');
+    // $galleys =& $record->getData('galleys');
+    // $articleId = $article->getId();
+    // $publication = $article->getCurrentPublication();
 
-		// $article =& $record->getData('article');
-		// $journal =& $record->getData('journal');
-		// $section =& $record->getData('section');
-		// $issue =& $record->getData('issue');
-		// $galleys =& $record->getData('galleys');
-		// $articleId = $article->getId();
-		// $publication = $article->getCurrentPublication();
+    // $request = Application::get()->getRequest();
 
-		// $request = Application::get()->getRequest();
-
-		// $abbreviation = $journal->getLocalizedSetting('abbreviation');
-		// $printIssn = $journal->getSetting('printIssn');
-		// $onlineIssn = $journal->getSetting('onlineIssn');
-		// $articleLocale = $article->getLocale();
+    // $abbreviation = $journal->getLocalizedSetting('abbreviation');
+    // $printIssn = $journal->getSetting('printIssn');
+    // $onlineIssn = $journal->getSetting('onlineIssn');
+    // $articleLocale = $article->getLocale();
 
 
     // ChromePhp::log($issue);
@@ -103,18 +107,18 @@ class PdfGenerator
     $pdfHeaderLogo = $this->_getHeaderLogo($this->_request);
     $this->_pdfDocument->SetCreator(PDF_CREATOR);
     $journal = $this->_request->getContext();
-		
+
     $this->_setTitle($this->_pdfDocument);
     $this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
     $this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
     $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($this->_localeKey), $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
     $this->_pdfDocument->setPageFormat('A4', "P"); // Recibe el formato y la orientación del documento como parámetros.
-		
+
     $this->_pdfDocument->AddPage();
 
     $this->_createFrontPage();
-    // $this->_createKeywordsSection($keywords);
+    $this->_createKeywordsSection();
 
     $this->_createTitleSection();
     $this->_createAuthorsSection();
@@ -124,7 +128,7 @@ class PdfGenerator
     return $this->_pdfDocument->Output('article.pdf', 'S');
   }
 
-  private function _createKeywordsSection($keywords)
+  private function _createKeywordsSection()
   {
     $this->_pdfDocument->SetFontSize(21);
     $this->_pdfDocument->MultiCell('', '', 'Keywords', 0, 'C', 1, 1, '', '', true);
@@ -188,7 +192,7 @@ class PdfGenerator
     $this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
     $this->_pdfDocument->SetFont('times', 'B', 15);
     $this->_pdfDocument->setCellHeightRatio(1.2);
-    $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 1, '', '', true);
+    $this->_pdfDocument->MultiCell('', '', 'Journal Informationn', 0, 'R', 1, 1, '', '', true);
     $this->_printPairInfo('Journal ID (publisher-id):', 'mb');
     $this->_printPairInfo('Abbreviated Title:', 'Madera bosques');
     $this->_printPairInfo('ISSN (print):', '1405-0471');
@@ -299,10 +303,10 @@ class PdfGenerator
 
   private function _getArticleDataString(Publication $publication, Request $request, string $localeKey): string
   {
-		//TODO Probar esto en la compu de charlie
+    //TODO Probar esto en la compu de charlie
     $articleDataString = '';
-		//TODO agregar journal como atrbuto de clase
-    $context = $request->getContext(); /* @var $context Journal */ 
+    //TODO agregar journal como atrbuto de clase
+    $context = $request->getContext(); /* @var $context Journal */
     $submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
     $issueDao = DAORegistry::getDAO('IssueDAO');
     $issue = $issueDao->getBySubmissionId($submission->getId(), $context->getId());
@@ -317,7 +321,7 @@ class PdfGenerator
       $articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
     }
 
-		ChromePhp::log($context);
+    ChromePhp::log($context);
 
     return $articleDataString;
   }
