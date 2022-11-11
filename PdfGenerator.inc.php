@@ -34,6 +34,7 @@ class PdfGenerator
 
   /* var $articleSections array */
   private $keywords = array();
+  private $_title = '';
 
 
   public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath, $submissionPluginPath)
@@ -64,6 +65,9 @@ class PdfGenerator
       $articleContent[] = $kwGroupFound;
     }
     $this->keywords = $articleContent;
+    foreach (self::$xpath->evaluate("//article-title") as $node) {
+      $this->_title = $node->nodeValue;
+    }
   }
 
   public function createPdf(): string
@@ -131,7 +135,7 @@ class PdfGenerator
     $keywordIndex = 1;
     $keywordPrintString = '';
     foreach ($this->keywords as $key => $keywordGroup) {
-      $this->_pdfDocument->setFont('times', 'b', 21);
+      $this->_pdfDocument->setFont('times', '', 21);
       $this->_pdfDocument->MultiCell('', '', $keywordGroup->getTitle(), 0, 'C', 1, 1, '', '', true);
       $this->_pdfDocument->setFont('times', '', 12);
       foreach ($keywordGroup->getContent() as $key => $keyword) {
@@ -207,6 +211,12 @@ class PdfGenerator
     $this->_printPairInfo('DOI:', '10.21829/myb.2017.2331418  ');
     $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
     $this->_printPairInfo('Award ID:', '203316');
+
+    $this->_pdfDocument->Ln(4);
+    // $title = $this->_publication->getLocalizedFullTitle($this->_localeKey);
+    $this->_pdfDocument->SetFont('times', 'B', 21);
+    $this->_pdfDocument->MultiCell('', '', $this->_title, 0, 'C', 1, 1, '', '', true);
+    $this->_pdfDocument->Ln(8);
 
     $this->_createKeywordsSection();
   }
