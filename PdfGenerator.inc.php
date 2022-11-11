@@ -32,9 +32,8 @@ class PdfGenerator
   /* @var $xpath \DOMXPath */
   private static $xpath;
 
-
   /* var $articleSections array */
-  private $articleContent = array();
+  private $keywords = array();
 
 
   public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath, $submissionPluginPath)
@@ -53,25 +52,25 @@ class PdfGenerator
     self::$xpath = new \DOMXPath($document);
 
     $this->extractContent();
-    // TODO: Ver donde poner esto
   }
   private function extractContent()
   {
     $articleContent = array();
-		foreach (self::$xpath->evaluate("/article/front/article-meta/kwd-group") as $kwdGroupNode) {
-            $kwGroupFound = new KeywordGroup($kwdGroupNode,self::$xpath);
-            ChromePhp::log('title FOund and saved');
-            ChromePhp::log($kwGroupFound->getTitle());
-            ChromePhp::log($kwGroupFound->getContent());
+    foreach (self::$xpath->evaluate("/article/front/article-meta/kwd-group") as $kwdGroupNode) {
+      $kwGroupFound = new KeywordGroup($kwdGroupNode, self::$xpath);
+      ChromePhp::log('title FOund and saved');
+      ChromePhp::log($kwGroupFound->getTitle());
+      ChromePhp::log($kwGroupFound->getContent());
+      $articleContent[] = $kwGroupFound;
     }
-    $this->articleContent = $articleContent;
+    $this->keywords = $articleContent;
   }
 
   public function createPdf(): string
   {
     $data = file_get_contents($this->_pluginPath . DIRECTORY_SEPARATOR . "pdfStyleTemplates" . DIRECTORY_SEPARATOR . "prueba.json");
     $prueba = json_decode($data, true);
-		//TODO agregar journal como atrbuto de clase
+    //TODO agregar journal como atrbuto de clase
 
     // $article =& $record->getData('article');
     // $journal =& $record->getData('journal');
@@ -118,7 +117,6 @@ class PdfGenerator
     $this->_pdfDocument->AddPage();
 
     $this->_createFrontPage();
-    $this->_createKeywordsSection();
 
     $this->_createTitleSection();
     $this->_createAuthorsSection();
@@ -130,24 +128,26 @@ class PdfGenerator
 
   private function _createKeywordsSection()
   {
-    $this->_pdfDocument->SetFontSize(21);
-    $this->_pdfDocument->MultiCell('', '', 'Keywords', 0, 'C', 1, 1, '', '', true);
-    // for ($keyword = 0; $keyword < $keywords; $keyword++) {
-    //   # code...
-    // }
-    // for ($i=0; $i < ; $i++) { 
-    //   # code...
-    // }
-    // for ($i=0; $i < ; $i++) { 
-    //   # code...
-    // }
-    // for ($i=0; $i < ; $i++) { 
-    //   # code...
-    // }
-    // for ($i=0; $i < ; $i++) { 
-    //   # code...
-    // }
+    $keywordIndex = 1;
+    $keywordPrintString = '';
+    foreach ($this->keywords as $key => $keywordGroup) {
+      $this->_pdfDocument->setFont('times', 'b', 21);
+      $this->_pdfDocument->MultiCell('', '', $keywordGroup->getTitle(), 0, 'C', 1, 1, '', '', true);
+      $this->_pdfDocument->setFont('times', '', 12);
+      foreach ($keywordGroup->getContent() as $key => $keyword) {
+        if ($keywordIndex % 3 == 0) {
+          $keywordPrintString = $keywordPrintString . '<br>';
+          // $keywordPrintString = $keywordPrintString . '|';
+        } else {
+          $keywordPrintString = $keywordPrintString . $keyword . ' ';
+        }
+        $keywordIndex++;
+      }
+      $this->_pdfDocument->writeHTML($keywordPrintString, true, false, false, false, 'C');
+      $keywordPrintString = '';
+    }
   }
+
   private function _setTitle(TCPDFDocument $pdfDocument): void
   {
     $pdfDocument->setTitle($this->_publication->getLocalizedFullTitle($this->_localeKey));
@@ -197,7 +197,7 @@ class PdfGenerator
     $this->_printPairInfo('Abbreviated Title:', 'Madera bosques');
     $this->_printPairInfo('ISSN (print):', '1405-0471');
     $this->_printPairInfo('Publisher:', 'Instituto de Ecología A.C. ');
-    //
+
     $this->_pdfDocument->SetFont('times', 'B', 15);
     $this->_pdfDocument->Ln(1);
     $this->_pdfDocument->MultiCell('', '', 'Article/Issue Information', 0, 'R', 1, 1, '', '', true);
@@ -208,33 +208,9 @@ class PdfGenerator
     $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
     $this->_printPairInfo('Award ID:', '203316');
 
-
-    // $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 1, '', '', true);
-    // $this->_pdfDocument->SetFont('times', 'B', 7);
-    // $this->_pdfDocument->MultiCell('', '', 'Journal ID (publisher-id):', 0, 'R', 1, 0, '', '', true);
-    // $this->_pdfDocument->SetFont('times', '', 7);
-    // $this->_pdfDocument->MultiCell('', '', 'mb', 0, 'R', 1, 1, '', '', true);
-    // $this->_pdfDocument->setCellHeightRatio(1.2);
-    // $this->_pdfDocument->SetFont('times', 'B', 7);
-    // $this->_pdfDocument->MultiCell('', '', 'Title:', 0, 'R', 1, 0, '', '', true);
-    // $this->_pdfDocument->SetFont('times', '', 7);
-    // $this->_pdfDocument->MultiCell('', '', 'Madera y bosques', 0, 'R', 1, 0, '', '', true);
-    // $h,
-    // $txt2
-    // $border = 0,
-    // $align = 'J',
-    // $fill = false,
-    // $ln = 1,
-    // $x = '',
-    // $y = '',
-    // $reseth = true,
-    // $stretch = 0,
-    // $ishtml = false,
-    // $autopadding = true,
-    // $maxh = 0,
-    // $valign = 'T',
-    // $fitcell = false
+    $this->_createKeywordsSection();
   }
+
   private function _createTitleSection(): void
   {
     $this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
