@@ -6,7 +6,6 @@ use JATSParser\Body\KeywordGroup;
 use JATSParser\PDF\TCPDFDocument;
 use JATSParser\Body\Section;
 
-
 import('plugins.generic.jatsParser.ChromePhp');
 import('plugins.generic.jatsParser.KeywordGroup');
 
@@ -51,6 +50,7 @@ class PdfGenerator
     $document = new \DOMDocument;
     $this->document = $document->load($submissionPluginPath);
     self::$xpath = new \DOMXPath($document);
+
 
     $this->extractContent();
   }
@@ -190,17 +190,19 @@ class PdfGenerator
     $a = '<b>' . $name . ' </b>' . $info;
     $this->_pdfDocument->writeHTML($a, true, false, false, false, 'R');
   }
+
   private function _createFrontPage(): void
   {
-
+    $context = $this->_request->getContext(); // Journal context
+    ChromePhp::log($context);
     $this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
     $this->_pdfDocument->SetFont('times', 'B', 15);
     $this->_pdfDocument->setCellHeightRatio(1.2);
     $this->_pdfDocument->MultiCell('', '', 'Journal Informationn', 0, 'R', 1, 1, '', '', true);
-    $this->_printPairInfo('Journal ID (publisher-id):', 'mb');
-    $this->_printPairInfo('Abbreviated Title:', 'Madera bosques');
-    $this->_printPairInfo('ISSN (print):', '1405-0471');
-    $this->_printPairInfo('Publisher:', 'Instituto de Ecología A.C. ');
+    $this->_printPairInfo('Journal ID (publisher-id):', $context->getLocalizedSetting('acronym')); //Localized es para objetos
+    $this->_printPairInfo('Abbreviated Title:', $context->getLocalizedSetting('abbreviation'));
+    $this->_printPairInfo('ISSN (print):', $context->getSetting('printIssn')); // setting normal es para strings
+    $this->_printPairInfo('Publisher:', $context->getSetting('publisherInstitution'));
 
     $this->_pdfDocument->SetFont('times', 'B', 15);
     $this->_pdfDocument->Ln(1);
@@ -307,7 +309,8 @@ class PdfGenerator
       $articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
     }
 
-    ChromePhp::log($context);
+    $printIssn = $context->getSetting('printIssn');
+    ChromePhp::log($printIssn);
 
     return $articleDataString;
   }
