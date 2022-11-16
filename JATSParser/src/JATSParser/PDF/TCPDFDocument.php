@@ -51,9 +51,13 @@ class TCPDFDocument extends \TCPDF {
 			$cw = $this->w - $this->original_lMargin - $this->original_rMargin - ($headerdata['logo_width'] * 1.2);
 			$this->SetTextColorArray($this->header_text_color);
 			// header title
-			$this->SetFont('dejavuserif', 'BI', 11);
+			// TODO: Lograr cambiar esto en base al font Seleccionado
+			// $this->SetFont('dejavuserif', 'BI', 11);
+			// $this->SetFont($headerfont[0], $headerfont[1], $headerfont[2]);
+			$this->SetFont('times','B',19);
 			$this->SetX($header_x);
-			$this->Cell($cw, $cell_height, $headerdata['title'], 0, 1, '', 0, '', 0);
+			// $this->Cell($cw, $cell_height, $headerdata['title'], 0, 1, '', 0, '', 0);
+			$this->MultiCell($cw, $cell_height, $headerdata['title'], 0, '', 0, 1, '', '', true, 0, false, true, 0, 'B', false);
 			// header string
 			$this->SetFont('dejavuserif', '', 9);
 			$this->SetX($header_x);

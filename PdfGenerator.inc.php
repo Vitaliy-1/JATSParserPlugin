@@ -130,7 +130,9 @@ class PdfGenerator
 
     // ChromePhp::log($issue);
     // ChromePhp::log($prueba);
-
+  // TODO: Lograr que esto funcione, ahorita no hace nada 
+    $fontArray = array('times', 'B', 19);
+    $this->_pdfDocument->setHeaderFont($fontArray);
 
     // HTML preparation
     $context = $this->_request->getContext(); /* @var $context Journal */
@@ -144,15 +146,16 @@ class PdfGenerator
 
     $articleDataString = $this->_getArticleDataString($this->_publication, $this->_request, $this->_localeKey);
     // $pdfHeaderLogo = $this->_getHeaderLogo($this->_request);
-    $pdfHeaderLogo = $this->_pluginPath.DIRECTORY_SEPARATOR.'images'. DIRECTORY_SEPARATOR . 'logoUcr.png';
+    $pdfHeaderLogo = $this->_pluginPath . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'logoUcr.png';
     $this->_pdfDocument->SetCreator(PDF_CREATOR);
     $journal = $this->_request->getContext();
+
 
     $this->_setTitle($this->_pdfDocument);
     $this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
     $this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
 
-    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, PDF_HEADER_LOGO_WIDTH, $journal->getName($this->_localeKey), $articleDataString);
+    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 900, $journal->getName($this->_localeKey), $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
     $this->_pdfDocument->setPageFormat('A4', "P"); // Recibe el formato y la orientación del documento como parámetros.
 
