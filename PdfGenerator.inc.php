@@ -39,6 +39,7 @@ class PdfGenerator
   private $_issue = '';
   private $_fpage = '';
   private $_lpage = '';
+  private $_enTitle = '';
 
 
 
@@ -73,9 +74,15 @@ class PdfGenerator
       $articleContent[] = $kwGroupFound;
     }
     $this->keywords = $articleContent;
-    foreach (self::$xpath->evaluate("//article-title") as $node) {
+
+    foreach (self::$xpath->evaluate("/article/front/article-meta/title-group/article-title") as $node) {
       $this->_title = $node->nodeValue;
     }
+
+    foreach (self::$xpath->evaluate("/article/front/article-meta/title-group/trans-title-group/trans-title") as $node) {
+      $this->_enTitle = $node->nodeValue;
+    }
+
 
     foreach (self::$xpath->evaluate("//article-id") as $node) {
       $this->_doi = $node->nodeValue;
@@ -131,8 +138,6 @@ class PdfGenerator
     // ChromePhp::log($issue);
     // ChromePhp::log($prueba);
   // TODO: Lograr que esto funcione, ahorita no hace nada 
-    $fontArray = array('times', 'B', 19);
-    $this->_pdfDocument->setHeaderFont($fontArray);
 
     // HTML preparation
     $context = $this->_request->getContext(); /* @var $context Journal */
@@ -155,7 +160,7 @@ class PdfGenerator
     $this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
     $this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
 
-    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 900, $journal->getName($this->_localeKey), $articleDataString);
+    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 45, $journal->getName($this->_localeKey), $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
     $this->_pdfDocument->setPageFormat('A4', "P"); // Recibe el formato y la orientación del documento como parámetros.
 
@@ -202,7 +207,7 @@ class PdfGenerator
   {
     // TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
     // Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
-    $pdfDocument->setHeaderFont(array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
+    $pdfDocument->setHeaderFont(array('times', '', 19));
     $pdfDocument->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
     $pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
     $pdfDocument->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
@@ -255,23 +260,29 @@ class PdfGenerator
     $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
     $this->_printPairInfo('Award ID:', '203316');
 
-    $this->_pdfDocument->Ln(4);
+    $this->_pdfDocument->Ln(7);
     // $title = $this->_publication->getLocalizedFullTitle($this->_localeKey);
     $this->_pdfDocument->SetFont('times', 'B', 21);
-    $this->_pdfDocument->MultiCell(
-      '',
-      '',
-      /**titulo del xml = $this->_title**/
-      /**Titulo de ojs =**/
-      $this->_publication->getLocalizedFullTitle($this->_localeKey),
-      0,
-      'C',
-      1,
-      1,
-      '',
-      '',
-      true
-    );
+    $this->_pdfDocument->MultiCell('', '', $this->_title, 0, 'C', 1, 1, '', '', true);
+    $this->_pdfDocument->Ln(10);
+    // $this->_pdfDocument->MultiCell(
+    //   '',
+    //   '',
+    //   /**titulo del xml = $this->_title**/
+    //   /**Titulo de ojs =**/
+    //   $this->_publication->getLocalizedFullTitle($this->_localeKey),
+    //   0,
+    //   'C',
+    //   1,
+    //   1,
+    //   '',
+    //   '',
+    //   true
+    // );
+    $this->_pdfDocument->SetFont('times', 'B', 12);
+    $this->_pdfDocument->MultiCell('', '', 'Translated Title (en)', 0, 'C', 1, 1, '', '', true);
+    $this->_pdfDocument->SetFont('times', 'B', 21);
+    $this->_pdfDocument->MultiCell('', '', $this->_enTitle, 0, 'C', 1, 1, '', '', true);
     $this->_pdfDocument->Ln(8);
 
     $this->_createKeywordsSection();
