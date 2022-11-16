@@ -6,7 +6,6 @@ use JATSParser\Body\KeywordGroup;
 use JATSParser\PDF\TCPDFDocument;
 use JATSParser\Body\Section;
 
-
 import('plugins.generic.jatsParser.ChromePhp');
 import('plugins.generic.jatsParser.KeywordGroup');
 
@@ -35,6 +34,14 @@ class PdfGenerator
   /* var $articleSections array */
   private $keywords = array();
   private $_title = '';
+  private $_doi = '';
+  private $_volume = '';
+  private $_issue = '';
+  private $_fpage = '';
+  private $_lpage = '';
+
+
+
 
 
   public function __construct(string $htmlString, Publication $publication, Request $request, string $localeKey, string $pluginPath, $submissionPluginPath)
@@ -52,6 +59,7 @@ class PdfGenerator
     $this->document = $document->load($submissionPluginPath);
     self::$xpath = new \DOMXPath($document);
 
+
     $this->extractContent();
   }
   private function extractContent()
@@ -67,6 +75,34 @@ class PdfGenerator
     $this->keywords = $articleContent;
     foreach (self::$xpath->evaluate("//article-title") as $node) {
       $this->_title = $node->nodeValue;
+    }
+
+    foreach (self::$xpath->evaluate("//article-id") as $node) {
+      $this->_doi = $node->nodeValue;
+    }
+
+    foreach (self::$xpath->evaluate("//volume") as $key => $node) {
+      if ($key == 0) {
+        $this->_volume = $node->nodeValue;
+      }
+    }
+
+    foreach (self::$xpath->evaluate("//issue") as $key => $node) {
+      if ($key == 0) {
+        $this->_issue = $node->nodeValue;
+      }
+    }
+
+    foreach (self::$xpath->evaluate("//fpage") as $key => $node) {
+      if ($key == 0) {
+        $this->_fpage = $node->nodeValue;
+      }
+    }
+
+    foreach (self::$xpath->evaluate("//lpage") as $key => $node) {
+      if ($key == 0) {
+        $this->_lpage = $node->nodeValue;
+      }
     }
   }
 
@@ -192,32 +228,47 @@ class PdfGenerator
     $a = '<b>' . $name . ' </b>' . $info;
     $this->_pdfDocument->writeHTML($a, true, false, false, false, 'R');
   }
+
   private function _createFrontPage(): void
   {
-
+    $context = $this->_request->getContext(); // Journal context
+    ChromePhp::log($context);
     $this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
     $this->_pdfDocument->SetFont('times', 'B', 15);
     $this->_pdfDocument->setCellHeightRatio(1.2);
-    $this->_pdfDocument->MultiCell('', '', 'Journal Informationn', 0, 'R', 1, 1, '', '', true);
-    $this->_printPairInfo('Journal ID (publisher-id):', 'mb');
-    $this->_printPairInfo('Abbreviated Title:', 'Madera bosques');
-    $this->_printPairInfo('ISSN (print):', '1405-0471');
-    $this->_printPairInfo('Publisher:', 'Instituto de Ecología A.C. ');
+    $this->_pdfDocument->MultiCell('', '', 'Journal Information', 0, 'R', 1, 1, '', '', true);
+    $this->_printPairInfo('Journal ID (publisher-id):', $context->getLocalizedSetting('acronym')); //Localized es para objetos
+    $this->_printPairInfo('Abbreviated Title:', $context->getLocalizedSetting('abbreviation'));
+    $this->_printPairInfo('ISSN (print):', $context->getSetting('printIssn')); // setting normal es para strings
+    $this->_printPairInfo('Publisher:', $context->getSetting('publisherInstitution'));
 
     $this->_pdfDocument->SetFont('times', 'B', 15);
     $this->_pdfDocument->Ln(1);
     $this->_pdfDocument->MultiCell('', '', 'Article/Issue Information', 0, 'R', 1, 1, '', '', true);
-    $this->_printPairInfo('Volume:', '23');
-    $this->_printPairInfo('Issue:', '3');
-    $this->_printPairInfo('Pages:', '07-14');
-    $this->_printPairInfo('DOI:', '10.21829/myb.2017.2331418  ');
+    $this->_printPairInfo('Volume:', $this->_volume);
+    $this->_printPairInfo('Issue:', $this->_issue);
+    $this->_printPairInfo('Pages:', "$this->_fpage - $this->_lpage");
+    $this->_printPairInfo('DOI:', $this->_doi);
     $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
     $this->_printPairInfo('Award ID:', '203316');
 
     $this->_pdfDocument->Ln(4);
     // $title = $this->_publication->getLocalizedFullTitle($this->_localeKey);
     $this->_pdfDocument->SetFont('times', 'B', 21);
-    $this->_pdfDocument->MultiCell('', '', $this->_title, 0, 'C', 1, 1, '', '', true);
+    $this->_pdfDocument->MultiCell(
+      '',
+      '',
+      /**titulo del xml = $this->_title**/
+      /**Titulo de ojs =**/
+      $this->_publication->getLocalizedFullTitle($this->_localeKey),
+      0,
+      'C',
+      1,
+      1,
+      '',
+      '',
+      true
+    );
     $this->_pdfDocument->Ln(8);
 
     $this->_createKeywordsSection();
@@ -236,9 +287,11 @@ class PdfGenerator
   {
     // TODO: En esta seccion se puede modificar el estilo del abstract
     if ($abstract = $this->_publication->getLocalizedData('abstract', $this->_localeKey)) {
+      $this->_pdfDocument->setFont('times', 'B', 11);
+      $this->_pdfDocument->MultiCell('', '', 'Abstract', 0, 'L', 1, 1, '', '', true);
       $this->_pdfDocument->setCellPaddings(5, 5, 5, 5);
       $this->_pdfDocument->SetFillColor(255, 255, 255); // Color de fondo del abstract
-      $this->_pdfDocument->SetFont('times', '', 11);
+      $this->_pdfDocument->SetFont('times', '', 9);
       $this->_pdfDocument->SetLineStyle(array('width' => 0.5, 'cap' => 'butt', 'join' => 'miter', 'dash' => 4, 'color' => array(255, 255, 255)));  // Tipo de linea divisoria y color
       $this->_pdfDocument->writeHTMLCell('', '', '', '', $abstract, 'B', 1, 1, true, 'J', true);
       $this->_pdfDocument->Ln(4);
@@ -252,8 +305,7 @@ class PdfGenerator
       /* @var $author Author */
       // En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
       foreach ($authors as $author) {
-        $this->_pdfDocument->SetFont('times', 'I', 10);
-
+        $this->_pdfDocument->SetFont('times', '', 16);
         // Calculating the line height for author name and affiliation
         $authorName = htmlspecialchars($author->getGivenName($this->_localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($this->_localeKey));
         $affiliation = htmlspecialchars($author->getAffiliation($this->_localeKey));
@@ -262,7 +314,7 @@ class PdfGenerator
         $authorNameStringHeight = $this->_pdfDocument->getStringHeight($authorLineWidth, $authorName);
 
         $affiliationLineWidth = 110;
-        $afilliationStringHeight = $this->_pdfDocument->getStringHeight(110, $affiliation);
+        $afilliationStringHeight = $this->_pdfDocument->getStringHeight(200, $affiliation);
 
         $authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
 
@@ -272,6 +324,7 @@ class PdfGenerator
         $this->_pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
       }
       $this->_pdfDocument->Ln(6);
+      $this->_pdfDocument->AddPage();
     }
   }
 
@@ -309,7 +362,8 @@ class PdfGenerator
       $articleDataString .= "\n" . __('plugins.pubIds.doi.readerDisplayName', null, $localeKey) . ': ' . $doi;
     }
 
-    ChromePhp::log($context);
+    $printIssn = $context->getSetting('printIssn');
+    ChromePhp::log($printIssn);
 
     return $articleDataString;
   }
