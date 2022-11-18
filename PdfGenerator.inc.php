@@ -40,6 +40,9 @@ class PdfGenerator
   private $_fpage = '';
   private $_lpage = '';
   private $_enTitle = '';
+  private $_category = '';
+// TODO: Make
+  private $_license = '';
 
 
 
@@ -77,6 +80,10 @@ class PdfGenerator
 
     foreach (self::$xpath->evaluate("/article/front/article-meta/title-group/article-title") as $node) {
       $this->_title = $node->nodeValue;
+    }
+
+    foreach (self::$xpath->evaluate("/article/front/article-meta/article-categories/subj-group/subject") as $node) {
+      $this->_category = $node->nodeValue;
     }
 
     foreach (self::$xpath->evaluate("/article/front/article-meta/title-group/trans-title-group/trans-title") as $node) {
@@ -137,7 +144,7 @@ class PdfGenerator
 
     // ChromePhp::log($issue);
     // ChromePhp::log($prueba);
-  // TODO: Lograr que esto funcione, ahorita no hace nada 
+    // TODO: Lograr que esto funcione, ahorita no hace nada 
 
     // HTML preparation
     $context = $this->_request->getContext(); /* @var $context Journal */
@@ -162,7 +169,7 @@ class PdfGenerator
 
     $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 45, $journal->getName($this->_localeKey), $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
-    $this->_pdfDocument->setPageFormat('A4', "P"); // Recibe el formato y la orientación del documento como parámetros.
+    $this->_pdfDocument->setPageFormat('LETTER', "P"); // Recibe el formato y la orientación del documento como parámetros.
 
     $this->_pdfDocument->AddPage();
 
@@ -205,6 +212,7 @@ class PdfGenerator
 
   private function _setFundamentalVisualizationParamters(TCPDFDocument $pdfDocument): void
   {
+    $footer = '<b>License (open-acces) •</b> Madera y bosques <b>•</b> Instituto de Ecología A.C <b>• Volume:</b> 23 <b>• Issue:</b> 3 <b>•</b> <b>ISSN (print):</b> 1405-0471 <b>• Pages</b> ';
     // TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
     // Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
     $pdfDocument->setHeaderFont(array('times', '', 19));
@@ -215,6 +223,7 @@ class PdfGenerator
     $pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
     $pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
     $pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
+    $pdfDocument->setFooterHtml($footer);
   }
 
   private function _getHeaderLogo(Request $request): string
@@ -265,25 +274,19 @@ class PdfGenerator
     $this->_pdfDocument->SetFont('times', 'B', 21);
     $this->_pdfDocument->MultiCell('', '', $this->_title, 0, 'C', 1, 1, '', '', true);
     $this->_pdfDocument->Ln(10);
-    // $this->_pdfDocument->MultiCell(
-    //   '',
-    //   '',
-    //   /**titulo del xml = $this->_title**/
-    //   /**Titulo de ojs =**/
-    //   $this->_publication->getLocalizedFullTitle($this->_localeKey),
-    //   0,
-    //   'C',
-    //   1,
-    //   1,
-    //   '',
-    //   '',
-    //   true
-    // );
     $this->_pdfDocument->SetFont('times', 'B', 12);
     $this->_pdfDocument->MultiCell('', '', 'Translated Title (en)', 0, 'C', 1, 1, '', '', true);
     $this->_pdfDocument->SetFont('times', 'B', 21);
     $this->_pdfDocument->MultiCell('', '', $this->_enTitle, 0, 'C', 1, 1, '', '', true);
-    $this->_pdfDocument->Ln(8);
+
+
+    $this->_pdfDocument->Ln(4);
+    $this->_pdfDocument->SetFont('times', 'B', 14);
+    $this->_pdfDocument->MultiCell('', '', 'Categorías', 0, 'R', 1, 1, '', '', true);
+    $this->_pdfDocument->SetFont('times', '', 9);
+    $textToWrite = '<b>' . 'Tipo: ' . ' </b>' . $this->_category;
+    $this->_pdfDocument->writeHTML($textToWrite, true, false, false, false, 'R');
+    $this->_pdfDocument->Ln(4);
 
     $this->_createKeywordsSection();
   }
