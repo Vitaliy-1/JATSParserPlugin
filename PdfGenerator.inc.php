@@ -30,7 +30,6 @@ class PdfGenerator
 
   /* @var $xpath \DOMXPath */
   private static $xpath;
-
   /* var $articleSections array */
   private $keywords = array();
   private $_title = '';
@@ -41,7 +40,11 @@ class PdfGenerator
   private $_lpage = '';
   private $_enTitle = '';
   private $_category = '';
-// TODO: Make
+  private $_journalId  = '';
+  private $_issn  = '';
+  private $_publisher  = '';
+  private $_abbreviatedTitle  = '';
+  // TODO: Make
   private $_license = '';
 
 
@@ -63,6 +66,11 @@ class PdfGenerator
     $this->document = $document->load($submissionPluginPath);
     self::$xpath = new \DOMXPath($document);
 
+    $context = $this->_request->getContext(); // Journal context
+    $this->_journalId = $context->getLocalizedSetting('acronym');
+    $this->_issn = $context->getSetting('printIssn');
+    $this->_publisher = $context->getSetting('publisherInstitution');
+    $this->_abbreviatedTitle = $context->getLocalizedSetting('abbreviation');
 
     $this->extractContent();
   }
@@ -212,7 +220,7 @@ class PdfGenerator
 
   private function _setFundamentalVisualizationParamters(TCPDFDocument $pdfDocument): void
   {
-    $footer = '<b>License (open-acces) •</b> Madera y bosques <b>•</b> Instituto de Ecología A.C <b>• Volume:</b> 23 <b>• Issue:</b> 3 <b>•</b> <b>ISSN (print):</b> 1405-0471 <b>• Pages</b> ';
+    $footer = '<b>License (open-acces) •</b> ' . $this->_abbreviatedTitle . ' <b>•</b> ' . $this->_publisher . ' <b>• Volume: </b>' . $this->_volume . ' <b>• Issue: </b>' . $this->_issue . '<b>•</b> <b>ISSN (print): </b>' . $this->_issn . ' <b>• Pages</b> ';
     // TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
     // Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
     $pdfDocument->setHeaderFont(array('times', '', 19));
@@ -317,31 +325,40 @@ class PdfGenerator
 
   private function _createAuthorsSection(): void
   {
+    $this->_pdfDocument->AddPage();
     $authors = $this->_publication->getData('authors');
+    $counter = 1;
     if (count($authors) > 0) {
       /* @var $author Author */
       // En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
+      $this->_pdfDocument->SetFont('times', '', 16);
       foreach ($authors as $author) {
-        $this->_pdfDocument->SetFont('times', '', 16);
-        // Calculating the line height for author name and affiliation
         $authorName = htmlspecialchars($author->getGivenName($this->_localeKey)) . ' ' . htmlspecialchars($author->getFamilyName($this->_localeKey));
         $affiliation = htmlspecialchars($author->getAffiliation($this->_localeKey));
-
-        $authorLineWidth = 60;
-        $authorNameStringHeight = $this->_pdfDocument->getStringHeight($authorLineWidth, $authorName);
-
-        $affiliationLineWidth = 110;
-        $afilliationStringHeight = $this->_pdfDocument->getStringHeight(200, $affiliation);
-
-        $authorNameStringHeight > $afilliationStringHeight ? $cellHeight = $authorNameStringHeight : $cellHeight = $afilliationStringHeight;
-
+        $authorName = $authorName . ' ' . $counter;
         // Writing affiliations into cells
-        $this->_pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
-        $this->_pdfDocument->SetFont('times', '', 10);
-        $this->_pdfDocument->MultiCell($affiliationLineWidth, $cellHeight, $affiliation, 0, 'L', 1, 1, '', '', true, 0, false, true, 0, "T", true);
+        // $this->_pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
+        $this->_pdfDocument->MultiCell('', '', $authorName, 0, 'R', 1, 1, '', '', true);
+        $counter++;
       }
       $this->_pdfDocument->Ln(6);
-      $this->_pdfDocument->AddPage();
+      // $this->_pdfDocument->AddPage();
+    }
+
+    $counter = 1;
+    if (count($authors) > 0) {
+      /* @var $author Author */
+      // En este ciclo se itera en la lista de autores del documento, acá se puden modificar ciertos estilos.
+      $this->_pdfDocument->SetFont('times', '', 8);
+      foreach ($authors as $author) {
+        $affiliation = htmlspecialchars($author->getAffiliation($this->_localeKey));
+        // $this->_pdfDocument->MultiCell($authorLineWidth, 0, $authorName, 0, 'L', 1, 0, 19, '', true, 0, false, true, 0, "T", true);
+        $affiliation = $counter . ' ' . $affiliation;
+        $this->_pdfDocument->MultiCell('', '', $affiliation, 0, 'J', 1, 1, '', '', true);
+        $counter++;
+      }
+      $this->_pdfDocument->Ln(6);
+      // $this->_pdfDocument->AddPage();
     }
   }
 

@@ -115,6 +115,7 @@ class TCPDFDocument extends \TCPDF
 		//set style for cell border
 		$line_width = (0.85 / $this->k);
 		$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => $this->footer_line_color));
+
 		//print document barcode
 		$barcode = $this->getBarcode();
 		if (!empty($barcode)) {
@@ -134,6 +135,7 @@ class TCPDFDocument extends \TCPDF
 			);
 			$this->write1DBarcode($barcode, 'C128', '', $cur_y + $line_width, '', (($this->footer_margin / 3) - $line_width), 0.3, $style, '');
 		}
+
 		$w_page = isset($this->l['w_page']) ? $this->l['w_page'] . ' ' : '';
 		if (empty($this->pagegroups)) {
 			$pagenumtxt = $w_page . $this->getAliasNumPage() . ' / ' . $this->getAliasNbPages();
@@ -145,15 +147,14 @@ class TCPDFDocument extends \TCPDF
 		if ($this->getRTL()) {
 			$this->SetX($this->original_rMargin);
 			$this->setFont('times', '', 8);
-			$this->writeHTML($this->footerHtml, false, false, false, false, 'C');
 			// $this->Cell(0, 0, $pagenumtxt, 'T', 0, 'L');
-			// $this->Cell(0, 0, $this->footerHtml, 'T', 0, 'L');
+			$this->writeHTML($this->footerHtml . $pagenumtxt, false, false, false, false, 'C');
 		} else {
-			$this->SetX($this->original_lMargin);
+			// $this->SetX($this->original_lMargin + 50);
+			// $this->SetX(0);
 			$this->setFont('times', '', 8);
-			$this->writeHTML($this->footerHtml, false, false, false, false, 'C');
+			$this->writeHTML($this->footerHtml . $pagenumtxt, false, false, false, false, 'C');
 			// $this->Cell(0, 0, $this->getAliasRightShift() . $pagenumtxt, 'T', 0, 'R');
-			// $this->Cell(0, 0, $this->footerHtml, 'T', 0, 'L');
 		}
 	}
 }
