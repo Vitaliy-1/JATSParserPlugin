@@ -81,7 +81,7 @@ class PdfGenerator
       $kwGroupFound = new KeywordGroup($kwdGroupNode, self::$xpath);
       ChromePhp::log('title FOund and saved');
       ChromePhp::log($kwGroupFound->getTitle());
-      ChromePhp::log($kwGroupFound->getContent());
+      ChromePhp::log($this->_pdfDocument->getAliasNumPage());
       $articleContent[] = $kwGroupFound;
     }
     $this->keywords = $articleContent;
@@ -170,20 +170,20 @@ class PdfGenerator
     $this->_pdfDocument->SetCreator(PDF_CREATOR);
     $journal = $this->_request->getContext();
 
-
+    $this->_pdfDocument->setPrintHeader(false);
     $this->_setTitle($this->_pdfDocument);
     $this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
     $this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
 
-    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 45, $journal->getName($this->_localeKey), $articleDataString);
+    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 20, $journal->getName($this->_localeKey), $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
     $this->_pdfDocument->setPageFormat('LETTER', "P"); // Recibe el formato y la orientación del documento como parámetros.
 
     $this->_pdfDocument->AddPage();
-
     $this->_createFrontPage();
 
     $this->_createTitleSection();
+    $this->_pdfDocument->setPrintHeader(true);
     $this->_createAuthorsSection();
     $this->_createAbstractSection();
     $this->_createTextSection();
@@ -223,7 +223,7 @@ class PdfGenerator
     $footer = '<b>License (open-acces) •</b> ' . $this->_abbreviatedTitle . ' <b>•</b> ' . $this->_publisher . ' <b>• Volume: </b>' . $this->_volume . ' <b>• Issue: </b>' . $this->_issue . '<b>•</b> <b>ISSN (print): </b>' . $this->_issn . ' <b>• Pages</b> ';
     // TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
     // Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
-    $pdfDocument->setHeaderFont(array('times', '', 19));
+    $pdfDocument->setHeaderFont(array('times', '', 10));
     $pdfDocument->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
     $pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
     $pdfDocument->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
@@ -231,7 +231,7 @@ class PdfGenerator
     $pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
     $pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
     $pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
-    $pdfDocument->setFooterHtml($footer);
+    $pdfDocument->setFooterHtml($footer); 
   }
 
   private function _getHeaderLogo(Request $request): string

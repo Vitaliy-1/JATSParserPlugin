@@ -2,11 +2,13 @@
 
 namespace JATSParser\PDF;
 
+use ChromePhp;
 use JATSParser\Body\Document as JATSDocument;
 use JATSParser\HTML\Document as HTMLDocument;
 
 require_once(__DIR__ . '/../../../vendor/tecnickcom/tcpdf/tcpdf.php');
 
+import('plugins.generic.jatsParser.ChromePhp');
 
 class TCPDFDocument extends \TCPDF
 {
@@ -38,44 +40,27 @@ class TCPDFDocument extends \TCPDF
 			} else {
 				$this->x = $this->original_lMargin;
 			}
-			if (($headerdata['logo']) and ($headerdata['logo'] != K_BLANK_IMAGE)) {
-				$imgtype = \TCPDF_IMAGES::getImageFileType($headerdata['logo']);
-				// $headerdata['logo_width'] = 12;
-				if (($imgtype == 'eps') or ($imgtype == 'ai')) {
-					$this->ImageEps($headerdata['logo'], '', '', $headerdata['logo_width']);
-				} elseif ($imgtype == 'svg') {
-					$this->ImageSVG($headerdata['logo'], '', '', $headerdata['logo_width']);
-				} else {
-					$this->Image($headerdata['logo'], '', 5, $headerdata['logo_width']);
-				}
-				$imgy = $this->getImageRBY();
-			} else {
-				$imgy = $this->y;
-			}
 			$cell_height = $this->getCellHeight($headerfont[2] / $this->k);
+			
+
 			// set starting margin for text data cell
 			if ($this->getRTL()) {
-				$header_x = $this->original_rMargin + ($headerdata['logo_width'] * 1.2);
+				$header_x = $this->original_rMargin;
 			} else {
-				$header_x = $this->original_lMargin + ($headerdata['logo_width'] * 1.2);
+				$header_x = $this->original_lMargin; 
 			}
 			$cw = $this->w - $this->original_lMargin - $this->original_rMargin - ($headerdata['logo_width'] * 1.2);
 			$this->SetTextColorArray($this->header_text_color);
 			// header title
-			// TODO: Lograr cambiar esto en base al font Seleccionado
-			// $this->SetFont('dejavuserif', 'BI', 11);
-			// $this->SetFont($headerfont[0], $headerfont[1], $headerfont[2]);
-			// $this->SetFont('times','B',19);
 			$this->SetX($header_x);
-			$this->Cell($cw, $cell_height, $headerdata['title'], 0, 1, '', 0, '', 0);
-			// $this->MultiCell($cw, $cell_height, $headerdata['title'], 0, '', 0, 1, '', '', true, 0, false, true, 0, 'B', false);
-			// header string
-			$this->SetFont('dejavuserif', '', 9);
-			$this->SetX($header_x);
-			$this->MultiCell($cw, $cell_height, $headerdata['string'], 0, '', 0, 1, '', '', true, 0, false, true, 0, 'T', false);
+			//$this->Cell($cw, $cell_height, $headerdata['title'], 0, 1, 'L', 0, 'c', 0);
+			$this->MultiCell($cw, $cell_height, $headerdata['title'], 0, '', 0, 1, '', '', true, 0, false, true, 0, 'B', false);
+			$this->SetFont('times', '', 10);
+			$this->Cell($cw, $cell_height, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, 1, 'R', 0, 'R', 0);
+
 			// print an ending header line
 			$this->SetLineStyle(array('width' => 0.85 / $this->k, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => $headerdata['line_color']));
-			$this->SetY((2.835 / $this->k) + max($imgy, $this->y));
+			// $this->SetY((2.835 / $this->k) + max($imgy, $this->y));
 			if ($this->rtl) {
 				$this->SetX($this->original_rMargin);
 			} else {
@@ -114,7 +99,7 @@ class TCPDFDocument extends \TCPDF
 		$this->SetTextColorArray($this->footer_text_color);
 		//set style for cell border
 		$line_width = (0.85 / $this->k);
-		$this->SetLineStyle(array('width' => $line_width, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => $this->footer_line_color));
+		$this->SetLineStyle(array('width' => 0.85 / $this->k, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => $this->footer_line_color));
 
 		//print document barcode
 		$barcode = $this->getBarcode();
