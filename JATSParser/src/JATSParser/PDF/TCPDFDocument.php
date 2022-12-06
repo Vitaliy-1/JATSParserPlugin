@@ -145,15 +145,16 @@ class TCPDFDocument extends \TCPDF
 		$this->SetY($cur_y);
 		//Print page number
 		if ($this->getRTL()) {
-			$this->SetX($this->original_rMargin);
+			// $this->SetX($this->original_rMargin);
 			$this->setFont('times', '', 8);
-			// $this->Cell(0, 0, $pagenumtxt, 'T', 0, 'L');
-			$this->writeHTML($this->footerHtml . $pagenumtxt, false, false, false, false, 'C');
+			$this->Cell(0, 0, $this->footerHtml . $pagenumtxt, 'T', 0, 'L');
+			// $this->writeHTML($this->footerHtml . $pagenumtxt, false, false, false, false, 'C');
 		} else {
-			// $this->SetX($this->original_lMargin + 50);
+			// $this->SetX($this->original_lMargin );
 			// $this->SetX(0);
 			$this->setFont('times', '', 8);
-			$this->writeHTML($this->footerHtml . $pagenumtxt, false, false, false, false, 'C');
+			// $this->write($this->footerHtml . $pagenumtxt, 'T', false, false, false, 'C');
+			$this->writeHTMLCell('', '', '', '', $this->footerHtml . $pagenumtxt, 'T', 0, false, true, 'C');
 			// $this->Cell(0, 0, $this->getAliasRightShift() . $pagenumtxt, 'T', 0, 'R');
 		}
 	}
