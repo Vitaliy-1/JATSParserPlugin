@@ -186,6 +186,7 @@ class PdfGenerator
     $this->_pdfDocument->setPrintHeader(true);
     $this->_createAuthorsSection();
     $this->_createAbstractSection();
+    $this->_pdfDocument->AddPage();
     $this->_createTextSection();
 
     return $this->_pdfDocument->Output('article.pdf', 'S');
@@ -227,11 +228,11 @@ class PdfGenerator
     $pdfDocument->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
     $pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
     $pdfDocument->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-    $pdfDocument->SetHeaderMargin(PDF_MARGIN_HEADER);
-    $pdfDocument->SetFooterMargin(PDF_MARGIN_FOOTER);
+    $pdfDocument->SetHeaderMargin(22.4409);
+    $pdfDocument->SetFooterMargin(-15.23492);
     $pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
     $pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
-    $pdfDocument->setFooterHtml($footer); 
+    $pdfDocument->setFooterHtml($footer);
   }
 
   private function _getHeaderLogo(Request $request): string
@@ -274,8 +275,8 @@ class PdfGenerator
     $this->_printPairInfo('Issue:', $this->_issue);
     $this->_printPairInfo('Pages:', "$this->_fpage - $this->_lpage");
     $this->_printPairInfo('DOI:', $this->_doi);
-    $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
-    $this->_printPairInfo('Award ID:', '203316');
+    // $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
+    // $this->_printPairInfw('Award ID:', '203316');
 
     $this->_pdfDocument->Ln(7);
     // $title = $this->_publication->getLocalizedFullTitle($this->_localeKey);
