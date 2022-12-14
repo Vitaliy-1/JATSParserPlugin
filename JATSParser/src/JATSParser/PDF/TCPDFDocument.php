@@ -42,22 +42,20 @@ class TCPDFDocument extends \TCPDF
       } else {
         $this->x = $this->original_lMargin;
       }
-      $cell_height = $this->getCellHeight($headerfont[2] / $this->k);
-
-
       // set starting margin for text data cell
       $header_x = $this->original_lMargin;
 
       $cw = $this->w - $this->original_lMargin - $this->original_rMargin - ($headerdata['logo_width'] * 1.2);
       $this->SetTextColorArray($this->header_text_color);
       // header title
+      $this->SetY(15);
       $this->SetX($header_x);
-      $this->MultiCell($cw, $cell_height, $headerdata['title'], 0, '', 0, 1, '', '', true, 0, false, true, 0, 'B', false);
-      $this->SetFont('times', '', 10);
+      $this->MultiCell(0, 0, $headerdata['title'], 0, '', 0, 1, '', '', true, 0, false, true, 0, 'M', false);
+      $this->SetFont($headerfont[1], '', $headerfont[2]);
 
       // print an ending header line
       $this->SetLineStyle(array('width' => 0.85 / $this->k, 'cap' => 'butt', 'join' => 'miter', 'dash' => 0, 'color' => $headerdata['line_color']));
-      // $this->SetY((2.835 / $this->k) + max($imgy, $this->y));
+      $this->SetY(22.4409);
       //
       $this->SetX($this->original_lMargin);
       $this->Cell(($this->w - $this->original_lMargin - $this->original_rMargin), 0, '', 'T', 0, 'C');
