@@ -61,13 +61,13 @@ class TCPDF_STATIC {
 	 * String alias for total number of pages.
 	 * @public static
 	 */
-	public static $alias_tot_pages = '{:ptp:}';
+	public static $alias_tot_pages = '♫';
 
 	/**
 	 * String alias for page number.
 	 * @public static
 	 */
-	public static $alias_num_page = '{:pnp:}';
+	public static $alias_num_page = 'n~';
 
 	/**
 	 * String alias for total number of pages in a single group.
