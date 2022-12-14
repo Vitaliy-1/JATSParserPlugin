@@ -175,7 +175,7 @@ class PdfGenerator
     $this->_pdfDocument->SetAuthor($this->_publication->getAuthorString($userGroups));
     $this->_pdfDocument->SetSubject($this->_publication->getLocalizedData('subject', $this->_localeKey));
 
-    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 20, $journal->getName($this->_localeKey), $articleDataString);
+    $this->_pdfDocument->SetHeaderData($pdfHeaderLogo, 20, $this->_title, $articleDataString);
     $this->_setFundamentalVisualizationParamters($this->_pdfDocument);
     $this->_pdfDocument->setPageFormat('LETTER', "P"); // Recibe el formato y la orientación del documento como parámetros.
 
@@ -227,8 +227,8 @@ class PdfGenerator
     $pdfDocument->setHeaderFont(array('times', '', 10));
     $pdfDocument->setFooterFont(array(PDF_FONT_NAME_DATA, '', PDF_FONT_SIZE_DATA));
     $pdfDocument->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
-    $pdfDocument->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
-    $pdfDocument->SetHeaderMargin(22.4409);
+    $pdfDocument->SetMargins(PDF_MARGIN_LEFT, 31.75, PDF_MARGIN_RIGHT);
+    $pdfDocument->SetHeaderMargin(25);
     $pdfDocument->SetFooterMargin(-15.23492);
     $pdfDocument->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
     $pdfDocument->setImageScale(PDF_IMAGE_SCALE_RATIO);
