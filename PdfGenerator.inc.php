@@ -221,6 +221,7 @@ class PdfGenerator
 
   private function _setFundamentalVisualizationParamters(TCPDFDocument $pdfDocument): void
   {
+    // TODO Cambiar la variable de _abbreviatedTitle porque lo que va es el journal name
     $footer = '<b>License (open-acces) •</b> ' . $this->_abbreviatedTitle . ' <b>•</b> ' . $this->_publisher . ' <b>• Volume: </b>' . $this->_volume . ' <b>• Issue: </b>' . $this->_issue . '<b>•</b> <b>ISSN (print): </b>' . $this->_issn . ' <b>• Pages</b> ';
     // TODO: Estos parámetros permiten modificar aspectos fundamentales del pdf, como los margenes, fuentes o el ratio de escalado de las imágenes
     // Los parámetros pueden ser modifcados en las constantes definidas en el archivo tcpdf_autoconfig  
@@ -257,7 +258,33 @@ class PdfGenerator
 
   private function _createFrontPage(): void
   {
+    // $header_x = $this->_pdfDocument->original_lMargin;
+    // $this->_pdfDocument->SetY();
+    // $this->_pdfDocument->SetX($header_x);
+
     $context = $this->_request->getContext(); // Journal context
+
+    $logoUcr = $this->_pluginPath . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'logoUcr.png';
+    $logoRevista = $this->_pluginPath . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'logoRevistaMaderYBosques.png';
+
+    $this->_pdfDocument->Image($logoUcr, 25.4, 3, 40);
+    // TODO Que Jorge evalue si le parece porque no se ve bien dos logos juntos
+    // $this->_pdfDocument->Image($logoRevista, 90, 5, 60);
+
+    // header title
+    $journalName = $context->getLocalizedSetting('name');
+
+    $this->_pdfDocument->SetY(26);
+    $this->_pdfDocument->SetX(25.4);
+
+    $this->_pdfDocument->SetFont('times', '', 19);
+    $this->_pdfDocument->MultiCell(0, 0, $journalName, 0, '', 0, 1, '', '', true, 0, false, true, 0, 'M', false);
+
+    $this->_pdfDocument->SetY(35.56);
+    $this->_pdfDocument->SetX(25.4);
+    $this->_pdfDocument->Cell(0, 0, '', 'T', 0, 'C');
+
+    $this->_pdfDocument->Ln(9);
     ChromePhp::log($context);
     $this->_pdfDocument->SetFillColor(255, 255, 255); //rgb
     $this->_pdfDocument->SetFont('times', 'B', 15);
@@ -278,7 +305,7 @@ class PdfGenerator
     // $this->_printPairInfo('Funded by:', 'DGAPA-UNAM');
     // $this->_printPairInfw('Award ID:', '203316');
 
-    $this->_pdfDocument->Ln(7);
+    $this->_pdfDocument->Ln(9);
     // $title = $this->_publication->getLocalizedFullTitle($this->_localeKey);
     $this->_pdfDocument->SetFont('times', 'B', 21);
     $this->_pdfDocument->MultiCell('', '', $this->_title, 0, 'C', 1, 1, '', '', true);
@@ -289,13 +316,13 @@ class PdfGenerator
     $this->_pdfDocument->MultiCell('', '', $this->_enTitle, 0, 'C', 1, 1, '', '', true);
 
 
-    $this->_pdfDocument->Ln(4);
+    $this->_pdfDocument->Ln(9);
     $this->_pdfDocument->SetFont('times', 'B', 14);
     $this->_pdfDocument->MultiCell('', '', 'Categorías', 0, 'R', 1, 1, '', '', true);
     $this->_pdfDocument->SetFont('times', '', 9);
     $textToWrite = '<b>' . 'Tipo: ' . ' </b>' . $this->_category;
     $this->_pdfDocument->writeHTML($textToWrite, true, false, false, false, 'R');
-    $this->_pdfDocument->Ln(4);
+    $this->_pdfDocument->Ln(10);
 
     $this->_createKeywordsSection();
   }
