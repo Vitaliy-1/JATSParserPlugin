@@ -368,6 +368,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$form = new PublicationJATSUploadForm($latestPublicationApiUrl, $locales, $latestPublication, $submissionFilesXML, $msg);
 		$state = $templateMgr->getTemplateVars('state');
 		$state['components'][FORM_PUBLICATION_JATS_FULLTEXT] = $form->getConfig();
+		$state['publicationFormIds'][] = FORM_PUBLICATION_JATS_FULLTEXT;
 		$templateMgr->assign('state', $state);
 
 		$templateMgr->display($this->getTemplateResource("workflowJatsFulltext.tpl"));
