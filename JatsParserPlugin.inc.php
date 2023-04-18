@@ -122,7 +122,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$context = $request->getContext(); /* @var $context Journal */
 		$submission = Services::get('submission')->get($publication->getData('submissionId')); /* @var $submission Submission */
 		$issueDao = DAORegistry::getDAO('IssueDAO');
-		$issue = $issueDao->getBySubmissionId($submission->getId(), $context->getId());
+		$issue = $issueDao->getById($publication->getData('issueId'), $context->getId());
 
 		//$this->imageUrlReplacement($xmlGalley, $xpath);
 		//$this->ojsCitationsExtraction($article, $templateMgr, $htmlDocument, $request);
