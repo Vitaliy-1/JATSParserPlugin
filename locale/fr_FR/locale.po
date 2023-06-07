@@ -1,0 +1,113 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2022-02-04T12:00:00+00:00\n"
+"PO-Revision-Date: 2022-02-04T12:00:00+00:00\n"
+"Language: fr_FR\n"
+
+msgid "plugins.generic.jatsParser.displayName"
+msgstr "Plugiciel JATSParser"
+
+msgid "plugins.generic.jatsParser.description"
+msgstr "Ce plugiciel convertit un document JATS XML en HTML et en PDF affichables sur le site web de la revue"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocale"
+msgstr "Le texte intégral de l'article est disponible dans cette langue :"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocales"
+msgstr "Le texte intégral de l'article est disponible dans ces langues :"
+
+msgid "plugins.generic.jatsParser.workflow.settings"
+msgstr "Paramètres du JATS Parser"
+
+msgid "plugins.generic.jatsParser.settings.description"
+msgstr "Menu de paramétrage du plugiciel JATSParser"
+
+msgid "plugins.generic.jatsParser.settings.convert.pdf"
+msgstr "Activer la conversion du JATS XML en PDF"
+
+msgid "plugins.generic.jatsParser.galley.import"
+msgstr "Import des épreuves JATS XML"
+
+msgid "plugins.generic.jatsParser.galley.import.description"
+msgstr "Cette option permet d'extraire le texte intégral des épreuves JATS XML pour toutes les publications du journal. Les épreuves ayant déjà donné lieu à une extraction de texte intégral ne sont pas traitées. Le traitement débute aussitôt le formulaire validé."
+
+msgid "plugins.generic.jatsParser.galley.import.title"
+msgstr "Extraire le texte intégral à partir des épreuves"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext"
+msgstr "Texte intégral"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext.success"
+msgstr "Réussite du chargement du texte intégral"
+
+msgid "plugins.generic.jatsParser.publication.jats.label"
+msgstr "Extraction du texte intégral"
+
+msgid "plugins.generic.jatsParser.publication.jats.description"
+msgstr "Sélectionnez le fichier publiable au format JATS XML d'où extraire le texte intégral."
+
+msgid "plugins.generic.jatsParser.publication.jats.descriptionEmpty"
+msgstr "Aucun fichier JATS XML à afficher. Intégrez un fichier à l'étape \"Production\" et il apparaîtra ci-dessous pour extraction du texte intégral."
+
+msgid "plugins.generic.jatsParser.publication.jats.references.label"
+msgstr "Récupérer les références à partir du JATS XML ?"
+
+msgid "plugins.generic.jatsParser.publication.jats.references.description"
+msgstr "Les références seront extraites du JATS XML et sauvegardées au sein de la publication. Les références déjà intégrées à la publication seront écrasées."
+
+msgid "plugins.generic.jatsParser.publication.jats.pdf.label"
+msgstr "Créer une épreuve PDF ?"
+
+msgid "plugins.generic.jatsParser.publication.galley.pdf.label"
+msgstr "PDF"
+
+msgid "plugins.generic.jatsParser.style.acm-sig-proceedings"
+msgstr "ACM"
+
+msgid "plugins.generic.jatsParser.style.acs-nano"
+msgstr "ACS"
+
+msgid "plugins.generic.jatsParser.style.apa"
+msgstr "APA"
+
+msgid "plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas"
+msgstr "ABNT"
+
+msgid "plugins.generic.jatsParser.style.chicago-author-date"
+msgstr "Chicago"
+
+msgid "plugins.generic.jatsParser.style.harvard-cite-them-right"
+msgstr "Harvard"
+
+msgid "plugins.generic.jatsParser.style.ieee"
+msgstr "IEEE"
+
+msgid "plugins.generic.jatsParser.style.modern-language-association"
+msgstr "MLA"
+
+msgid "plugins.generic.jatsParser.style.turabian-fullnote-bibliography"
+msgstr "Turabian"
+
+msgid "plugins.generic.jatsParser.style.vancouver"
+msgstr "Vancouver"
+
+msgid "plugins.generic.jatsParser.style.custom"
+msgstr "Autres formats de référence"
+
+msgid "plugins.generic.jatsParser.style.description"
+msgstr "Le format des références extraites par le plugiciel. Pour les autres formats supportés, voir le <a target=\"_blank\" href=\"https://github.com/citation-style-language/styles\">CSL repository</a>."
+
+msgid "plugins.generic.jatsParser.style.label"
+msgstr "ex. : american-medical-association"
+
+msgid "plugins.generic.jatsParser.publication.jats.links.label"
+msgstr "Mettre en forme les liens vers les références trouvés dans le texte ?"
+
+
