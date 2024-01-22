@@ -1,0 +1,131 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2022-10-09 21:01+0000\n"
+"Last-Translator: Cyril Kamburov <cc@intermedia.bg>\n"
+"Language-Team: Bulgarian <http://translate.pkp.sfu.ca/projects/plugins/"
+"jatsParserPlugin/bg/>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.13.1\n"
+
+msgid "plugins.generic.jatsParser.displayName"
+msgstr "Плъгин JATSParser"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocale"
+msgstr "Пълният текст на статията е достъпен за този език:"
+
+msgid "plugins.generic.jatsParser.workflow.settings"
+msgstr "Настройки на JATS Parser"
+
+msgid "plugins.generic.jatsParser.settings.description"
+msgstr "Меню с настройки на плъгина JATSParser"
+
+msgid "plugins.generic.jatsParser.settings.covert.pdf"
+msgstr "Активиране преобразуването на JATS XML в PDF"
+
+msgid "plugins.generic.jatsParser.galley.import"
+msgstr "Импортиране на JATS XML типографии"
+
+msgid "plugins.generic.jatsParser.galley.import.title"
+msgstr "Импортиране на пълен текст от типографии"
+
+msgid "plugins.generic.jatsParser.galley.import.description"
+msgstr ""
+"Тази опция позволява да се запазят JATS XML типографии като пълен текст във "
+"всички публикации в списанието. Импортирането се пропуска, ако публикацията "
+"вече има пълен текст за дадена типография. Импортирането започва веднага "
+"след запазване на формата"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext"
+msgstr "Пълен текст"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext.success"
+msgstr "Успешно качване на пълен текст"
+
+msgid "plugins.generic.jatsParser.publication.jats.label"
+msgstr "Създаване на пълен текст"
+
+msgid "plugins.generic.jatsParser.publication.jats.description"
+msgstr ""
+"Изберете готов за производство файл във формат JATS XML, за да създадете "
+"пълния текст."
+
+msgid "plugins.generic.jatsParser.publication.jats.descriptionEmpty"
+msgstr ""
+"Списъкът с JATS XML файлове е празен. Моля, качете файла в производствения "
+"етап и той ще се появи по-долу за генериране на пълен текст."
+
+msgid "plugins.generic.jatsParser.publication.jats.references.label"
+msgstr "Извличане на препратки от JATS XML?"
+
+msgid "plugins.generic.jatsParser.publication.jats.references.description"
+msgstr ""
+"Референтният списък ще бъде извлечен от JATS XML и запазен като част от "
+"публикацията. Ако препратките вече са включени в публикацията, те ще бъдат "
+"пренаписани."
+
+msgid "plugins.generic.jatsParser.publication.jats.pdf.label"
+msgstr "Създаване на PDF типография?"
+
+msgid "plugins.generic.jatsParser.publication.galley.pdf.label"
+msgstr "PDF"
+
+msgid "plugins.generic.jatsParser.style.acm-sig-proceedings"
+msgstr "ACM"
+
+msgid "plugins.generic.jatsParser.style.acs-nano"
+msgstr "ACS"
+
+msgid "plugins.generic.jatsParser.style.apa"
+msgstr "APA"
+
+msgid "plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas"
+msgstr "ABNT"
+
+msgid "plugins.generic.jatsParser.style.chicago-author-date"
+msgstr "Чикаго"
+
+msgid "plugins.generic.jatsParser.style.harvard-cite-them-right"
+msgstr "Харвард"
+
+msgid "plugins.generic.jatsParser.style.ieee"
+msgstr "IEEE"
+
+msgid "plugins.generic.jatsParser.style.modern-language-association"
+msgstr "MLA"
+
+msgid "plugins.generic.jatsParser.style.turabian-fullnote-bibliography"
+msgstr "Турабиан"
+
+msgid "plugins.generic.jatsParser.style.vancouver"
+msgstr "Ванкувър"
+
+msgid "plugins.generic.jatsParser.style.custom"
+msgstr "Други формати за стил на цитиране"
+
+msgid "plugins.generic.jatsParser.style.label"
+msgstr "напр.: американска-медицинска-асоциация"
+
+msgid "plugins.generic.jatsParser.publication.jats.links.label"
+msgstr "Форматиране на връзки в текст към препратки?"
+
+msgid "plugins.generic.jatsParser.settings.convert.pdf"
+msgstr "Активиране на конвертирането на PDF"
+
+msgid "plugins.generic.jatsParser.description"
+msgstr ""
+"Плъгинът трансформира JATS XML в HTML и PDF за преглед в предния край на "
+"списанието"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocales"
+msgstr "Пълният текст на статията е достъпен за тези езици:"
+
+msgid "plugins.generic.jatsParser.style.description"
+msgstr ""
+"Форматът на стила за препратки, анализирани от плъгина. За други стилове "
+"посетете <a target=\"_blank\" href=\"https://github.com/"
+"citation-style-language/styles\">CSL хранилището</a>, за да видите дали се "
+"поддържа."
