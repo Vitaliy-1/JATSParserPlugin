@@ -132,9 +132,13 @@ class JatsParserPlugin extends GenericPlugin {
 		// get the logo
 		$journal = $request->getContext();
 		$thumb = $journal->getLocalizedData('journalThumbnail');
+		$logo = $journal->getLocalizedPageHeaderLogo();
 		if (!empty($thumb)) {
 			$journalFilesPath = __DIR__ . '/../../../' . Config::getVar('files', 'public_files_dir') . '/journals/' . $journal->getId() . '/'; // TCPDF accepts only relative path
 			$pdfHeaderLogo = $journalFilesPath . $thumb['uploadName'];
+			} elseif (!empty($logo)) {
+                                 $journalFilesPath = __DIR__ . '/../../../' . Config::getVar('files', 'public_files_dir') . '/journals/' $
+                                 $pdfHeaderLogo = $journalFilesPath . $logo['uploadName'];
 		} else {
 			$pdfHeaderLogo = __DIR__ . "/JATSParser/logo/logo.jpg";
 		}
