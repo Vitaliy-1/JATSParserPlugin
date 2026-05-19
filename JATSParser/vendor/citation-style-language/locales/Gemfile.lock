@@ -1,0 +1,47 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    csl (1.5.0)
+      namae (~> 1.0)
+    diff-lcs (1.3)
+    fuubar (2.3.1)
+      rspec-core (~> 3.0)
+      ruby-progressbar (~> 1.4)
+    mini_portile2 (2.3.0)
+    namae (1.0.1)
+    nokogiri (1.8.2)
+      mini_portile2 (~> 2.3.0)
+    nokogiri (1.8.2-x64-mingw32)
+      mini_portile2 (~> 2.3.0)
+    nokogiri (1.8.2-x86-mingw32)
+      mini_portile2 (~> 2.3.0)
+    rake (12.3.1)
+    rspec (3.7.0)
+      rspec-core (~> 3.7.0)
+      rspec-expectations (~> 3.7.0)
+      rspec-mocks (~> 3.7.0)
+    rspec-core (3.7.1)
+      rspec-support (~> 3.7.0)
+    rspec-expectations (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-mocks (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-support (3.7.1)
+    ruby-progressbar (1.9.0)
+
+PLATFORMS
+  ruby
+  x64-mingw32
+  x86-mingw32
+
+DEPENDENCIES
+  csl (~> 1.1)
+  fuubar
+  nokogiri
+  rake
+  rspec
+
+BUNDLED WITH
+   1.15.4

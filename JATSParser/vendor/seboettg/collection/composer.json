@@ -1,0 +1,40 @@
+{
+    "name": "seboettg/collection",
+    "description": "Collection is a set of useful PHP wrapper classes for arrays, similar to Java Collection. Contains ArrayList, Stack, Queue.",
+    "license": "MIT",
+    "keywords": [
+        "arraylist",
+        "sort",
+        "collections",
+        "comparable",
+        "array",
+        "oop",
+        "datastructures",
+        "basic-data-structures",
+        "stack",
+        "queue",
+        "comparator",
+        "filter",
+        "map",
+        "comparable-interface"
+    ],
+    "authors": [
+        {
+            "name": "Sebastian Böttger",
+            "email": "seboettg@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"Seboettg\\Collection\\": "src/"}
+    },
+    "autoload-dev": {
+        "psr-4": {"Seboettg\\Collection\\Test\\": "tests/"}
+    },
+    "require": {
+        "php": ">=7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "6.5.*",
+        "satooshi/php-coveralls": "2.*"
+    }
+}

@@ -11,8 +11,8 @@
  *
  */
 
-require_once('JatsParserPlugin.inc.php');
+require_once('JatsParserPlugin.php');
 
-return new JatsParserPlugin();
+return new \APP\plugins\generic\jatsParser\JatsParserPlugin();
 
 ?>

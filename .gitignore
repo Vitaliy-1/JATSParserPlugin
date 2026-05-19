@@ -1,2 +1,25 @@
+# SVN
+.svn/
+
+# Documentazione interna
+DOCUMENTAZIONE_OJS35.md
+
+
+# File di debug
+app/app-debug.js
+
+# OS
+Thumbs.db
+.DS_Store
+*:Zone.Identifier
+*.Identifier
+
+# IDE
 .idea/
-node_modules/
+.vscode/
+
+# Testing
+.phpunit.result.cache
+
+# Compiled locale
+locale/**/*.mo
