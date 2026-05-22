@@ -23,3 +23,6 @@ Thumbs.db
 
 # Compiled locale
 locale/**/*.mo
+
+# Submodules
+ JATSParser/vendor/
