@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" xml:lang="en">
+  <front>
+    <article-meta>
+      <title-group>
+        <article-title>Test Article for Unit Tests</article-title>
+      </title-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="sec-1">
+      <title>Introduction</title>
+      <p>This is a simple paragraph with no formatting.</p>
+      <p>This paragraph has <bold>bold text</bold> and <italic>italic text</italic>.</p>
+    </sec>
+    <sec id="sec-2">
+      <title>Methods</title>
+      <p>Paragraph in the second section.</p>
+    </sec>
+  </body>
+  <back>
+    <ref-list>
+      <ref id="ref-1">
+        <mixed-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name><surname>Smith</surname><given-names>J</given-names></name>
+          </person-group>
+          <article-title>A test article</article-title>
+          <source>Test Journal</source>
+          <year>2023</year>
+          <volume>1</volume>
+          <fpage>10</fpage>
+          <lpage>20</lpage>
+        </mixed-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>

@@ -1,0 +1,163 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-03-01T09:34:26+00:00\n"
+"PO-Revision-Date: 2026-05-17 10:32+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.1\n"
+
+msgid "plugins.generic.jatsParser.displayName"
+msgstr "Plugin JATSParser"
+
+msgid "plugins.generic.jatsParser.description"
+msgstr "Il plugin trasforma JATS XML in HTML e PDF per la visualizzazione nel front-end della rivista"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocale"
+msgstr "Il Full-text dell'articolo è disponibile in questa lingua:"
+
+msgid "plugins.generic.jatsParser.article.fulltext.availableLocales"
+msgstr "Il Full-text dell'articolo è disponibile in queste lingue:"
+
+msgid "plugins.generic.jatsParser.workflow.settings"
+msgstr "Impostazioni JATS Parser"
+
+msgid "plugins.generic.jatsParser.settings.description"
+msgstr "Menu impostazioni per plugin JATSParser"
+
+msgid "plugins.generic.jatsParser.settings.convert.pdf"
+msgstr "Attiva la conversione JATS XML a PDF"
+
+msgid "plugins.generic.jatsParser.galley.import"
+msgstr "Importazione delle bozze JATS XML"
+
+msgid "plugins.generic.jatsParser.galley.import.description"
+msgstr "Questa opzione consente di salvare le bozze JATS XML come full-text in tutte le pubblicazioni della rivista. L'importazione viene omessa se una pubblicazione ha già il Full-text per una determinata bozza. L'importazione inizia subito dopo il salvataggio del modulo."
+
+msgid "plugins.generic.jatsParser.galley.import.title"
+msgstr "Importazione di Full-text dalle bozze"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext"
+msgstr "Full Text"
+
+msgid "plugins.generic.jatsParser.publication.jats.fulltext.success"
+msgstr "Caricamento del Full-text completato con successo"
+
+msgid "plugins.generic.jatsParser.publication.jats.label"
+msgstr "Crea full text"
+
+msgid "plugins.generic.jatsParser.publication.jats.description"
+msgstr "Seleziona un file pronto per la produzione in formato JATS XML per creare il Full-text."
+
+msgid "plugins.generic.jatsParser.publication.jats.descriptionEmpty"
+msgstr "La lista dei files JATS XML è vuota. Carica il file nella fase di produzione e apparirà qui sotto per la generazione del Full-text."
+
+msgid "plugins.generic.jatsParser.publication.jats.references.label"
+msgstr "Recuperare i riferimenti bibliografici dal file JATS XML?"
+
+msgid "plugins.generic.jatsParser.publication.jats.references.description"
+msgstr "La lista dei riferimenti bibliografici verrà recuperata dal file JATS XML e salvata come parte della pubblicazione. Se i riferimenti sono già inclusi nella pubblicazione, verranno sovrascritti."
+
+msgid "plugins.generic.jatsParser.publication.jats.pdf.label"
+msgstr "Creare la bozza PDF?"
+
+msgid "plugins.generic.jatsParser.publication.galley.pdf.label"
+msgstr "PDF"
+
+msgid "plugins.generic.jatsParser.style.acm-sig-proceedings"
+msgstr "ACM"
+
+msgid "plugins.generic.jatsParser.style.acs-nano"
+msgstr "ACS"
+
+msgid "plugins.generic.jatsParser.style.apa"
+msgstr "APA"
+
+msgid "plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas"
+msgstr "ABNT"
+
+msgid "plugins.generic.jatsParser.style.chicago-author-date"
+msgstr "Chicago"
+
+msgid "plugins.generic.jatsParser.style.harvard-cite-them-right"
+msgstr "Harvard"
+
+msgid "plugins.generic.jatsParser.style.ieee"
+msgstr "IEEE"
+
+msgid "plugins.generic.jatsParser.style.modern-language-association"
+msgstr "MLA"
+
+msgid "plugins.generic.jatsParser.style.turabian-fullnote-bibliography"
+msgstr "Turabian"
+
+msgid "plugins.generic.jatsParser.style.vancouver"
+msgstr "Vancouver"
+
+msgid "plugins.generic.jatsParser.style.custom"
+msgstr "Altri formati di stile citazione"
+
+msgid "plugins.generic.jatsParser.style.description"
+msgstr "Il formato di stile per i riferimenti elaborati dal plugin. Per altri stili, visita il <a target=\"_blank\" href=\"https://github.com/citation-style-language/styles\">repository CSL</a> per verificare se è supportato."
+
+msgid "plugins.generic.jatsParser.style.label"
+msgstr "es.: american-medical-association"
+
+msgid "plugins.generic.jatsParser.publication.jats.links.label"
+msgstr "Formattare i links in-text come riferimenti?"
+
+msgid "plugins.generic.jatsParser.workflow.processed"
+msgstr "Il full text è stato processato dal JATS XML."
+
+msgid "plugins.generic.jatsParser.workflow.notProcessed"
+msgstr "Nessun full test JATS è stato ancora elaborato. Carica un file JATS XML nella sezione sopra per elaborarlo automaticamente, oppure usa il pulsante qui sotto se un file esiste già."
+
+msgid "plugins.generic.jatsParser.workflow.process"
+msgstr "Elabora JATS"
+
+msgid "plugins.generic.jatsParser.workflow.reprocess"
+msgstr "Rielabora JATS"
+
+msgid "plugins.generic.jatsParser.workflow.processSuccess"
+msgstr "File JATS elaborato con successo."
+
+msgid "plugins.generic.jatsParser.workflow.processError"
+msgstr "Si è verificato un errore durante l'elaborazione del file JATS."
+
+msgid "plugins.generic.jatsParser.workflow.noJatsFile"
+msgstr "Nessun file JATS trovato per questa pubblicazione."
+
+msgid "plugins.generic.jatsParser.workflow.clearFullText"
+msgstr "Removere Full Text"
+
+msgid "plugins.generic.jatsParser.workflow.clearSuccess"
+msgstr "Full text rimosso con successo. Il file JATS XML rimane in produzione."
+
+msgid "plugins.generic.jatsParser.workflow.clearError"
+msgstr "Si è verificato un errore durante la rimozione del full text."
+
+msgid "plugins.generic.jatsParser.workflow.confirmClear"
+msgstr "Sei sicuro di voler rimuovere il testo integrale elaborato? Il file JATS XML non verrà eliminato, verrà rimosso solo l'HTML generato."
+
+msgid "plugins.generic.jatsParser.workflow.tab.label"
+msgstr "JATS Full Text"
+
+msgid "plugins.generic.jatsParser.workflow.selectFile"
+msgstr "Selezionare un file XML dalla fase di produzione:"
+
+msgid "plugins.generic.jatsParser.workflow.noProductionFiles"
+msgstr "Nessun file XML trovato nella fase di produzione. Carica un file XML (Pronto per la produzione) e, facoltativamente, allega le immagini come file dipendenti."
+
+msgid "plugins.generic.jatsParser.workflow.currentlyProcessed"
+msgstr "attualmente elaborato"
+
+msgid "plugins.generic.jatsParser.workflow.assets.title"
+msgstr "Immagini allegate"
+
+msgid "plugins.generic.jatsParser.workflow.assets.uploadInfo"
+msgstr "Carica il file XML e allega le immagini come file dipendenti nella fase di produzione, quindi seleziona il file qui sopra."

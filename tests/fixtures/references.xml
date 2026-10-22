@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" xml:lang="en">
+  <front>
+    <article-meta>
+      <title-group>
+        <article-title>References Test</article-title>
+      </title-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="sec-1">
+      <title>Introduction</title>
+      <p>See references below.</p>
+    </sec>
+  </body>
+  <back>
+    <ref-list>
+      <ref id="ref-1">
+        <label>1</label>
+        <mixed-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name><surname>Smith</surname><given-names>John A.</given-names></name>
+            <name><surname>Doe</surname><given-names>Jane</given-names></name>
+          </person-group>.
+          <article-title>A groundbreaking study on JATS parsing</article-title>.
+          <source>Journal of XML Research</source>.
+          <year>2023</year>;
+          <volume>15</volume>(<issue>3</issue>):
+          <fpage>100</fpage>-<lpage>115</lpage>.
+          <pub-id pub-id-type="doi">10.1234/jxr.2023.001</pub-id>
+        </mixed-citation>
+      </ref>
+      <ref id="ref-2">
+        <label>2</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name><surname>Johnson</surname><given-names>Robert</given-names></name>
+          </person-group>
+          <source>XML Processing: A Complete Guide</source>
+          <publisher-name>Academic Press</publisher-name>
+          <publisher-loc>New York</publisher-loc>
+          <year>2022</year>
+          <pub-id pub-id-type="doi">10.5678/book.2022</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="ref-3">
+        <label>3</label>
+        <mixed-citation publication-type="chapter">
+          <person-group person-group-type="author">
+            <name><surname>Williams</surname><given-names>Amy</given-names></name>
+          </person-group>.
+          <chapter-title>JATS in the Modern Era</chapter-title>. In:
+          <person-group person-group-type="editor">
+            <name><surname>Brown</surname><given-names>David</given-names></name>
+          </person-group>, editor.
+          <source>Handbook of Scholarly Publishing</source>.
+          <publisher-name>University Press</publisher-name>;
+          <year>2021</year>. p.
+          <fpage>45</fpage>-<lpage>67</lpage>.
+        </mixed-citation>
+      </ref>
+      <ref id="ref-4">
+        <label>4</label>
+        <element-citation publication-type="confproc">
+          <person-group person-group-type="author">
+            <name><surname>Lee</surname><given-names>Min</given-names></name>
+            <collab>XML Working Group</collab>
+          </person-group>
+          <article-title>New approaches to JATS validation</article-title>
+          <conf-name>International Conference on Scholarly Communication</conf-name>
+          <conf-date>2023-06-15</conf-date>
+          <conf-loc>Berlin, Germany</conf-loc>
+          <pub-id pub-id-type="pmid">12345678</pub-id>
+        </element-citation>
+      </ref>
+    </ref-list>
+  </back>
+</article>

@@ -1,0 +1,54 @@
+{
+    "name": "doc/jatsparser",
+    "description": "JATS XML parser",
+    "type": "library",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "Vitaliy Bezsheiko",
+            "email": "vitaliybezsh@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "citation-style-language/locales",
+				"version":"1.0.0",
+				"source": {
+					"type": "git",
+					"url": "https://github.com/citation-style-language/locales.git",
+					"reference": "master"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "citation-style-language/styles-distribution",
+				"version":"1.0.0",
+				"source": {
+					"type": "git",
+					"url": "https://github.com/citation-style-language/styles-distribution.git",
+					"reference": "master"
+				}
+			}
+		}
+	],
+    "require": {
+        "php": "^8.2",
+        "tecnickcom/tcpdf": "^6.2.17",
+		"citation-style-language/locales":"@dev",
+		"citation-style-language/styles-distribution":"@dev",
+		"seboettg/citeproc-php": "^2"
+    },
+    "autoload": {
+        "psr-4": {
+            "JATSParser\\": "src/JATSParser"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    }
+}
