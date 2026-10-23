@@ -1,0 +1,8 @@
+[
+  "plugins.generic.jatsParser.workflow.processed",
+  "plugins.generic.jatsParser.workflow.notProcessed",
+  "plugins.generic.jatsParser.workflow.process",
+  "plugins.generic.jatsParser.workflow.reprocess",
+  "plugins.generic.jatsParser.workflow.processSuccess",
+  "plugins.generic.jatsParser.workflow.processError"
+]

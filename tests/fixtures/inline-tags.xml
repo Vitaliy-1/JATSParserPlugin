@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" xml:lang="en">
+  <front>
+    <article-meta>
+      <title-group>
+        <article-title>Inline Tags Test</article-title>
+      </title-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="sec-inline">
+      <title>Inline Tags</title>
+      <p>Text with <monospace>monospaced code</monospace> in it.</p>
+      <p>Text with <sc>small caps</sc> styling.</p>
+      <p>Text with <strike>strikethrough</strike> content.</p>
+      <p>Text with <named-content content-type="gene">BRCA1</named-content> annotation.</p>
+      <p>Text with <styled-content style="color:red">styled</styled-content> content.</p>
+      <p>Text with <abbrev>WHO</abbrev> abbreviation.</p>
+      <p>Text with <code>inline code</code> element.</p>
+      <p>Text with <comment>editorial comment</comment> annotation.</p>
+      <p>Text with <roman>roman text</roman> styling.</p>
+      <p>Text with <overline>overlined text</overline> decoration.</p>
+      <p>Contact: <email>test@example.com</email></p>
+      <p>Visit: <uri>https://example.com</uri></p>
+        <p>The formula <inline-formula>x + y = z</inline-formula> is famous.</p>
+      <p>The formula <inline-formula><tex-math>E = mc^2</tex-math></inline-formula> is famous.</p>
+      <p>See the image <inline-graphic xlink:href="figure1.png"/> in the text.</p>
+      <p>Combined <bold><italic>bold italic</italic></bold> text.</p>
+      <p>Nested <bold><sc>bold small caps</sc></bold> text.</p>
+    </sec>
+  </body>
+  <back/>
+</article>

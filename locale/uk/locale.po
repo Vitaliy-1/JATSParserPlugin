@@ -29,7 +29,7 @@ msgstr "Налаштування JATS парсера"
 msgid "plugins.generic.jatsParser.settings.description"
 msgstr "Форма налаштувань для плагіна JATSParser"
 
-msgid "plugins.generic.jatsParser.settings.covert.pdf"
+msgid "plugins.generic.jatsParser.settings.convert.pdf"
 msgstr "Активувати перетворення JATS XML в PDF"
 
 msgid "plugins.generic.jatsParser.galley.import"
@@ -67,45 +67,6 @@ msgstr "Створити PDF гранку?"
 
 msgid "plugins.generic.jatsParser.publication.galley.pdf.label"
 msgstr "PDF"
-
-msgid "plugins.generic.jatsParser.style.acm-sig-proceedings"
-msgstr "ACM"
-
-msgid "plugins.generic.jatsParser.style.acs-nano"
-msgstr "ACS"
-
-msgid "plugins.generic.jatsParser.style.apa"
-msgstr "APA"
-
-msgid "plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas"
-msgstr "ABNT"
-
-msgid "plugins.generic.jatsParser.style.chicago-author-date"
-msgstr "Chicago"
-
-msgid "plugins.generic.jatsParser.style.harvard-cite-them-right"
-msgstr "Harvard"
-
-msgid "plugins.generic.jatsParser.style.ieee"
-msgstr "IEEE"
-
-msgid "plugins.generic.jatsParser.style.modern-language-association"
-msgstr "MLA"
-
-msgid "plugins.generic.jatsParser.style.turabian-fullnote-bibliography"
-msgstr "Turabian"
-
-msgid "plugins.generic.jatsParser.style.vancouver"
-msgstr "Vancouver"
-
-msgid "plugins.generic.jatsParser.style.custom"
-msgstr "Інші стилі цитувань"
-
-msgid "plugins.generic.jatsParser.style.description"
-msgstr "Стиль цитування для посилань, який буде використовуватись плагіном. Для інших стилів цитувань зверніть увагу на <a target=\"_blank\" href=\"https://github.com/citation-style-language/styles\">CSL репозиторій</a>, щоб упевнитись що він підтримується."
-
-msgid "plugins.generic.jatsParser.style.label"
-msgstr "наприклад: american-medical-association"
 
 msgid "plugins.generic.jatsParser.publication.jats.links.label"
 msgstr "Відформатувати посилання на бібліографічний список в тексті статті?"

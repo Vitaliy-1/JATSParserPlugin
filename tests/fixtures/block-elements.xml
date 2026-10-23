@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" xml:lang="en">
+  <front>
+    <article-meta>
+      <title-group>
+        <article-title>Block Elements Test</article-title>
+      </title-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="sec-blocks">
+      <title>Block Elements</title>
+
+      <boxed-text>
+        <p>This is content inside a boxed text element.</p>
+        <p>It can contain multiple paragraphs.</p>
+      </boxed-text>
+
+      <def-list>
+        <title>Glossary</title>
+        <def-item>
+          <term>API</term>
+          <def><p>Application Programming Interface</p></def>
+        </def-item>
+        <def-item>
+          <term>XML</term>
+          <def><p>Extensible Markup Language</p></def>
+        </def-item>
+      </def-list>
+
+      <preformat>
+function hello() {
+    return "world";
+}
+      </preformat>
+
+      <code>
+SELECT * FROM articles WHERE status = 'published';
+      </code>
+
+      <disp-formula id="eq-1">
+        <label>(1)</label>
+        <tex-math>E = mc^2</tex-math>
+      </disp-formula>
+
+      <disp-formula id="eq-2">
+        <label>(2)</label>
+        <tex-math>\sum_{i=1}^{n} x_i = x_1 + x_2 + \cdots + x_n</tex-math>
+      </disp-formula>
+
+      <p>A regular paragraph between block elements.</p>
+
+      <disp-quote>
+        <p>This is a block quote with attribution.</p>
+        <attrib>Famous Author</attrib>
+      </disp-quote>
+
+    </sec>
+  </body>
+  <back/>
+</article>
