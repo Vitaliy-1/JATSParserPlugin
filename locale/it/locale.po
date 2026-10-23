@@ -69,45 +69,6 @@ msgstr "Creare la bozza PDF?"
 msgid "plugins.generic.jatsParser.publication.galley.pdf.label"
 msgstr "PDF"
 
-msgid "plugins.generic.jatsParser.style.acm-sig-proceedings"
-msgstr "ACM"
-
-msgid "plugins.generic.jatsParser.style.acs-nano"
-msgstr "ACS"
-
-msgid "plugins.generic.jatsParser.style.apa"
-msgstr "APA"
-
-msgid "plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas"
-msgstr "ABNT"
-
-msgid "plugins.generic.jatsParser.style.chicago-author-date"
-msgstr "Chicago"
-
-msgid "plugins.generic.jatsParser.style.harvard-cite-them-right"
-msgstr "Harvard"
-
-msgid "plugins.generic.jatsParser.style.ieee"
-msgstr "IEEE"
-
-msgid "plugins.generic.jatsParser.style.modern-language-association"
-msgstr "MLA"
-
-msgid "plugins.generic.jatsParser.style.turabian-fullnote-bibliography"
-msgstr "Turabian"
-
-msgid "plugins.generic.jatsParser.style.vancouver"
-msgstr "Vancouver"
-
-msgid "plugins.generic.jatsParser.style.custom"
-msgstr "Altri formati di stile citazione"
-
-msgid "plugins.generic.jatsParser.style.description"
-msgstr "Il formato di stile per i riferimenti elaborati dal plugin. Per altri stili, visita il <a target=\"_blank\" href=\"https://github.com/citation-style-language/styles\">repository CSL</a> per verificare se è supportato."
-
-msgid "plugins.generic.jatsParser.style.label"
-msgstr "es.: american-medical-association"
-
 msgid "plugins.generic.jatsParser.publication.jats.links.label"
 msgstr "Formattare i links in-text come riferimenti?"
 

@@ -16,8 +16,6 @@ require_once __DIR__ . '/JATSParser/vendor/autoload.php';
 use APP\core\Application;
 use APP\facades\Repo;
 use APP\template\TemplateManager;
-use APP\plugins\generic\jatsParser\classes\JATSParserDocument;
-use PKP\citation\CitationDAO;
 use PKP\citation\CitationListTokenizerFilter;
 use PKP\config\Config;
 use PKP\db\DAORegistry;
@@ -441,62 +439,6 @@ class JatsParserPlugin extends GenericPlugin
     }
 
     /**
-     * @param \APP\journal\Journal $context Journal
-     * @return string
-     * @brief Retrieve citation style format
-     */
-    public function getCitationStyle($context): string
-    {
-        $contextId = $context->getId();
-
-        $citationStyle = $this->getSetting($contextId, 'citationStyle');
-        if ($citationStyle) {
-            return $citationStyle;
-        }
-
-        $pluginSettingsDAO = DAORegistry::getDAO('PluginSettingsDAO');
-        $cslPluginSettings = $pluginSettingsDAO->getPluginSettings($contextId, 'CitationStyleLanguagePlugin');
-
-        if ($cslPluginSettings &&
-            array_key_exists('enabled', $cslPluginSettings) &&
-            $cslPluginSettings['enabled'] &&
-            array_key_exists('primaryCitationStyle', $cslPluginSettings) &&
-            $cslPrimaryCitStyle = $cslPluginSettings['primaryCitationStyle']
-        ) {
-            $citationStyle = $cslPrimaryCitStyle;
-        }
-
-        if ($citationStyle) {
-            return $citationStyle;
-        }
-
-        $lastCslKey = array_key_last(self::getSupportedCitationStyles());
-        return self::getSupportedCitationStyles()[$lastCslKey]['id']; // vancouver
-    }
-
-    /**
-     * @param HTMLDocument $htmlDocument
-     * @param \APP\publication\Publication $newPublication
-     * @return void
-     * @brief saves parsed citeproc references as raw citations
-     */
-    private function _importCitations(HTMLDocument $htmlDocument, $newPublication): void
-    {
-        $refs = $htmlDocument->getRawReferences();
-        $publicationId = $newPublication->getId();
-        $citationDao = DAORegistry::getDAO('CitationDAO');
-
-        $citationDao->deleteByPublicationId($publicationId);
-        $rawCitations = '';
-
-        foreach ($refs as $key => $ref) {
-            $rawCitations .= $ref . "\n";
-        }
-
-        $newPublication->setData('citationsRaw', $rawCitations);
-    }
-
-    /**
      * @param SubmissionFile $submissionFile
      * @return HTMLDocument
      * @brief retrieves PHP DOM representation of the article's full-text
@@ -664,22 +606,6 @@ class JatsParserPlugin extends GenericPlugin
         return [
             'image/png',
             'image/jpeg',
-        ];
-    }
-
-    public static function getSupportedCitationStyles(): array
-    {
-        return [
-            ['id' => 'acm-sig-proceedings', 'title' => 'plugins.generic.jatsParser.style.acm-sig-proceedings'],
-            ['id' => 'acs-nano', 'title' => 'plugins.generic.jatsParser.style.acs-nano'],
-            ['id' => 'apa', 'title' => 'plugins.generic.jatsParser.style.apa'],
-            ['id' => 'associacao-brasileira-de-normas-tecnicas', 'title' => 'plugins.generic.jatsParser.style.associacao-brasileira-de-normas-tecnicas'],
-            ['id' => 'chicago-author-date', 'title' => 'plugins.generic.jatsParser.style.chicago-author-date'],
-            ['id' => 'harvard-cite-them-right', 'title' => 'plugins.generic.jatsParser.style.harvard-cite-them-right'],
-            ['id' => 'ieee', 'title' => 'plugins.generic.jatsParser.style.ieee'],
-            ['id' => 'modern-language-association', 'title' => 'plugins.generic.jatsParser.style.modern-language-association'],
-            ['id' => 'turabian-fullnote-bibliography', 'title' => 'plugins.generic.jatsParser.style.turabian-fullnote-bibliography'],
-            ['id' => 'vancouver', 'title' => 'plugins.generic.jatsParser.style.vancouver'],
         ];
     }
 

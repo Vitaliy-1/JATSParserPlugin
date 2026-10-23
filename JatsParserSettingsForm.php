@@ -40,12 +40,11 @@ class JatsParserSettingsForm extends Form
         $plugin = $this->_plugin;
 
         $this->setData('convertToPdf', $plugin->getSetting($contextId, 'convertToPdf'));
-        $this->setData('citationStyle', $plugin->getSetting($contextId, 'citationStyle'));
     }
 
     public function readInputData(): void
     {
-        $this->readUserVars(['convertToPdf', 'citationStyle', 'customStyleInput', 'galleysImport']);
+        $this->readUserVars(['convertToPdf', 'galleysImport']);
     }
 
     public function fetch($request, $template = null, $display = false)
@@ -53,7 +52,6 @@ class JatsParserSettingsForm extends Form
         $templateMgr = \APP\template\TemplateManager::getManager($request);
         $templateMgr->assign([
             'pluginName' => $this->_plugin->getName(),
-            'citationStyles' => $this->_plugin::getSupportedCitationStyles(),
         ]);
         return parent::fetch($request, $template, $display);
     }
@@ -65,13 +63,6 @@ class JatsParserSettingsForm extends Form
 
         $convertToPdf = (bool) $this->getData('convertToPdf');
         $plugin->updateSetting($contextId, 'convertToPdf', $convertToPdf);
-
-        $citationStyle = $this->getData('citationStyle');
-        if ($citationStyle === 'customStyle') {
-            $plugin->updateSetting($contextId, 'citationStyle', $this->getData('customStyleInput'));
-        } else {
-            $plugin->updateSetting($contextId, 'citationStyle', $citationStyle);
-        }
 
         if ($this->getData('galleysImport')) {
             $plugin->importGalleys();
