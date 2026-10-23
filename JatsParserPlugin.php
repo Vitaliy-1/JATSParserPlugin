@@ -311,8 +311,10 @@ class JatsParserPlugin extends GenericPlugin
             $pdf = $this->pdfCreation($fullText, $newPublication, $request, $localeKey);
 
             // Riusa la galley esistente o creane una nuova
+            $oldSubmissionFileId = null;
             if ($existingGalley) {
                 $galley = $existingGalley;
+                $oldSubmissionFileId = $galley->getData('submissionFileId');
             } else {
                 $galleyId = $this->createGalley($localeKey, $newPublication);
                 $galley = Repo::galley()->get($galleyId);
@@ -322,6 +324,13 @@ class JatsParserPlugin extends GenericPlugin
             $submissionFile = $this->_setPdfSubmissionFile($pdf, $newPublication, $galley, $localeKey);
             if ($submissionFile) {
                 Repo::galley()->edit($galley, ['submissionFileId' => $submissionFile->getId()]);
+                // Rimuove il PDF precedente della galley, ora non più referenziato
+                if ($oldSubmissionFileId && (int) $oldSubmissionFileId !== $submissionFile->getId()) {
+                    $oldSubmissionFile = Repo::submissionFile()->get((int) $oldSubmissionFileId);
+                    if ($oldSubmissionFile) {
+                        Repo::submissionFile()->delete($oldSubmissionFile);
+                    }
+                }
             } else {
                 Repo::galley()->delete($galley);
             }
